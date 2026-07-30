@@ -1,0 +1,11 @@
+{
+  "name": "Remix CURA",
+  "description": "CURA is an AI-powered healthcare platform that helps doctors manage patients, generate prescriptions, and analyze drug interactions.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

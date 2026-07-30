@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-cura-primary: var(--cura-primary);
+  --color-cura-primary-dark: var(--cura-primary-dark);
+  --color-cura-primary-light: var(--cura-primary-light);
+  --color-cura-secondary: var(--cura-secondary);
+  --color-cura-accent: var(--cura-accent);
+  --color-cura-text: #0F172A;
+  --color-cura-text-secondary: #475569;
+  --color-cura-text-muted: #94A3B8;
+  --color-cura-bg-subtle: var(--cura-bg-subtle);
+  --color-cura-border: #E2E8F0;
+  
+  --color-cura-success: #22C55E;
+  --color-cura-warning: #F59E0B;
+  --color-cura-error: #EF4444;
+  --color-cura-info: #8B5CF6;
+}
+
+:root {
+  --cura-primary: #0EA5E9;
+  --cura-primary-dark: #0C4A6E;
+  --cura-primary-light: #38BDF8;
+  --cura-secondary: #10B981;
+  --cura-accent: #EF4444;
+  --cura-text: #0F172A;
+  --cura-text-secondary: #475569;
+  --cura-text-muted: #94A3B8;
+  --cura-background: #FFFFFF;
+  --cura-background-subtle: #F8FAFC;
+  --cura-border: #E2E8F0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--cura-bg-subtle, #ffffff);
+  color: #0F172A;
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom animation utils */
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.pulse-dot {
+  animation: pulse-opacity 2s infinite;
+}
+
+.gradient-text-cura {
+  background: linear-gradient(135deg, var(--cura-primary), var(--cura-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-bg-cura {
+  background: linear-gradient(135deg, var(--cura-primary-dark) 0%, var(--cura-primary) 100%);
+}
+
+.gradient-btn-cura {
+  background: linear-gradient(135deg, var(--cura-primary), var(--cura-secondary));
+}
+
+.shadow-glow-cura {
+  box-shadow: 0 0 40px var(--cura-primary);
+}
+
+.shadow-glow-cta {
+  box-shadow: 0 20px 60px var(--cura-primary);
+}
