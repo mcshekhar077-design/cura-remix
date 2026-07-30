@@ -28,6 +28,7 @@ import DentistrySuite from "./components/DentistrySuite";
 import PhysiologySuite from "./components/PhysiologySuite";
 import ThemeSelectorWidget, { ThemeProvider } from "./components/ThemeSelector";
 import OfflineSyncEngine from "./components/OfflineSyncEngine";
+import GlobalEmergencySOS from "./components/GlobalEmergencySOS";
 
 type ViewState = "landing" | "dashboard" | "admin" | "patient" | "pharmacy" | "ayush" | "mr" | "mental_health" | "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ai_core" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "analytics" | "dentistry" | "physiology";
 
@@ -216,6 +217,11 @@ export default function App() {
 
       {/* Global Offline Storage Sink & Auto-Sync Engine */}
       <OfflineSyncEngine />
+
+      {/* Global Emergency SOS Floating Action Button */}
+      <GlobalEmergencySOS 
+        onNavigateToEmergency={() => navigateTo("emergency")}
+      />
     </ThemeProvider>
   );
 }

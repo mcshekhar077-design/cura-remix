@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "EmergencySosAlert": {
+      "title": "Emergency SOS Alert",
+      "description": "Emergency SOS alerts triggered via the 3-second hold Global Emergency SOS button.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "ticketNumber": { "type": "string", "maxLength": 64 },
+        "patientName": { "type": "string", "maxLength": 128 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "holdDurationMs": { "type": "number" },
+        "triggerSource": { "type": "string", "maxLength": 256 },
+        "priority": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "location": { "type": "object" },
+        "notes": { "type": "array" },
+        "cancellationReason": { "type": "string", "maxLength": 256 }
+      },
+      "required": ["ticketNumber", "patientName", "phone", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/emergencySosAlerts/{alertId}": {
+      "schema": "EmergencySosAlert",
+      "description": "Emergency SOS tickets dispatched to the clinic emergency desk."
+    }
+  }
+}

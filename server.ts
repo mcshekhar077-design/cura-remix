@@ -5055,6 +5055,99 @@ async function startServer() {
     }
   });
 
+  // === GLOBAL EMERGENCY SOS API ENDPOINTS ===
+  const globalEmergencySosStore: Array<{
+    id: string;
+    ticketNumber: string;
+    patientName: string;
+    phone: string;
+    holdDurationMs: number;
+    triggerSource: string;
+    priority: string;
+    status: string;
+    createdAt: string;
+    location?: any;
+    notes?: string[];
+    cancellationReason?: string;
+  }> = [];
+
+  // POST Trigger Global Emergency SOS Alert (3-second hold confirmation)
+  app.post("/api/v1/emergency/sos", (req, res) => {
+    try {
+      const { id, ticketNumber, patientName, phone, holdDurationMs, triggerSource, priority, location } = req.body;
+      
+      const newAlert = {
+        id: id || `sos-${Date.now()}`,
+        ticketNumber: ticketNumber || `SOS-ER-${Math.floor(1000 + Math.random() * 9000)}`,
+        patientName: patientName || "Vikram Malhotra",
+        phone: phone || "+91 98765 43210",
+        holdDurationMs: holdDurationMs || 3000,
+        triggerSource: triggerSource || "Global Floating Action SOS Button (3s Hold)",
+        priority: priority || "CRITICAL_RED",
+        status: "acknowledged",
+        createdAt: new Date().toISOString(),
+        location: location || { latitude: 17.4485, longitude: 78.3741, address: "CURA HQ Emergency Zone" },
+        notes: []
+      };
+
+      globalEmergencySosStore.unshift(newAlert);
+      logAudit("CREATE", "emergency_sos", newAlert.id, `CRITICAL EMERGENCY SOS TRIGGERED by ${newAlert.patientName} after ${newAlert.holdDurationMs}ms hold. Dispatched to ER Desk.`, req);
+
+      return res.status(201).json({
+        success: true,
+        message: "Emergency Desk notified immediately. ER team dispatched.",
+        alert: newAlert
+      });
+    } catch (e: any) {
+      return res.status(500).json({ detail: e.message || "Failed to trigger emergency SOS" });
+    }
+  });
+
+  // GET List all active Global Emergency SOS Alerts
+  app.get("/api/v1/emergency/sos", (req, res) => {
+    return res.status(200).json(globalEmergencySosStore);
+  });
+
+  // POST Add urgent doctor/patient note to active SOS alert
+  app.post("/api/v1/emergency/sos/:id/note", (req, res) => {
+    try {
+      const { id } = req.params;
+      const { note } = req.body;
+      const alert = globalEmergencySosStore.find(a => a.id === id);
+      if (!alert) {
+        return res.status(404).json({ detail: "Emergency SOS ticket not found" });
+      }
+
+      alert.notes = alert.notes || [];
+      alert.notes.push(`${new Date().toLocaleTimeString()}: ${note}`);
+      logAudit("UPDATE", "emergency_sos", alert.id, `Added clinical note to SOS ticket ${alert.ticketNumber}: ${note}`, req);
+
+      return res.status(200).json({ success: true, alert });
+    } catch (e: any) {
+      return res.status(500).json({ detail: e.message });
+    }
+  });
+
+  // POST Cancel active Emergency SOS (False alarm resolution)
+  app.post("/api/v1/emergency/sos/:id/cancel", (req, res) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      const alert = globalEmergencySosStore.find(a => a.id === id);
+      if (!alert) {
+        return res.status(404).json({ detail: "Emergency SOS ticket not found" });
+      }
+
+      alert.status = "cancelled";
+      alert.cancellationReason = reason || "User cancelled false alarm";
+      logAudit("UPDATE", "emergency_sos", alert.id, `Cancelled SOS ticket ${alert.ticketNumber}: ${alert.cancellationReason}`, req);
+
+      return res.status(200).json({ success: true, alert });
+    } catch (e: any) {
+      return res.status(500).json({ detail: e.message });
+    }
+  });
+
   // GET verify a secure share code and return patient details
   app.get("/api/v1/family-shares/verify/:code", (req, res) => {
     try {

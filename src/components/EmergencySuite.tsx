@@ -140,6 +140,34 @@ export function EmergencySuite({
       "1. Immediate 30 mL/kg IV Crystalloid Bolus (2,000 mL Plasma-Lyte) started via dual large-bore IVs.\n2. Initiate IV Norepinephrine infusion titrated to maintain MAP ≥65 mmHg.\n3. STAT Blood Cultures x2 & Sputum Culture followed by Broad-Spectrum IV Antibiotics: Meropenem 1g IV + Vancomycin 1.5g IV within 1 Hour Sepsis Bundle.\n4. ICU Bed Transfer for invasive arterial line monitoring and Non-Invasive Ventilation / Intubation readiness.\n5. Repeat Serum Lactate and ABG in 2 hours."
   });
 
+  // Global SOS Alerts Queue State
+  const [activeSosQueue, setActiveSosQueue] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const loadSosAlerts = () => {
+      try {
+        const stored = JSON.parse(localStorage.getItem("cura_active_sos_alerts") || "[]");
+        setActiveSosQueue(stored.filter((item: any) => item.status !== "cancelled"));
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    loadSosAlerts();
+
+    const handleSosTriggered = (e: any) => {
+      loadSosAlerts();
+    };
+
+    window.addEventListener("cura-emergency-sos-triggered", handleSosTriggered);
+    window.addEventListener("cura-emergency-sos-cancelled", handleSosTriggered);
+
+    return () => {
+      window.removeEventListener("cura-emergency-sos-triggered", handleSosTriggered);
+      window.removeEventListener("cura-emergency-sos-cancelled", handleSosTriggered);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans p-3 sm:p-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-4">
@@ -177,6 +205,40 @@ export function EmergencySuite({
             <span>AI Sepsis & ICU Resuscitation Engine Active</span>
           </div>
         </div>
+
+        {/* Global Floating SOS Incoming Alerts Ticker Banner */}
+        {activeSosQueue.length > 0 && (
+          <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white p-4 rounded-2xl shadow-2xl border-2 border-red-400/80 animate-pulse space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-black text-sm uppercase tracking-wider">
+                <Zap className="w-5 h-5 text-amber-300 animate-bounce" />
+                <span>INCOMING GLOBAL EMERGENCY SOS CALLS ({activeSosQueue.length})</span>
+              </div>
+              <span className="text-xs bg-black/30 px-2.5 py-1 rounded-full font-mono font-bold text-red-100">
+                LIVE DESK DISPATCH
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+              {activeSosQueue.map((sos, idx) => (
+                <div key={sos.id || idx} className="bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/20 text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-amber-200">#{sos.ticketNumber} • {sos.patientName}</span>
+                    <span className="text-[10px] font-mono text-red-200">{sos.phone}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-200">
+                    Triggered via: <strong className="text-white">{sos.triggerSource}</strong> ({sos.holdDurationMs}ms Hold)
+                  </p>
+                  {sos.location && (
+                    <p className="text-[10px] text-slate-300 font-mono">
+                      Location: {sos.location.address || `${sos.location.latitude}, ${sos.location.longitude}`}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Patient Profile & Critical Status Banner */}
         <div className="bg-gradient-to-r from-red-950/60 via-slate-800 to-slate-900 border border-red-900/40 p-4 rounded-xl flex flex-wrap items-center justify-between gap-4">
