@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import AIHealthcareSuite from "./AIHealthcareSuite";
+import HealthMemoryCompanion from "./HealthMemoryCompanion";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   User, 
@@ -55,7 +56,8 @@ import {
   Camera,
   RotateCw,
   Square,
-  Volume2
+  Volume2,
+  Brain
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { 
@@ -99,8 +101,8 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   
-  // Tabs: "home" | "schedule" | "rx" | "history" | "profile" | "vision" | "ai_suite"
-  const [activeTab, setActiveTab] = useState<"home" | "schedule" | "rx" | "history" | "profile" | "vision" | "ai_suite">("home");
+  // Tabs: "home" | "schedule" | "rx" | "history" | "profile" | "vision" | "ai_suite" | "companion"
+  const [activeTab, setActiveTab] = useState<"home" | "schedule" | "rx" | "history" | "profile" | "vision" | "ai_suite" | "companion">("home");
   
   // Login / Auth states
   const [loginInput, setLoginInput] = useState("");
@@ -3151,7 +3153,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                       </div>
 
                       {/* Bottom Custom Tab Bar Navigation */}
-                      <div className="bg-slate-950/95 border-t border-slate-800/80 grid grid-cols-7 py-2 px-1 shrink-0 z-10 pb-4">
+                      <div className="bg-slate-950/95 border-t border-slate-800/80 grid grid-cols-8 py-2 px-1 shrink-0 z-10 pb-4">
                         <button
                           onClick={() => { setActiveTab("home"); setRxUnlocked(false); }}
                           className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${
@@ -3159,7 +3161,17 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                           }`}
                         >
                           <Activity className="h-4.5 w-4.5" />
-                          <span className="text-[9px] font-bold">Health</span>
+                          <span className="text-[8.5px] font-bold truncate">Health</span>
+                        </button>
+
+                        <button
+                          onClick={() => { setActiveTab("companion"); }}
+                          className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${
+                            activeTab === "companion" ? "text-teal-400 font-extrabold" : "text-teal-400/70 hover:text-teal-300"
+                          }`}
+                        >
+                          <Brain className="h-4.5 w-4.5 text-teal-400 animate-pulse" />
+                          <span className="text-[8.5px] font-bold truncate">Memory</span>
                         </button>
 
                         <button
@@ -3169,7 +3181,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                           }`}
                         >
                           <Lock className="h-4.5 w-4.5" />
-                          <span className="text-[9px] font-bold">Rx Vault</span>
+                          <span className="text-[8.5px] font-bold truncate">Rx Vault</span>
                         </button>
 
                         <button
@@ -3386,6 +3398,23 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                           </div>
                           <span className="bg-amber-400 text-slate-950 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full">
                             RPM & AI
+                          </span>
+                        </button>
+
+                        <button
+                          onClick={() => setActiveTab("companion")}
+                          className={`w-full text-left p-3 rounded-2xl font-black text-xs transition-all flex items-center justify-between border cursor-pointer ${
+                            activeTab === "companion"
+                              ? "bg-gradient-to-r from-teal-600 to-emerald-600 text-white border-teal-400 shadow-lg shadow-teal-950/80 scale-[1.02]"
+                              : "bg-teal-950/40 text-teal-300 border-teal-500/30 hover:bg-teal-900/60"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Brain className="h-4 w-4 text-teal-300 animate-pulse" />
+                            <span>🧬 Health Memory & AI Companion</span>
+                          </div>
+                          <span className="bg-teal-400 text-slate-950 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full">
+                            8 Pillars
                           </span>
                         </button>
 
@@ -5848,6 +5877,16 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         );
       }
 
+      case "companion": {
+        return (
+          <HealthMemoryCompanion
+            patientName={selectedPatient.name}
+            patientId={selectedPatient.id}
+            onBack={() => setActiveTab("home")}
+          />
+        );
+      }
+
       case "home": {
         const notificationApt = getNotificationAppointment();
         const latestVitals = vitalsHistory[vitalsHistory.length - 1];
@@ -6070,6 +6109,43 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 </div>
               </div>
             )}
+
+            {/* HEALTH MEMORY & AI COMPANION PROMINENT BANNER */}
+            <div 
+              onClick={() => setActiveTab("companion")}
+              className="bg-gradient-to-r from-teal-950/90 via-slate-900 to-emerald-950/90 border-2 border-teal-500/40 p-4 rounded-2xl shadow-xl cursor-pointer hover:border-teal-400 transition-all group relative overflow-hidden my-1"
+            >
+              <div className="absolute -right-4 -bottom-4 opacity-10 text-teal-300 pointer-events-none">
+                <Brain className="h-28 w-28" />
+              </div>
+              <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-teal-500/20 text-teal-300 rounded-xl border border-teal-500/30 group-hover:scale-105 transition-transform shrink-0">
+                    <Brain className="h-5 w-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[8.5px] font-black uppercase tracking-widest text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">
+                        8 Health Pillars
+                      </span>
+                      <span className="text-[8.5px] font-bold text-amber-300 flex items-center gap-1">
+                        <Sparkles className="h-3 w-3" /> AI Active Companion
+                      </span>
+                    </div>
+                    <h3 className="text-xs font-black text-white mt-1 group-hover:text-teal-200 transition-colors">
+                      Health Memory & AI Companion
+                    </h3>
+                    <p className="text-[9.5px] text-slate-300 mt-0.5 max-w-xs leading-tight">
+                      Prescription Reader, Voice Log, Diet & Workout, EHR Vault & Emergency Protocols
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-black text-teal-300 bg-teal-950/80 border border-teal-500/30 px-2.5 py-1.5 rounded-xl group-hover:bg-teal-500 group-hover:text-slate-950 transition-all shrink-0">
+                  <span>Open Companion</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </div>
+              </div>
+            </div>
 
             {/* UNIFIED HOME VIEW DASHBOARD */}
             <PatientDashboard 

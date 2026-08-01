@@ -1,6 +1,6 @@
 {
   "name": "Remix CURA",
-  "description": "CURA is an AI-powered healthcare platform that helps doctors manage patients, generate prescriptions, and analyze drug interactions.",
+  "description": "CURA is an AI-powered healthcare platform featuring Phase 2 AI Care Team multi-agent orchestration, lifetime health memory, AI Personal Health Record (PHR), remote monitoring with wearable telemetry, and doctor visit preparation.",
   "requestFramePermissions": [
     "microphone",
     "camera"

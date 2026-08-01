@@ -23,12 +23,349 @@ import {
   Camera,
   Tag,
   Dna,
-  Heart
+  Heart,
+  Users,
+  Bot,
+  UserCheck,
+  ChevronRight,
+  ShieldCheck,
+  ArrowRight,
+  Download,
+  Volume2,
+  Apple,
+  Lightbulb
 } from "lucide-react";
 
 export interface SharedAICoreSuiteProps {
   onBackToLanding?: () => void;
   initialSpecialty?: string;
+}
+
+// ============================================================
+// AI CARE TEAM & COORDINATOR AGENT ARCHITECTURE TYPES & ENGINE
+// ============================================================
+
+export interface AgentEvaluation {
+  agentId: string;
+  agentName: string;
+  specialty: string;
+  findings: string;
+  recommendations: string[];
+  confidence: number;
+  urgency: "low" | "moderate" | "high" | "critical";
+}
+
+export interface UnifiedCareTeamResponse {
+  query: string;
+  timestamp: string;
+  coordinatorSummary: string;
+  primarySpecialty: string;
+  routedAgents: AgentEvaluation[];
+  actionPlan: {
+    category: "Medication & Safety" | "Vitals & Diagnostics" | "Diet & Lifestyle" | "Red Flags & Follow-up";
+    item: string;
+    sourceAgent: string;
+  }[];
+  overallConfidence: number;
+  safetyDisclaimer: string;
+}
+
+// Specialized Agents Definition
+const SPECIALIST_ROSTER = [
+  {
+    id: "cardiology",
+    name: "Cardiology AI",
+    specialty: "Cardiovascular Medicine",
+    icon: Heart,
+    avatarBg: "bg-rose-600",
+    color: "text-rose-400",
+    keywords: ["heart", "bp", "blood pressure", "chest pain", "ecg", "edema", "dyspnea", "palpitation", "hypertension", "hfref", "cad", "arrhythmia"],
+    evaluate: (query: string, context?: any): AgentEvaluation => {
+      const q = query.toLowerCase();
+      let urgency: "low" | "moderate" | "high" | "critical" = "moderate";
+      let findings = "Blood pressure and cardiac performance evaluated against ACC/AHA 2024 guidelines.";
+      let recommendations = [
+        "Maintain target blood pressure <130/80 mmHg.",
+        "Monitor daily weight for fluid retention (>1.5kg in 48h)."
+      ];
+
+      if (q.includes("chest pain") || q.includes("troponin") || q.includes("basilar crackles")) {
+        urgency = "high";
+        findings = "Potential ischemic or congestive heart failure progression detected. Elevated cardiac risk parameters present.";
+        recommendations = [
+          "Urgent 12-lead ECG and serial high-sensitivity Troponin testing.",
+          "Evaluate for NYHA Class III HFrEF and consider SGLT2i + ARNI optimization."
+        ];
+      } else if (q.includes("bp 154") || q.includes("hypertension")) {
+        findings = "Stage 2 Essential Hypertension noted with sub-optimal blood pressure control.";
+        recommendations = ["Titrate antihypertensive regimen under clinical supervision.", "Enforce low-sodium diet (<2.0g/day)."];
+      }
+
+      return {
+        agentId: "cardiology",
+        agentName: "Cardiology AI",
+        specialty: "Cardiovascular Medicine",
+        findings,
+        recommendations,
+        confidence: 0.96,
+        urgency
+      };
+    }
+  },
+  {
+    id: "neurology",
+    name: "Neurology AI",
+    specialty: "Neuro-Vascular & Brain Health",
+    icon: Brain,
+    avatarBg: "bg-cyan-600",
+    color: "text-cyan-400",
+    keywords: ["headache", "migraine", "dizziness", "numbness", "tingling", "seizure", "neuropathy", "brain", "stroke", "syncope", "occipital"],
+    evaluate: (query: string, context?: any): AgentEvaluation => {
+      const q = query.toLowerCase();
+      let urgency: "low" | "moderate" | "high" | "critical" = "low";
+      let findings = "Neurological symptom screening completed. No acute focal deficit reported.";
+      let recommendations = [
+        "Track headache frequency and potential environmental triggers.",
+        "Ensure adequate hydration and regular sleep hygiene."
+      ];
+
+      if (q.includes("headache") || q.includes("occipital")) {
+        urgency = "moderate";
+        findings = "Vascular or hypertensive headache pattern identified. May correlate with elevated systemic blood pressure.";
+        recommendations = [
+          "Rule out hypertensive emergency with immediate BP re-check.",
+          "Assess for neck stiffness, visual scotoma, or neurological deficit."
+        ];
+      } else if (q.includes("numbness") || q.includes("tingling") || q.includes("neuropathy")) {
+        findings = "Peripheral sensory nerve involvement noted, common in metabolic or drug-induced etiologies.";
+        recommendations = ["Perform monofilament sensory testing.", "Check Serum Vitamin B12 and HbA1c levels."];
+      }
+
+      return {
+        agentId: "neurology",
+        agentName: "Neurology AI",
+        specialty: "Neuro-Vascular & Brain Health",
+        findings,
+        recommendations,
+        confidence: 0.94,
+        urgency
+      };
+    }
+  },
+  {
+    id: "pharmacy",
+    name: "Pharmacy AI",
+    specialty: "Pharmacotherapy & Safety",
+    icon: Pill,
+    avatarBg: "bg-purple-600",
+    color: "text-purple-400",
+    keywords: ["medication", "drug", "lisinopril", "metformin", "sacubitril", "valsartan", "spironolactone", "interaction", "side effect", "dosage", "pill"],
+    evaluate: (query: string, context?: any): AgentEvaluation => {
+      const q = query.toLowerCase();
+      let urgency: "low" | "moderate" | "high" | "critical" = "moderate";
+      let findings = "Pharmacotherapy review completed for drug interactions, cytochrome P450 conflicts, and renal dosing.";
+      let recommendations = [
+        "Take prescribed medications at fixed daily schedules with food as directed.",
+        "Avoid over-the-counter NSAIDs (e.g. Ibuprofen) which compromise renal autoregulation."
+      ];
+
+      if (q.includes("sacubitril") && q.includes("lisinopril")) {
+        urgency = "critical";
+        findings = "CRITICAL CONTRAINDICATION: Concomitant ARNI (Sacubitril/Valsartan) + ACEi (Lisinopril) poses severe angioedema risk!";
+        recommendations = [
+          "Discontinue ACE inhibitor immediately prior to starting ARNI.",
+          "Mandatory 36-hour washout period required between Lisinopril and Sacubitril/Valsartan."
+        ];
+      } else if (q.includes("metformin") || q.includes("lisinopril")) {
+        findings = "Dual regimen (Lisinopril + Metformin) is synergistically protective for diabetic nephropathy and hypertension.";
+        recommendations = [
+          "Monitor eGFR and Serum Creatinine every 3-6 months.",
+          "Take Metformin with evening meal to minimize gastrointestinal distress."
+        ];
+      }
+
+      return {
+        agentId: "pharmacy",
+        agentName: "Pharmacy AI",
+        specialty: "Pharmacotherapy & Safety",
+        findings,
+        recommendations,
+        confidence: 0.99,
+        urgency
+      };
+    }
+  },
+  {
+    id: "nutrition",
+    name: "Nutrition & Metabolic AI",
+    specialty: "Metabolic & Clinical Dietetics",
+    icon: Apple,
+    avatarBg: "bg-emerald-600",
+    color: "text-emerald-400",
+    keywords: ["hba1c", "diabetes", "sugar", "glucose", "diet", "food", "calorie", "weight", "cholesterol", "post-meal", "glycemic", "fatigue"],
+    evaluate: (query: string, context?: any): AgentEvaluation => {
+      const q = query.toLowerCase();
+      let urgency: "low" | "moderate" | "high" | "critical" = "low";
+      let findings = "Metabolic & nutritional analysis performed against ADA 2026 Diabetes Standards of Care.";
+      let recommendations = [
+        "Aim for glycemic control with low-glycemic index dietary choices.",
+        "Integrate 150 minutes of moderate aerobic physical activity per week."
+      ];
+
+      if (q.includes("hba1c 6.6") || q.includes("pre-diabetes") || q.includes("post-meal")) {
+        urgency = "moderate";
+        findings = "HbA1c 6.6% indicates early Stage 2 Diabetes / Impaired Glucose Tolerance with post-prandial glycemic variability.";
+        recommendations = [
+          "Implement post-meal light 15-minute walking protocol to dampen post-prandial spikes.",
+          "Pair dietary carbohydrates with 20-25g dietary protein and soluble fiber."
+        ];
+      }
+
+      return {
+        agentId: "nutrition",
+        agentName: "Nutrition & Metabolic AI",
+        specialty: "Metabolic & Clinical Dietetics",
+        findings,
+        recommendations,
+        confidence: 0.95,
+        urgency
+      };
+    }
+  },
+  {
+    id: "oncology",
+    name: "Oncology AI",
+    specialty: "Oncology & Precision Genomics",
+    icon: Dna,
+    avatarBg: "bg-indigo-600",
+    color: "text-indigo-400",
+    keywords: ["cancer", "tumor", "chemo", "olaparib", "brca", "biopsy", "histology", "carcinoma", "nct", "radiation", "oncology"],
+    evaluate: (query: string, context?: any): AgentEvaluation => {
+      const q = query.toLowerCase();
+      let urgency: "low" | "moderate" | "high" | "critical" = "low";
+      let findings = "Oncology & genomic biomarker evaluation executed against NCCN guidelines.";
+      let recommendations = [
+        "Review molecular profiling results with attending Medical Oncologist.",
+        "Monitor complete blood counts (CBC) for therapy-related cytopenias."
+      ];
+
+      if (q.includes("brca") || q.includes("olaparib") || q.includes("carcinoma")) {
+        urgency = "moderate";
+        findings = "Targeted PARP inhibitor / precision biomarker therapy identified. High eligibility for clinical trial matching.";
+        recommendations = [
+          "Check germline BRCA1/2 mutation status.",
+          "Screen for fatigue and mild peripheral sensory neuropathy."
+        ];
+      }
+
+      return {
+        agentId: "oncology",
+        agentName: "Oncology AI",
+        specialty: "Oncology & Precision Genomics",
+        findings,
+        recommendations,
+        confidence: 0.93,
+        urgency
+      };
+    }
+  },
+  {
+    id: "general",
+    name: "General Medicine AI",
+    specialty: "Primary Care & Triage",
+    icon: Stethoscope,
+    avatarBg: "bg-teal-600",
+    color: "text-teal-400",
+    keywords: ["fever", "cough", "fatigue", "general", "symptom", "checkup", "vitals", "wellness", "pain"],
+    evaluate: (query: string, context?: any): AgentEvaluation => {
+      return {
+        agentId: "general",
+        agentName: "General Medicine AI",
+        specialty: "Primary Care & Triage",
+        findings: "Primary care symptom triage completed. Vitals baseline and general organ system risk reviewed.",
+        recommendations: [
+          "Maintain routine follow-up with Primary Care Physician every 3-6 months.",
+          "Ensure up-to-date vaccinations (Influenza, Pneumococcal, COVID-19 booster)."
+        ],
+        confidence: 0.97,
+        urgency: "low"
+      };
+    }
+  }
+];
+
+// Coordinator Agent Engine Class
+class CoordinatorAgent {
+  public static processQuery(query: string, patientContext?: any): UnifiedCareTeamResponse {
+    const qLower = query.toLowerCase();
+    
+    // Determine which specialized agents should be routed
+    const routedAgents: AgentEvaluation[] = [];
+    
+    // Always include General Medicine
+    routedAgents.push(SPECIALIST_ROSTER.find(a => a.id === "general")!.evaluate(query, patientContext));
+
+    // Check keyword matches for specialized roster
+    SPECIALIST_ROSTER.forEach(agent => {
+      if (agent.id === "general") return;
+      const matches = agent.keywords.some(kw => qLower.includes(kw));
+      if (matches) {
+        routedAgents.push(agent.evaluate(query, patientContext));
+      }
+    });
+
+    // Determine primary specialty
+    const primaryAgent = routedAgents.find(a => a.urgency === "critical" || a.urgency === "high") || routedAgents[1] || routedAgents[0];
+
+    // Build consolidated action plan
+    const actionPlan: UnifiedCareTeamResponse["actionPlan"] = [];
+
+    routedAgents.forEach(agent => {
+      agent.recommendations.forEach(rec => {
+        let cat: UnifiedCareTeamResponse["actionPlan"][number]["category"] = "Vitals & Diagnostics";
+        if (agent.agentId === "pharmacy" || rec.toLowerCase().includes("medication") || rec.toLowerCase().includes("dose") || rec.toLowerCase().includes("pill")) {
+          cat = "Medication & Safety";
+        } else if (agent.agentId === "nutrition" || rec.toLowerCase().includes("diet") || rec.toLowerCase().includes("walk") || rec.toLowerCase().includes("food")) {
+          cat = "Diet & Lifestyle";
+        } else if (agent.urgency === "high" || agent.urgency === "critical" || rec.toLowerCase().includes("urgent") || rec.toLowerCase().includes("immediately")) {
+          cat = "Red Flags & Follow-up";
+        }
+
+        actionPlan.push({
+          category: cat,
+          item: rec,
+          sourceAgent: agent.agentName
+        });
+      });
+    });
+
+    // Formulate Coordinator Executive Synthesis
+    const isCritical = routedAgents.some(a => a.urgency === "critical");
+    const isHigh = routedAgents.some(a => a.urgency === "high");
+
+    let coordinatorSummary = `Coordinator AI has analyzed your query across ${routedAgents.length} specialized clinical agents (${routedAgents.map(a => a.specialty).join(", ")}). `;
+    
+    if (isCritical) {
+      coordinatorSummary += "⚠️ CRITICAL ALERT IDENTIFIED: A severe drug-drug interaction or urgent clinical risk requires immediate attention before continuing current regimen.";
+    } else if (isHigh) {
+      coordinatorSummary += "⚡ HIGH PRIORITY: Significant clinical findings detected. Accelerated specialist review and targeted diagnostic testing recommended.";
+    } else {
+      coordinatorSummary += "✅ Harmonized care plan generated. Your current clinical indicators demonstrate stable parameters with actionable guidance provided below.";
+    }
+
+    const avgConfidence = routedAgents.reduce((acc, a) => acc + a.confidence, 0) / routedAgents.length;
+
+    return {
+      query,
+      timestamp: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+      coordinatorSummary,
+      primarySpecialty: primaryAgent.specialty,
+      routedAgents,
+      actionPlan,
+      overallConfidence: parseFloat(avgConfidence.toFixed(2)),
+      safetyDisclaimer: "This multi-agent AI synthesis provides clinical decision support. Always consult your attending physician before modifying prescribed drug regimens or initiating treatment."
+    };
+  }
 }
 
 export function SharedAICoreSuite({
@@ -37,8 +374,19 @@ export function SharedAICoreSuite({
 }: SharedAICoreSuiteProps) {
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>(initialSpecialty);
   const [activeEngine, setActiveEngine] = useState<
-    "scribe" | "diagnosis" | "drug" | "image" | "guideline" | "coding" | "followup" | "trials" | "router"
-  >("scribe");
+    "care_team" | "scribe" | "diagnosis" | "drug" | "image" | "guideline" | "coding" | "followup" | "trials" | "router"
+  >("care_team");
+
+  // Care Team & Coordinator State
+  const [coordinatorQueryInput, setCoordinatorQueryInput] = useState<string>(
+    "Patient is a 58yo male with Stage 2 Hypertension (BP 154/92 mmHg) and HbA1c 6.6%, taking Lisinopril 10mg + Metformin 500mg. Complaining of severe occipital headache and bilateral ankle swelling over past 3 weeks."
+  );
+  const [isOrchestrating, setIsOrchestrating] = useState<boolean>(false);
+  const [careTeamResponse, setCareTeamResponse] = useState<UnifiedCareTeamResponse | null>(() =>
+    CoordinatorAgent.processQuery(
+      "Patient is a 58yo male with Stage 2 Hypertension (BP 154/92 mmHg) and HbA1c 6.6%, taking Lisinopril 10mg + Metformin 500mg. Complaining of severe occipital headache and bilateral ankle swelling over past 3 weeks."
+    )
+  );
 
   // 1. Scribe Engine State
   const [transcriptInput, setTranscriptInput] = useState<string>(
@@ -143,6 +491,16 @@ export function SharedAICoreSuite({
     { nct: "NCT04332107", title: "Talazoparib Monotherapy vs Physician Choice in Locally Advanced Her2- Breast Cancer", phase: "Phase II", status: "Recruiting" }
   ]);
 
+  const handleRunCoordinator = () => {
+    if (!coordinatorQueryInput.trim()) return;
+    setIsOrchestrating(true);
+    setTimeout(() => {
+      const res = CoordinatorAgent.processQuery(coordinatorQueryInput);
+      setCareTeamResponse(res);
+      setIsOrchestrating(false);
+    }, 1000);
+  };
+
   const handleSimulateScribe = () => {
     setIsGeneratingNote(true);
     setTimeout(() => {
@@ -164,20 +522,20 @@ export function SharedAICoreSuite({
                 ← Back
               </button>
             )}
-            <div className="p-3 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 rounded-2xl">
+            <div className="p-3 bg-gradient-to-br from-cyan-500/20 via-purple-600/20 to-indigo-600/20 border border-cyan-500/40 rounded-2xl">
               <Brain className="h-8 w-8 text-cyan-400 animate-pulse" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-2xl font-black text-white tracking-tight">
                   CURA Universal AI Clinical Core Engine
                 </h1>
-                <span className="px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-full">
-                  Central Intelligence Hub v3.0
+                <span className="px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full flex items-center gap-1">
+                  <Bot className="h-3 w-3" /> AI Care Team Orchestrator
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Multi-Specialty Scribe, Clinical Decision Support, Drug Interaction Safety, Image Analysis, Guidelines & Coding Router
+                Coordinator Agent + Specialized Clinical Engines (Cardiology, Neurology, Pharmacy, Oncology, Nutrition & General Triage)
               </p>
             </div>
           </div>
@@ -192,21 +550,21 @@ export function SharedAICoreSuite({
             >
               <option value="cardiology">🫀 Cardiology AI</option>
               <option value="neurology">🧠 Neurology AI</option>
+              <option value="pharmacy">💊 Pharmacy & Safety AI</option>
               <option value="oncology">🧬 Oncology AI</option>
+              <option value="nutrition">🥗 Nutrition & Metabolic AI</option>
               <option value="emergency">🚑 Emergency & ICU AI</option>
               <option value="ent">👂 ENT & Audiology AI</option>
               <option value="pediatrics">👶 Pediatrics AI</option>
               <option value="dermatology">🔬 Dermatology AI</option>
-              <option value="orthopedics">🦴 Orthopedics AI</option>
-              <option value="mental_health">🧘 Mental Health AI</option>
-              <option value="womens_health">🌸 Women's Health AI</option>
             </select>
           </div>
         </div>
 
-        {/* 9 Shared Engine Tabs */}
+        {/* 10 Shared Engine Tabs */}
         <div className="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
           {[
+            { id: "care_team", label: "👨‍⚕️ AI Care Team & Coordinator", icon: Users },
             { id: "scribe", label: "🎙️ AI Scribe Engine", icon: FileText },
             { id: "diagnosis", label: "🎯 Clinical Decision Support", icon: Brain },
             { id: "drug", label: "💊 Drug Safety & Interaction", icon: Pill },
@@ -224,7 +582,7 @@ export function SharedAICoreSuite({
                 onClick={() => setActiveEngine(tab.id as any)}
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition-all cursor-pointer ${
                   activeEngine === tab.id
-                    ? "bg-cyan-600 text-white shadow-lg shadow-cyan-900/30"
+                    ? "bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 text-white shadow-lg shadow-purple-900/30 scale-[1.02]"
                     : "bg-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-850"
                 }`}
               >
@@ -234,6 +592,292 @@ export function SharedAICoreSuite({
             );
           })}
         </div>
+
+        {/* ENGINE 0: AI CARE TEAM & COORDINATOR AGENT */}
+        {activeEngine === "care_team" && (
+          <div className="space-y-6">
+            {/* HERO & ARCHITECTURE BANNER */}
+            <div className="bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 border-2 border-purple-500/40 p-5 rounded-3xl shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="p-3 bg-purple-500/20 text-purple-300 rounded-2xl border border-purple-500/30 shrink-0">
+                  <Users className="h-8 w-8 animate-pulse text-purple-300" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                      CoordinatorAgent Architecture
+                    </span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
+                      <Layers className="h-3 w-3" /> Unified Response Interface
+                    </span>
+                  </div>
+                  <h2 className="text-lg font-black text-white mt-1">
+                    AI Care Team — Multi-Agent Orchestration Engine
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-0.5 max-w-2xl">
+                    Patients and doctors talk to 1 interface. The <strong>CoordinatorAgent</strong> evaluates intent, delegates patient queries to specialized clinical agents (Cardiology, Neurology, Pharmacy, Oncology, Nutrition), and outputs 1 unified synthesis.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="px-3.5 py-2 bg-slate-950/80 rounded-2xl border border-slate-800 text-right">
+                  <span className="text-[10px] text-slate-400 block font-semibold">Orchestrator Status</span>
+                  <span className="text-xs font-bold text-purple-300 flex items-center gap-1 justify-end">
+                    <Bot className="h-3.5 w-3.5 text-purple-400" /> 6 Agents Roster Active
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* SPECIALIZED AGENT ROSTER GRID */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-black text-white flex items-center gap-2">
+                <Users className="h-4 w-4 text-purple-400" /> Delegated Specialist Roster
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {SPECIALIST_ROSTER.map((agent) => {
+                  const Icon = agent.icon;
+                  return (
+                    <div
+                      key={agent.id}
+                      className="bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 rounded-2xl p-4 transition-all flex items-start gap-3"
+                    >
+                      <div className={`p-2.5 rounded-xl text-white ${agent.avatarBg} shrink-0 shadow-md`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-black text-white">{agent.name}</h4>
+                          <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                            Ready
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-purple-300 font-semibold">{agent.specialty}</p>
+                        <p className="text-[10px] text-slate-400 line-clamp-2">
+                          Keywords: {agent.keywords.slice(0, 4).join(", ")}...
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* INTERACTIVE COORDINATOR AGENT CONSULTATION PORTAL */}
+            <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <Bot className="h-5 w-5 text-purple-400" />
+                    CoordinatorAgent Live Consultation Portal
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Input a complex multi-specialty clinical query. The CoordinatorAgent automatically parses intent, delegates to specialists, and outputs a unified care plan.
+                  </p>
+                </div>
+
+                {/* Preset Clinical Queries */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pt-2 sm:pt-0">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider shrink-0">Preset Scenarios:</span>
+                  {[
+                    "Hypertension + HbA1c 6.6% + Lisinopril/Metformin + Headache",
+                    "Sacubitril/Valsartan + Lisinopril Angioedema Risk",
+                    "BRCA2 Breast Cancer + Olaparib Trial + Diet Plan"
+                  ].map((preset, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCoordinatorQueryInput(preset)}
+                      className="px-2.5 py-1 bg-slate-950 hover:bg-slate-800 text-purple-300 border border-purple-500/20 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap cursor-pointer"
+                    >
+                      {preset.split(" ")[0]}...
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Query Input & Trigger */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 block">Patient Query / Clinical Presentation</label>
+                <div className="flex gap-2">
+                  <textarea
+                    value={coordinatorQueryInput}
+                    onChange={(e) => setCoordinatorQueryInput(e.target.value)}
+                    rows={3}
+                    placeholder="Describe patient query, vitals, current medications, or symptoms..."
+                    className="flex-1 bg-slate-950 border border-slate-800 focus:border-purple-500 text-white rounded-2xl p-3 text-xs font-medium placeholder-slate-500 outline-none transition-all"
+                  />
+                  <button
+                    onClick={handleRunCoordinator}
+                    disabled={isOrchestrating || !coordinatorQueryInput.trim()}
+                    className="px-5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs rounded-2xl shadow-lg shadow-purple-600/30 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    {isOrchestrating ? (
+                      <>
+                        <Zap className="h-5 w-5 animate-spin" />
+                        <span>Orchestrating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-5 w-5" />
+                        <span>Run Coordinator Agent</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* LIVE ORCHESTRATION PIPELINE VISUALIZER */}
+              {isOrchestrating && (
+                <div className="bg-purple-950/40 border border-purple-500/40 p-4 rounded-2xl space-y-3 animate-pulse">
+                  <div className="flex items-center justify-between text-xs font-black text-purple-300">
+                    <span className="flex items-center gap-2">
+                      <Zap className="h-4 w-4 animate-spin text-purple-400" />
+                      CoordinatorAgent Delegating Across Specialist Roster
+                    </span>
+                    <span className="text-[10px] text-purple-400 font-mono">Parsing clinical intent...</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                    <div className="bg-slate-950 p-2 rounded-xl border border-purple-500/20 text-slate-300 font-bold flex items-center gap-1.5">
+                      <Layers className="h-3.5 w-3.5 text-purple-400" /> 1. Query Decomposition
+                    </div>
+                    <div className="bg-slate-950 p-2 rounded-xl border border-purple-500/20 text-slate-300 font-bold flex items-center gap-1.5">
+                      <Heart className="h-3.5 w-3.5 text-rose-400" /> 2. Cardiology Evaluation
+                    </div>
+                    <div className="bg-slate-950 p-2 rounded-xl border border-purple-500/20 text-slate-300 font-bold flex items-center gap-1.5">
+                      <Pill className="h-3.5 w-3.5 text-purple-400" /> 3. Pharmacy Screening
+                    </div>
+                    <div className="bg-slate-950 p-2 rounded-xl border border-purple-500/20 text-slate-300 font-bold flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-indigo-400" /> 4. Unified Synthesis
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* UNIFIED CARE TEAM RESPONSE DISPLAY */}
+              {careTeamResponse && !isOrchestrating && (
+                <div className="bg-slate-950 border border-slate-800 rounded-3xl p-5 space-y-5">
+                  {/* Coordinator Executive Summary Header */}
+                  <div className="p-4 bg-purple-950/30 border border-purple-500/30 rounded-2xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Bot className="h-5 w-5 text-purple-400" />
+                        <h4 className="text-xs font-black text-purple-300 uppercase tracking-wider">
+                          CoordinatorAgent Executive Synthesis
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        {(careTeamResponse.overallConfidence * 100).toFixed(0)}% Overall Confidence
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                      {careTeamResponse.coordinatorSummary}
+                    </p>
+
+                    <div className="text-[10px] text-slate-400 pt-1 border-t border-purple-500/20 flex items-center justify-between">
+                      <span>Primary Specialty Lead: <strong className="text-purple-300">{careTeamResponse.primarySpecialty}</strong></span>
+                      <span>Evaluated: {careTeamResponse.timestamp}</span>
+                    </div>
+                  </div>
+
+                  {/* Delegated Specialist Evaluations Breakdown */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                      <Users className="h-4 w-4 text-purple-400" /> Delegated Specialist Assessments ({careTeamResponse.routedAgents.length})
+                    </h4>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {careTeamResponse.routedAgents.map((agent) => (
+                        <div
+                          key={agent.agentId}
+                          className={`p-4 rounded-2xl border space-y-2.5 ${
+                            agent.urgency === "critical"
+                              ? "bg-rose-950/40 border-rose-500/50 text-rose-200"
+                              : agent.urgency === "high"
+                              ? "bg-amber-950/40 border-amber-500/50 text-amber-200"
+                              : "bg-slate-900/90 border-slate-800 text-slate-200"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="font-black text-xs text-white">{agent.agentName}</span>
+                              <span className="text-[9px] font-bold text-purple-300 bg-purple-950 px-2 py-0.5 rounded border border-purple-500/20">
+                                {agent.specialty}
+                              </span>
+                            </div>
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
+                              agent.urgency === "critical" ? "bg-rose-900 text-rose-100 border-rose-500" :
+                              agent.urgency === "high" ? "bg-amber-900 text-amber-100 border-amber-500" :
+                              "bg-slate-800 text-slate-300 border-slate-700"
+                            }`}>
+                              {agent.urgency} Priority
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-slate-300 leading-relaxed">
+                            {agent.findings}
+                          </p>
+
+                          <div className="pt-2 border-t border-slate-800 space-y-1">
+                            <span className="text-[10px] font-extrabold text-slate-400 uppercase block">Specialist Recommendations:</span>
+                            <ul className="space-y-1 text-[11px]">
+                              {agent.recommendations.map((rec, idx) => (
+                                <li key={idx} className="flex items-start gap-1.5 text-slate-200">
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                                  <span>{rec}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Consolidated Unified Action Plan */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-emerald-400" /> Consolidated Patient Action Plan
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      {["Medication & Safety", "Vitals & Diagnostics", "Diet & Lifestyle", "Red Flags & Follow-up"].map((cat) => {
+                        const items = careTeamResponse.actionPlan.filter(a => a.category === cat);
+                        if (items.length === 0) return null;
+                        return (
+                          <div key={cat} className="p-4 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+                            <h5 className="font-extrabold text-xs text-emerald-300 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+                              <span>{cat}</span>
+                              <span className="text-[10px] text-slate-500 font-mono">{items.length} Items</span>
+                            </h5>
+                            <ul className="space-y-1.5 text-[11px]">
+                              {items.map((it, idx) => (
+                                <li key={idx} className="flex items-start gap-1.5 text-slate-200">
+                                  <ArrowRight className="h-3 w-3 text-purple-400 shrink-0 mt-0.5" />
+                                  <div>
+                                    <span>{it.item}</span>
+                                    <span className="text-[9px] text-slate-500 block font-mono">Source: {it.sourceAgent}</span>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Safety Disclaimer */}
+                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl text-[10px] text-slate-400 flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+                    <span>{careTeamResponse.safetyDisclaimer}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ENGINE 1: AI SCRIBE ENGINE */}
         {activeEngine === "scribe" && (
