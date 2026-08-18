@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
 import { 
   Pill, 
@@ -17,9 +17,11 @@ import {
   ArrowRight,
   TrendingUp,
   Scale,
-  Brain
+  Brain,
+  Mic
 } from "lucide-react";
 import { Patient, Appointment } from "../types";
+import VoiceCommandOverlay from "./VoiceCommandOverlay";
 
 interface PatientDashboardProps {
   patient: Patient;
@@ -30,6 +32,8 @@ interface PatientDashboardProps {
   onBookAppointmentClick?: () => void;
   onJoinCallClick?: (appointment: Appointment) => void;
   onViewRouteClick?: (appointment: Appointment) => void;
+  onNavigateTab?: (tab: string) => void;
+  onOpenRefillModal?: () => void;
 }
 
 export default function PatientDashboard({
@@ -40,8 +44,11 @@ export default function PatientDashboard({
   onAddVitalsClick,
   onBookAppointmentClick,
   onJoinCallClick,
-  onViewRouteClick
+  onViewRouteClick,
+  onNavigateTab,
+  onOpenRefillModal
 }: PatientDashboardProps) {
+  const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   
   // Sort and filter upcoming appointments (status is scheduled/confirmed/in_progress)
   const upcomingAppointments = appointments
@@ -133,7 +140,13 @@ export default function PatientDashboard({
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setShowVoiceOverlay(true)}
+              className="py-2 px-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/40 text-emerald-300 font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-md uppercase tracking-wider flex items-center gap-1.5 shrink-0"
+            >
+              <Mic className="h-3.5 w-3.5 text-emerald-400 animate-pulse" /> Voice Command
+            </button>
             <button
               onClick={onAddVitalsClick}
               className="py-2 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-md uppercase tracking-wider flex items-center gap-1.5 border-0 shrink-0"
@@ -546,6 +559,37 @@ export default function PatientDashboard({
         </div>
 
       </div>
+
+      {/* Floating Voice Command FAB */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          onClick={() => setShowVoiceOverlay(true)}
+          className="h-12 w-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/30 flex items-center justify-center cursor-pointer transition-all border-2 border-slate-900 group"
+          title="Open Voice Assistant Commands"
+        >
+          <Mic className="h-6 w-6 group-hover:scale-110 transition-transform" />
+        </button>
+      </div>
+
+      {/* Voice Command Overlay Modal */}
+      <VoiceCommandOverlay
+        isOpen={showVoiceOverlay}
+        onClose={() => setShowVoiceOverlay(false)}
+        onNavigateTab={onNavigateTab}
+        onAddVitalsClick={onAddVitalsClick}
+        onBookAppointmentClick={onBookAppointmentClick}
+        onOpenRefillModal={onOpenRefillModal}
+        onJoinCallClick={() => {
+          if (upcomingAppointments.length > 0) {
+            onJoinCallClick?.(upcomingAppointments[0]);
+          }
+        }}
+        onViewRouteClick={() => {
+          if (upcomingAppointments.length > 0) {
+            onViewRouteClick?.(upcomingAppointments[0]);
+          }
+        }}
+      />
 
     </div>
   );

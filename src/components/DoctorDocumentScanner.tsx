@@ -79,34 +79,6 @@ export function DoctorDocumentScanner({
   const [labResults, setLabResults] = useState<any[]>([]);
   const [medications, setMedications] = useState<any[]>([]);
 
-  // Simulation test cases for instant clinical demo feedback
-  const sampleTestCases = [
-    {
-      name: "CBC Lab Scan",
-      fileName: "cbc_blood_panel_may2026.pdf",
-      manualTitle: "Complete Blood Count",
-      manualCategory: "Lab Report"
-    },
-    {
-      name: "Lipid Profile Panel",
-      fileName: "lipid_panel_oct2025.jpg",
-      manualTitle: "Lipid Profile Panel",
-      manualCategory: "Lab Report"
-    },
-    {
-      name: "Glycated HbA1c",
-      fileName: "hba1c_glycated_report.jpg",
-      manualTitle: "HbA1c Glycated Hemoglobin Report",
-      manualCategory: "Lab Report"
-    },
-    {
-      name: "Past Physician Rx Script",
-      fileName: "rx_script_june2025.png",
-      manualTitle: "Historical Physician Rx Script",
-      manualCategory: "Prescription"
-    }
-  ];
-
   // Camera Control Functions
   const startCamera = async (deviceId?: string) => {
     setCameraError("");
@@ -242,11 +214,6 @@ export function DoctorDocumentScanner({
       triggerScanPipeline(selectedFile.name, selectedFile.name, "Lab Report");
     };
     reader.readAsDataURL(selectedFile);
-  };
-
-  const runSample = (sample: typeof sampleTestCases[0]) => {
-    setFile({ name: sample.fileName, size: 456000 } as File);
-    triggerScanPipeline(sample.fileName, sample.manualTitle, sample.manualCategory);
   };
 
   const triggerScanPipeline = async (
@@ -527,30 +494,6 @@ export function DoctorDocumentScanner({
                   >
                     Browse Files
                   </button>
-                </div>
-              </div>
-
-              {/* Pre-cooked Test Sample buttons for instant demo review */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5 px-1">
-                  <Sparkles className="h-3 w-3 text-emerald-500" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Instant Clinical Demo Samples:</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {sampleTestCases.map((sample, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => runSample(sample)}
-                      className="p-2 text-left bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 rounded-xl transition-all font-medium text-xs text-slate-600 flex items-center gap-1.5 group shadow-sm cursor-pointer"
-                    >
-                      <FileText className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-600 shrink-0" />
-                      <div className="truncate">
-                        <p className="font-extrabold text-slate-700 group-hover:text-emerald-800 leading-tight">{sample.name}</p>
-                        <p className="text-[9px] text-slate-400 font-bold tracking-tight truncate">{sample.fileName}</p>
-                      </div>
-                    </button>
-                  ))}
                 </div>
               </div>
             </div>

@@ -26,11 +26,13 @@ import GastroenterologySuite from "./components/GastroenterologySuite";
 import AnalyticsSuite from "./components/AnalyticsSuite";
 import DentistrySuite from "./components/DentistrySuite";
 import PhysiologySuite from "./components/PhysiologySuite";
+import VideoConsultation from "./components/VideoConsultation";
+import AICareNavigation from "./components/AICareNavigation";
 import ThemeSelectorWidget, { ThemeProvider } from "./components/ThemeSelector";
 import OfflineSyncEngine from "./components/OfflineSyncEngine";
 import GlobalEmergencySOS from "./components/GlobalEmergencySOS";
 
-type ViewState = "landing" | "dashboard" | "admin" | "patient" | "pharmacy" | "ayush" | "mr" | "mental_health" | "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ai_core" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "analytics" | "dentistry" | "physiology";
+type ViewState = "landing" | "dashboard" | "admin" | "patient" | "pharmacy" | "ayush" | "mr" | "mental_health" | "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ai_core" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "analytics" | "dentistry" | "physiology" | "video_consultation" | "care_navigation";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
@@ -74,6 +76,8 @@ export default function App() {
           onNavigateToAnalytics={() => navigateTo("analytics")}
           onNavigateToDentistry={() => navigateTo("dentistry")}
           onNavigateToPhysiology={() => navigateTo("physiology")}
+          onNavigateToVideoConsultation={() => navigateTo("video_consultation")}
+          onNavigateToCareNavigation={() => navigateTo("care_navigation")}
         />
       )}
       {currentView === "dashboard" && (
@@ -209,6 +213,16 @@ export default function App() {
       {currentView === "physiology" && (
         <PhysiologySuite 
           onBackToLanding={() => navigateTo("landing")}
+        />
+      )}
+      {currentView === "video_consultation" && (
+        <VideoConsultation 
+          onBack={() => navigateTo("landing")}
+        />
+      )}
+      {currentView === "care_navigation" && (
+        <AICareNavigation 
+          onBack={() => navigateTo("landing")}
         />
       )}
 

@@ -65,6 +65,7 @@ import {
   ExternalLink,
   LockKeyhole
 } from "lucide-react";
+import DoctorDiscovery from "./DoctorDiscovery";
 
 interface HealthMemoryCompanionProps {
   patientId?: string;
@@ -105,9 +106,9 @@ export default function HealthMemoryCompanion({
   patientName = "Rajesh Kumar",
   onBack
 }: HealthMemoryCompanionProps) {
-  // Navigation Tabs: care_team | family | companion | visit_prep | phr | wearables | memory | digital_twin | precision | scanner | emergency
+  // Navigation Tabs: care_team | family | discovery | companion | visit_prep | phr | wearables | memory | digital_twin | precision | scanner | emergency
   const [activeTab, setActiveTab] = useState<
-    "care_team" | "family" | "wearables" | "phr" | "visit_prep" | "companion" | "memory" | "digital_twin" | "precision" | "scanner" | "emergency"
+    "care_team" | "family" | "discovery" | "wearables" | "phr" | "visit_prep" | "companion" | "memory" | "digital_twin" | "precision" | "scanner" | "emergency"
   >("family");
 
   // === AI CARE TEAM MULTI-AGENT STATES ===
@@ -1146,6 +1147,18 @@ export default function HealthMemoryCompanion({
         >
           <Users className="h-4 w-4 text-emerald-300" />
           <span>👨‍👩‍👦 Family Health</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("discovery")}
+          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            activeTab === "discovery"
+              ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white shadow-lg shadow-blue-600/30 scale-[1.02]"
+              : "bg-blue-950/30 border border-blue-500/20 text-blue-300 hover:bg-blue-900/50"
+          }`}
+        >
+          <Stethoscope className="h-4 w-4 text-blue-300 animate-pulse" />
+          <span>🩺 Doctor Discovery</span>
         </button>
 
         <button
@@ -2266,6 +2279,14 @@ export default function HealthMemoryCompanion({
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB: AI DOCTOR DISCOVERY & APPOINTMENT BOOKING */}
+      {activeTab === "discovery" && (
+        <DoctorDiscovery
+          patientId={patientId}
+          patientName={patientName}
+        />
       )}
 
       {/* TAB: AI REMOTE MONITORING & WEARABLES ECOSYSTEM */}

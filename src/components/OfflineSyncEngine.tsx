@@ -71,7 +71,7 @@ export default function OfflineSyncEngine({ onSyncCompleted }: OfflineSyncEngine
   const [syncSuccessMsg, setSyncSuccessMsg] = useState("");
   const [syncErrorMsg, setSyncErrorMsg] = useState("");
 
-  // Test form input state for adding dummy offline items
+  // Form input state for adding offline queued records
   const [newLogTitle, setNewLogTitle] = useState("");
   const [newLogType, setNewLogType] = useState<OfflineQueueItem["type"]>("clinical_note");
   const [newLogDetails, setNewLogDetails] = useState("");

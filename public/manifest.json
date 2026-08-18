@@ -1,0 +1,19 @@
+{
+  "short_name": "RemixCURA",
+  "name": "Remix CURA - AI Healthcare Platform",
+  "description": "AI-powered healthcare platform with multi-agent orchestration, lifetime health memory, and wearable telemetry.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "categories": ["medical", "health", "lifestyle"]
+}

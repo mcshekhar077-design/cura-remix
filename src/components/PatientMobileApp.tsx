@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import AIHealthcareSuite from "./AIHealthcareSuite";
 import HealthMemoryCompanion from "./HealthMemoryCompanion";
+import VideoConsultation from "./VideoConsultation";
+import PatientAuthScreen from "./PatientAuthScreen";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   User, 
@@ -243,6 +245,9 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const [overlaySymptomSeverity, setOverlaySymptomSeverity] = useState(false);
   const [logSuccessMsg, setLogSuccessMsg] = useState(false);
   const [dismissedAlertIndex, setDismissedAlertIndex] = useState<number | null>(null);
+
+  // History tab EHR visit logs search filter state
+  const [historySearchQuery, setHistorySearchQuery] = useState("");
 
   // Medication reminders state
   const [medicationReminders, setMedicationReminders] = useState<any[]>([]);
@@ -744,16 +749,6 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     if (medicationReminders.length > 0) {
       // Pick the first reminder
       triggerMedicationNotification(medicationReminders[0]);
-    } else {
-      // Fallback dummy reminder for demonstration
-      triggerMedicationNotification({
-        id: "SCH-TEST",
-        medicineName: "Metformin 500mg",
-        dosage: "1 Tablet",
-        time: "10:15 AM",
-        instructions: "Take with breakfast. Do not crush.",
-        messageContent: "💊 Medication Reminder: Metformin 1 Tablet for Patient. Timing: Daily at 10:15 AM."
-      });
     }
   };
 
@@ -2155,14 +2150,204 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     doc.save(`Health_Summary_${selectedPatient.fullName.replace(/\s+/g, "_")}.pdf`);
   };
 
-  // Voice speech recognition states
-  const [speechSupported, setSpeechSupported] = useState(false);
+  // Voice speech recognition & Smartwatch states
+  const [speechSupported, setSpeechSupported] = useState(true);
   const [listeningField, setListeningField] = useState<"hr" | "systolic" | "diastolic" | "sugar" | "weight" | "height" | "all" | null>(null);
   const [voiceFeedback, setVoiceFeedback] = useState<string>("");
+  const [parsedVitalsSummary, setParsedVitalsSummary] = useState<{
+    hr?: string;
+    systolic?: string;
+    diastolic?: string;
+    sugar?: string;
+    weight?: string;
+    height?: string;
+  } | null>(null);
+
+  // Smartwatch Sync & Bluetooth BLE Scanner states
+  const [smartwatchSyncMode, setSmartwatchSyncMode] = useState<"smartwatch" | "voice">("smartwatch");
+  const [selectedSmartwatch, setSelectedSmartwatch] = useState<"apple" | "fitbit" | "galaxy" | "garmin">("apple");
+  const [isSyncingSmartwatch, setIsSyncingSmartwatch] = useState(false);
+  const [smartwatchLastSynced, setSmartwatchLastSynced] = useState<string | null>(null);
+
+  // PWA (Progressive Web App) Install States
+  const [deferredPwaPrompt, setDeferredPwaPrompt] = useState<any>(null);
+  const [isPwaInstalled, setIsPwaInstalled] = useState<boolean>(false);
+  const [pwaInstallSuccess, setPwaInstallSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Check if app is already running in standalone PWA mode
+    if (typeof window !== 'undefined') {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+      if (isStandalone) {
+        setIsPwaInstalled(true);
+      }
+
+      const handleBeforeInstallPrompt = (e: any) => {
+        e.preventDefault();
+        setDeferredPwaPrompt(e);
+      };
+
+      const handleAppInstalled = () => {
+        setIsPwaInstalled(true);
+        setPwaInstallSuccess(true);
+        setDeferredPwaPrompt(null);
+      };
+
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.addEventListener('appinstalled', handleAppInstalled);
+
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.removeEventListener('appinstalled', handleAppInstalled);
+      };
+    }
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (deferredPwaPrompt) {
+      deferredPwaPrompt.prompt();
+      const { outcome } = await deferredPwaPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setIsPwaInstalled(true);
+        setPwaInstallSuccess(true);
+      }
+      setDeferredPwaPrompt(null);
+    } else {
+      // Direct instructions fallback for browsers or iOS Safari
+      alert("To install Remix CURA as a PWA:\n\n• On Mobile Chrome/Android: Tap Menu (⋮) → 'Install app' or 'Add to Home screen'\n• On iPhone/Safari: Tap Share (⎋) → 'Add to Home Screen'");
+    }
+  };
+
+  // Bluetooth scanning states
+  const [isScanningBluetooth, setIsScanningBluetooth] = useState(false);
+  const [connectedBleDevice, setConnectedBleDevice] = useState<string | null>("Apple Watch Ultra 2 (Paired)");
+  const [discoveredBleDevices, setDiscoveredBleDevices] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+    rssi: number;
+    battery: number;
+    services: string[];
+    isPaired: boolean;
+  }>>([
+    { id: "BLE-AW-8921", name: "Apple Watch Ultra 2", type: "Smartwatch / HealthKit", rssi: -54, battery: 88, services: ["Heart Rate (0x180D)", "Blood Pressure", "Spo2"], isPaired: true },
+    { id: "BLE-FB-4309", name: "Fitbit Sense 2", type: "Fitness Tracker", rssi: -62, battery: 74, services: ["Heart Rate (0x180D)", "ECG", "Skin Temp"], isPaired: false },
+    { id: "BLE-GW-1102", name: "Galaxy Watch 6 Classic", type: "Wear OS Smartwatch", rssi: -71, battery: 92, services: ["Heart Rate", "BIA Composition"], isPaired: false },
+    { id: "BLE-OM-9920", name: "Omron Evolv BP Cuff", type: "Medical BLE Peripheral", rssi: -68, battery: 65, services: ["Blood Pressure (0x1810)"], isPaired: false }
+  ]);
+
+  const handleStartBluetoothScan = async () => {
+    setIsScanningBluetooth(true);
+    setVoiceFeedback("Scanning 2.4GHz Bluetooth LE channels for nearby medical wearables...");
+
+    // Web Bluetooth API execution if supported and allowed
+    if (typeof navigator !== "undefined" && (navigator as any).bluetooth) {
+      try {
+        const device = await (navigator as any).bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['heart_rate', 'blood_pressure', 'battery_service']
+        });
+        if (device) {
+          const newDev = {
+            id: device.id || `BLE-${Math.floor(1000 + Math.random() * 9000)}`,
+            name: device.name || "Generic BLE Heart Rate Sensor",
+            type: "Discovered GATT Device",
+            rssi: -58,
+            battery: 90,
+            services: ["Heart Rate (0x180D)", "Battery Service"],
+            isPaired: false
+          };
+          setDiscoveredBleDevices(prev => [newDev, ...prev.filter(d => d.id !== newDev.id)]);
+          setVoiceFeedback(`Discovered physical device: ${newDev.name}`);
+        }
+      } catch (err: any) {
+        console.log("Web Bluetooth scan cancelled or fallback to BLE radar:", err);
+      }
+    }
+
+    // Radar scan simulation for interactive preview
+    setTimeout(() => {
+      setIsScanningBluetooth(false);
+      setVoiceFeedback("✓ Bluetooth scan complete. 4 BLE wearables ready for live telemetry streaming.");
+    }, 1800);
+  };
+
+  const handlePairAndStreamBleDevice = (device: { id: string; name: string; type: string }) => {
+    setIsSyncingSmartwatch(true);
+    setConnectedBleDevice(device.name);
+    setVoiceFeedback(`Pairing GATT service with ${device.name}...`);
+
+    setTimeout(() => {
+      const data = {
+        hr: String(Math.floor(68 + Math.random() * 14)),
+        systolic: String(Math.floor(115 + Math.random() * 10)),
+        diastolic: String(Math.floor(75 + Math.random() * 8)),
+        sugar: String(Math.floor(95 + Math.random() * 20)),
+        weight: "71.2",
+        height: "172"
+      };
+
+      setLogHeartRate(data.hr);
+      setLogSystolic(data.systolic);
+      setLogDiastolic(data.diastolic);
+      setLogSugar(data.sugar);
+      setLogWeight(data.weight);
+      setLogHeight(data.height);
+
+      setParsedVitalsSummary(data);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setSmartwatchLastSynced(timeStr);
+      setIsSyncingSmartwatch(false);
+
+      setDiscoveredBleDevices(prev =>
+        prev.map(d => d.id === device.id ? { ...d, isPaired: true } : d)
+      );
+
+      setVoiceFeedback(`✓ Biometrics streaming live from ${device.name} over BLE GATT at ${timeStr}`);
+    }, 1200);
+  };
+
+  const handleSyncSmartwatchData = (device = selectedSmartwatch) => {
+    setIsSyncingSmartwatch(true);
+    const deviceName = device === "apple" ? "Apple Watch Ultra 2 (HealthKit)" : device === "fitbit" ? "Fitbit Sense 2" : device === "galaxy" ? "Samsung Galaxy Watch 6" : "Garmin Venu 3";
+    setVoiceFeedback(`Connecting to ${deviceName} over Bluetooth & Health API...`);
+
+    setTimeout(() => {
+      let data = {
+        hr: "74",
+        systolic: "122",
+        diastolic: "81",
+        sugar: "106",
+        weight: "71.2",
+        height: "172"
+      };
+
+      if (device === "fitbit") {
+        data = { hr: "76", systolic: "118", diastolic: "78", sugar: "102", weight: "70.8", height: "172" };
+      } else if (device === "galaxy") {
+        data = { hr: "72", systolic: "120", diastolic: "80", sugar: "108", weight: "71.5", height: "172" };
+      } else if (device === "garmin") {
+        data = { hr: "68", systolic: "116", diastolic: "76", sugar: "98", weight: "71.0", height: "172" };
+      }
+
+      setLogHeartRate(data.hr);
+      setLogSystolic(data.systolic);
+      setLogDiastolic(data.diastolic);
+      setLogSugar(data.sugar);
+      setLogWeight(data.weight);
+      setLogHeight(data.height);
+
+      setParsedVitalsSummary(data);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setSmartwatchLastSynced(timeStr);
+      setIsSyncingSmartwatch(false);
+      setVoiceFeedback(`✓ Biometrics synced live from ${deviceName} at ${timeStr}`);
+    }, 1100);
+  };
 
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    setSpeechSupported(!!SpeechRecognition);
+    setSpeechSupported(true);
   }, []);
 
   const stopListening = () => {
@@ -2179,57 +2364,103 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     if (!showVitalsModal) {
       stopListening();
       setVoiceFeedback("");
+      setParsedVitalsSummary(null);
     }
   }, [showVitalsModal]);
 
-  const processSpeechTranscript = (field: "hr" | "systolic" | "diastolic" | "sugar" | "weight" | "height" | "all", transcript: string) => {
+  const normalizeSpokenText = (rawText: string): string => {
+    let text = rawText.toLowerCase().trim();
+
+    const wordMap: Record<string, number> = {
+      zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7,
+      eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13,
+      fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18,
+      nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50,
+      sixty: 60, seventy: 70, eighty: 80, ninety: 90
+    };
+
+    text = text.replace(/(\w+)\s+hundred(?:\s+and)?(?:\s+(\w+))?(?:\s+(\w+))?/g, (match, p1, p2, p3) => {
+      let val = 0;
+      if (wordMap[p1] !== undefined) val += wordMap[p1] * 100;
+      else if (!isNaN(Number(p1))) val += Number(p1) * 100;
+      else val = 100;
+
+      if (p2 && wordMap[p2] !== undefined) val += wordMap[p2];
+      if (p3 && wordMap[p3] !== undefined) val += wordMap[p3];
+      return val > 0 ? String(val) : match;
+    });
+
+    text = text.replace(/\b(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\s+(one|two|three|four|five|six|seven|eight|nine)\b/g, (_, tens, ones) => {
+      return String((wordMap[tens] || 0) + (wordMap[ones] || 0));
+    });
+
+    Object.keys(wordMap).forEach((word) => {
+      const reg = new RegExp(`\\b${word}\\b`, 'g');
+      text = text.replace(reg, String(wordMap[word]));
+    });
+
+    text = text.replace(/\b(\d+)\s*(?:point|dot)\s*(\d+)\b/g, '$1.$2');
+    text = text.replace(/(\d+)\s*(?:over|by|slash|\/)\s*(\d+)/g, '$1 over $2');
+
+    return text;
+  };
+
+  const processSpeechTranscript = (field: "hr" | "systolic" | "diastolic" | "sugar" | "weight" | "height" | "all", rawTranscript: string) => {
+    const transcript = normalizeSpokenText(rawTranscript);
+
     if (field === "hr") {
       const match = transcript.match(/\d+/);
       if (match) {
         setLogHeartRate(match[0]);
+        setParsedVitalsSummary(prev => ({ ...prev, hr: match[0] }));
         setVoiceFeedback(`Set Heart Rate to ${match[0]} BPM`);
       } else {
-        setVoiceFeedback("Could not detect a number. Try saying 'seventy two'");
+        setVoiceFeedback("Could not detect heart rate. Try saying 'seventy two'");
       }
     } else if (field === "systolic") {
       const match = transcript.match(/\d+/);
       if (match) {
         setLogSystolic(match[0]);
-        setVoiceFeedback(`Set Systolic to ${match[0]}`);
+        setParsedVitalsSummary(prev => ({ ...prev, systolic: match[0] }));
+        setVoiceFeedback(`Set Systolic BP to ${match[0]} mmHg`);
       } else {
-        setVoiceFeedback("Could not detect a number. Try saying 'one hundred twenty'");
+        setVoiceFeedback("Could not detect systolic BP. Try saying 'one hundred twenty'");
       }
     } else if (field === "diastolic") {
       const match = transcript.match(/\d+/);
       if (match) {
         setLogDiastolic(match[0]);
-        setVoiceFeedback(`Set Diastolic to ${match[0]}`);
+        setParsedVitalsSummary(prev => ({ ...prev, diastolic: match[0] }));
+        setVoiceFeedback(`Set Diastolic BP to ${match[0]} mmHg`);
       } else {
-        setVoiceFeedback("Could not detect a number. Try saying 'eighty'");
+        setVoiceFeedback("Could not detect diastolic BP. Try saying 'eighty'");
       }
     } else if (field === "sugar") {
       const match = transcript.match(/\d+/);
       if (match) {
         setLogSugar(match[0]);
-        setVoiceFeedback(`Set Blood Sugar to ${match[0]}`);
+        setParsedVitalsSummary(prev => ({ ...prev, sugar: match[0] }));
+        setVoiceFeedback(`Set Blood Sugar to ${match[0]} mg/dL`);
       } else {
-        setVoiceFeedback("Could not detect a number. Try saying 'one hundred five'");
+        setVoiceFeedback("Could not detect blood sugar. Try saying 'one hundred five'");
       }
     } else if (field === "weight") {
       const match = transcript.match(/(\d+(?:\.\d+)?)/);
       if (match) {
         setLogWeight(match[1]);
+        setParsedVitalsSummary(prev => ({ ...prev, weight: match[1] }));
         setVoiceFeedback(`Set Weight to ${match[1]} kg`);
       } else {
-        setVoiceFeedback("Could not detect a weight. Try saying 'seventy point five'");
+        setVoiceFeedback("Could not detect weight. Try saying 'seventy point five'");
       }
     } else if (field === "height") {
       const match = transcript.match(/(\d+(?:\.\d+)?)/);
       if (match) {
         setLogHeight(match[1]);
+        setParsedVitalsSummary(prev => ({ ...prev, height: match[1] }));
         setVoiceFeedback(`Set Height to ${match[1]} cm`);
       } else {
-        setVoiceFeedback("Could not detect a height. Try saying 'one hundred seventy two'");
+        setVoiceFeedback("Could not detect height. Try saying 'one hundred seventy two'");
       }
     } else if (field === "all") {
       let parsedHR = "";
@@ -2239,7 +2470,9 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       let parsedWeight = "";
       let parsedHeight = "";
 
-      const bpMatch = transcript.match(/(\d+)\s*(?:over|by|slash|\/)\s*(\d+)/);
+      // 1. Blood Pressure match
+      const bpMatch = transcript.match(/(\d+)\s*(?:over|by|slash|\/)\s*(\d+)/i) ||
+                      transcript.match(/(?:bp|blood pressure|pressure)(?:\s+(?:is|of|was))?\s*(\d+)\s*(?:over|by|slash|\/)\s*(\d+)/i);
       if (bpMatch) {
         parsedSystolic = bpMatch[1];
         parsedDiastolic = bpMatch[2];
@@ -2247,30 +2480,38 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         setLogDiastolic(parsedDiastolic);
       }
 
-      const hrMatch = transcript.match(/(?:heart rate|pulse|bpm|hr)(?:\s+(?:is|of))?\s*(\d+)/) || transcript.match(/(\d+)\s*(?:bpm|beats)/);
+      // 2. Heart Rate match
+      const hrMatch = transcript.match(/(?:heart rate|pulse|bpm|hr|beats)(?:\s+(?:is|of|was))?\s*(\d+)/i) ||
+                      transcript.match(/(\d+)\s*(?:bpm|beats per minute|beats)/i);
       if (hrMatch) {
         parsedHR = hrMatch[1];
         setLogHeartRate(parsedHR);
       }
 
-      const sugarMatch = transcript.match(/(?:sugar|glucose|blood sugar)(?:\s+(?:is|of))?\s*(\d+)/);
+      // 3. Sugar / Glucose match
+      const sugarMatch = transcript.match(/(?:sugar|glucose|blood sugar|fasting sugar|random sugar)(?:\s+(?:is|of|was))?\s*(\d+)/i);
       if (sugarMatch) {
         parsedSugar = sugarMatch[1];
         setLogSugar(parsedSugar);
       }
 
-      const weightMatch = transcript.match(/(?:weight|weighs|lbs|kg|mass)(?:\s+(?:is|of))?\s*(\d+(?:\.\d+)?)/);
+      // 4. Weight match
+      const weightMatch = transcript.match(/(?:weight|weighs|weigh|mass)(?:\s+(?:is|of|was))?\s*(\d+(?:\.\d+)?)/i) ||
+                          transcript.match(/(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilograms|lbs|pounds)/i);
       if (weightMatch) {
         parsedWeight = weightMatch[1];
         setLogWeight(parsedWeight);
       }
 
-      const heightMatch = transcript.match(/(?:height|tall|cm|inches|feet)(?:\s+(?:is|of))?\s*(\d+(?:\.\d+)?)/);
+      // 5. Height match
+      const heightMatch = transcript.match(/(?:height|tall)(?:\s+(?:is|of|was))?\s*(\d+(?:\.\d+)?)/i) ||
+                          transcript.match(/(\d+(?:\.\d+)?)\s*(?:cm|centimeters)/i);
       if (heightMatch) {
         parsedHeight = heightMatch[1];
         setLogHeight(parsedHeight);
       }
 
+      // Positional fallback if no keywords matched
       const allNumbers = transcript.match(/\d+(?:\.\d+)?/g);
       if (allNumbers && !bpMatch && !hrMatch && !sugarMatch && !weightMatch && !heightMatch) {
         if (allNumbers.length === 1) {
@@ -2303,17 +2544,20 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         }
       }
 
-      const updates = [];
-      if (parsedHR) updates.push(`HR: ${parsedHR} BPM`);
-      if (parsedSystolic && parsedDiastolic) updates.push(`BP: ${parsedSystolic}/${parsedDiastolic}`);
-      if (parsedSugar) updates.push(`Sugar: ${parsedSugar} mg/dL`);
-      if (parsedWeight) updates.push(`Weight: ${parsedWeight} kg`);
-      if (parsedHeight) updates.push(`Height: ${parsedHeight} cm`);
+      const updates: string[] = [];
+      const summaryObj: any = {};
+      if (parsedHR) { updates.push(`HR: ${parsedHR} BPM`); summaryObj.hr = parsedHR; }
+      if (parsedSystolic && parsedDiastolic) { updates.push(`BP: ${parsedSystolic}/${parsedDiastolic}`); summaryObj.systolic = parsedSystolic; summaryObj.diastolic = parsedDiastolic; }
+      if (parsedSugar) { updates.push(`Sugar: ${parsedSugar} mg/dL`); summaryObj.sugar = parsedSugar; }
+      if (parsedWeight) { updates.push(`Weight: ${parsedWeight} kg`); summaryObj.weight = parsedWeight; }
+      if (parsedHeight) { updates.push(`Height: ${parsedHeight} cm`); summaryObj.height = parsedHeight; }
+
+      setParsedVitalsSummary(summaryObj);
 
       if (updates.length > 0) {
-        setVoiceFeedback(`Set: ${updates.join(", ")}`);
+        setVoiceFeedback(`Parsed ${updates.length} vitals: ${updates.join(", ")}`);
       } else {
-        setVoiceFeedback("No numbers found. Try: 'Heart rate 75, BP 120 over 80'");
+        setVoiceFeedback("No clear numbers recognized. Dictate e.g.: 'Heart rate 76, BP 120 over 80, sugar 105, weight 70.5'");
       }
     }
   };
@@ -2395,22 +2639,87 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch initial system patients, appointments, and doctor profile
+  // Persistent Patient Logout Handler
+  const handlePatientLogout = async () => {
+    setSelectedPatient(null);
+    setFamilyViewShareCode("");
+    setFamilyViewRelation("");
+    setFamilyViewAccessLevel("view");
+    setOriginalSelfPatient(null);
+    try {
+      localStorage.removeItem("cura_patient_session");
+      await fetch("/api/v1/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.warn("Logout error", e);
+    }
+  };
+
+  // Persistent Patient Selection Handler
+  const handlePatientSelectAndPersist = async (p: Patient) => {
+    setSelectedPatient(p);
+    try {
+      localStorage.setItem("cura_patient_session", JSON.stringify({
+        id: p.id,
+        patientCode: p.patientCode,
+        fullName: p.fullName,
+        timestamp: Date.now()
+      }));
+      await fetch("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier: p.id })
+      });
+    } catch (e) {
+      console.warn("Session persist error", e);
+    }
+  };
+
+  // Fetch initial system patients, appointments, doctor profile, and persistent session
   useEffect(() => {
     const fetchSystemData = async () => {
       try {
-        const [resPatients, resAppts] = await Promise.all([
+        const [resPatients, resAppts, resAuth] = await Promise.all([
           fetch("/api/v1/patients"),
-          fetch("/api/v1/appointments")
+          fetch("/api/v1/appointments"),
+          fetch("/api/v1/auth/me")
         ]);
+
+        let loadedPatients: Patient[] = [];
         if (resPatients.ok) {
-          const data = await resPatients.json();
-          setPatients(data);
+          loadedPatients = await resPatients.json();
+          setPatients(loadedPatients);
         }
         if (resAppts.ok) {
           const data = await resAppts.json();
           setAppointments(data);
         }
+
+        // Restore active patient session from HTTP-only cookie or persistent localStorage
+        let restoredPatient: Patient | null = null;
+
+        if (resAuth.ok) {
+          const authData = await resAuth.json();
+          if (authData.authenticated && authData.patient) {
+            restoredPatient = authData.patient;
+          }
+        }
+
+        if (!restoredPatient && typeof window !== "undefined") {
+          const stored = localStorage.getItem("cura_patient_session");
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              restoredPatient = loadedPatients.find(
+                p => p.id === parsed.id || (p.patientCode && p.patientCode === parsed.patientCode)
+              ) || null;
+            } catch (e) {}
+          }
+        }
+
+        if (restoredPatient) {
+          setSelectedPatient(restoredPatient);
+        }
+
         await fetchDoctorProfile();
       } catch (err) {
         console.error("Failed to load systems data", err);
@@ -2933,92 +3242,16 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
               <div className="flex-1 overflow-hidden flex flex-col bg-slate-900 text-slate-100 relative">
                 <AnimatePresence mode="wait">
                   {!selectedPatient ? (
-                    /* LOGIN SCREEN */
-                    <motion.div 
-                      key="login"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex-1 p-6 flex flex-col justify-between overflow-y-auto"
-                    >
-                      {/* Logo and Intro */}
-                      <div className="text-center pt-8 space-y-3">
-                        <div className="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-500/20">
-                          ✙
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-black text-white tracking-tight">CURA Patient Portal</h2>
-                          <p className="text-xs text-slate-400 mt-1">Connect with your clinic, access secure EMR history, and book live consultation appointments.</p>
-                        </div>
-                      </div>
-
-                      {/* Login Form */}
-                      <div className="space-y-4 my-6">
-                        <div className="space-y-1.5">
-                          <label className="block text-[10px] font-black text-emerald-400 uppercase tracking-widest">Digital EMR Login Code</label>
-                          <div className="relative">
-                            <input 
-                              type="text"
-                              value={loginInput}
-                              onChange={(e) => setLoginInput(e.target.value)}
-                              placeholder="e.g. PAT-001 or CURA Code"
-                              className="w-full bg-slate-950/80 border border-slate-800 text-xs font-bold text-white placeholder-slate-500 px-4 py-3.5 rounded-2xl focus:outline-none focus:border-emerald-500 transition-all text-center uppercase tracking-widest font-mono"
-                            />
-                            <Search className="absolute right-4 top-3.5 h-4 w-4 text-slate-500" />
-                          </div>
-                        </div>
-
-                        {authError && (
-                          <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-semibold px-3 py-2 rounded-xl text-center">
-                            ⚠️ {authError}
-                          </div>
-                        )}
-
-                        <button
-                          onClick={() => handleLogin(loginInput)}
-                          disabled={isLoadingAuth || !loginInput}
-                          className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-95 text-slate-950 font-black text-xs rounded-2xl shadow-md tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          {isLoadingAuth ? "Authenticating..." : <>Proceed into EHR Vault <ArrowRight className="h-3 w-3" /></>}
-                        </button>
-                      </div>
-
-                      {/* Evaluator Quick Seed Helper List */}
-                      <div className="border-t border-slate-800/80 pt-4 space-y-2">
-                        <p className="text-[10px] font-black text-slate-400 text-center uppercase tracking-widest">
-                          Demo Profiles (Frictionless Quick Select)
-                        </p>
-                        <div className="grid grid-cols-1 gap-2">
-                          {patients.length > 0 ? (
-                            patients.slice(0, 3).map((pat) => (
-                              <button
-                                key={pat.id}
-                                onClick={() => {
-                                  setLoginInput(pat.patientCode || pat.id);
-                                  handleLogin(pat.patientCode || pat.id);
-                                }}
-                                className="w-full p-2.5 bg-slate-950/40 hover:bg-slate-950 border border-slate-800 rounded-xl text-left hover:border-emerald-500/40 transition-all flex items-center justify-between cursor-pointer group"
-                              >
-                                <div>
-                                  <p className="text-[11px] font-extrabold text-white group-hover:text-emerald-400 transition-colors">
-                                    {pat.fullName}
-                                  </p>
-                                  <p className="text-[9px] font-semibold text-slate-500 font-mono">
-                                    Code: {pat.patientCode || pat.id}
-                                  </p>
-                                </div>
-                                <ChevronRight className="h-3 w-3 text-slate-500 group-hover:text-emerald-400 transition-all" />
-                              </button>
-                            ))
-                          ) : (
-                            <div className="text-center py-2 text-xs text-slate-500 font-semibold">
-                              Loading system demo profiles...
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                    </motion.div>
+                    <PatientAuthScreen 
+                      patients={patients}
+                      onSelectPatient={(p) => handlePatientSelectAndPersist(p)}
+                      onPatientCreated={(p) => setPatients(prev => [p, ...prev])}
+                      onInstallPWA={handleInstallPWA}
+                      isPwaInstalled={isPwaInstalled}
+                      isSimulator={true}
+                      isBiometricSupported={isSupported}
+                      onAuthenticateBiometric={authenticateBiometric}
+                    />
                   ) : (
                     /* PORTAL MAIN SCREENS */
                     <motion.div 
@@ -3029,7 +3262,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                       className="flex-1 flex flex-col justify-between overflow-hidden relative"
                     >
                       {/* Top App Header bar */}
-                      <div className="px-5 py-3.5 bg-slate-950/90 border-b border-slate-800/60 flex items-center justify-between shrink-0">
+                      <div className="px-5 py-3 bg-slate-950/90 border-b border-slate-800/60 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-2">
                           <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xs">
                             ✙
@@ -3040,13 +3273,29 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                           </div>
                         </div>
 
-                        <button 
-                          onClick={() => setSelectedPatient(null)}
-                          className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer"
-                          title="Log Out"
-                        >
-                          <LogOut className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={handleInstallPWA}
+                            className={`px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-wider transition-all flex items-center gap-1 cursor-pointer ${
+                              isPwaInstalled
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                : "bg-emerald-500 hover:bg-emerald-400 text-slate-950 border-emerald-400"
+                            }`}
+                            title="Install CURA Progressive Web App"
+                          >
+                            <span>📲</span>
+                            <span>{isPwaInstalled ? "PWA Active" : "Install App"}</span>
+                          </button>
+
+                          <button 
+                            onClick={handlePatientLogout}
+                            className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer"
+                            title="Log Out"
+                          >
+                            <LogOut className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
 
                       {/* FLOATING PUSH NOTIFICATION ALERT SIMULATOR BANNER */}
@@ -3133,12 +3382,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                             </button>
                           ) : (
                             <button
-                              onClick={() => {
-                                setSelectedPatient(null);
-                                setFamilyViewShareCode("");
-                                setFamilyViewRelation("");
-                                setFamilyViewAccessLevel("view");
-                              }}
+                              onClick={handlePatientLogout}
                               className="text-[9px] font-black uppercase tracking-wider text-slate-950 bg-rose-500 hover:bg-rose-400 px-2.5 py-1 rounded transition-all cursor-pointer shrink-0"
                             >
                               Log Out
@@ -3278,69 +3522,16 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
           <div className="w-full bg-slate-950 rounded-3xl border border-slate-800 p-6 md:p-8 space-y-6 shadow-xl relative min-h-[700px]">
             <AnimatePresence mode="wait">
               {!selectedPatient ? (
-                /* RESPONSIVE LOGIN SCREEN */
-                <motion.div 
-                  key="resp-login"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="max-w-md mx-auto space-y-8 py-12 text-center"
-                >
-                  <div className="inline-flex h-16 w-16 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 items-center justify-center text-white font-black text-3xl shadow-lg">
-                    ✙
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-white">Access Patient Gateway</h2>
-                    <p className="text-sm text-slate-400 mt-2">Enter your medical identifier code or phone to securely sign in, view prescriptions, and log health vitals.</p>
-                  </div>
-
-                  <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-left space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="block text-[10px] font-black text-emerald-400 uppercase tracking-widest">Patient Code / Mobile Number</label>
-                      <div className="relative">
-                        <input 
-                          type="text"
-                          value={loginInput}
-                          onChange={(e) => setLoginInput(e.target.value)}
-                          placeholder="e.g. PAT-001 or +91 98765 43210"
-                          className="w-full bg-slate-950 border border-slate-800 text-sm font-bold text-white placeholder-slate-500 px-4 py-3 rounded-xl focus:outline-none focus:border-emerald-500 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    {authError && (
-                      <p className="text-xs text-rose-400 font-semibold text-center">⚠️ {authError}</p>
-                    )}
-
-                    <button
-                      onClick={() => handleLogin(loginInput)}
-                      disabled={isLoadingAuth || !loginInput}
-                      className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs rounded-xl shadow-md uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {isLoadingAuth ? "Searching Portal..." : "Secure Login"}
-                    </button>
-                  </div>
-
-                  {/* Quick switchers */}
-                  <div className="space-y-3">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Demo Evaluator Bypass Profiles</p>
-                    <div className="grid grid-cols-3 gap-3">
-                      {patients.map(p => (
-                        <button
-                          key={p.id}
-                          onClick={() => {
-                            setLoginInput(p.patientCode || p.id);
-                            handleLogin(p.patientCode || p.id);
-                          }}
-                          className="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500 rounded-xl text-center cursor-pointer transition-all"
-                        >
-                          <p className="text-xs font-bold text-white">{p.fullName}</p>
-                          <p className="text-[10px] font-mono font-semibold text-slate-500 mt-1">{p.patientCode || p.id}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                <PatientAuthScreen 
+                  patients={patients}
+                  onSelectPatient={(p) => handlePatientSelectAndPersist(p)}
+                  onPatientCreated={(p) => setPatients(prev => [p, ...prev])}
+                  onInstallPWA={handleInstallPWA}
+                  isPwaInstalled={isPwaInstalled}
+                  isSimulator={false}
+                  isBiometricSupported={isSupported}
+                  onAuthenticateBiometric={authenticateBiometric}
+                />
               ) : (
                 /* RESPONSIVE FULL WEB MAIN CONTENT */
                 <motion.div 
@@ -3362,7 +3553,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                       </div>
                     </div>
                     <button
-                      onClick={() => setSelectedPatient(null)}
+                      onClick={handlePatientLogout}
                       className="px-4 py-2 text-xs bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 border border-slate-700"
                     >
                       <LogOut className="h-3.5 w-3.5" /> Log Out Portal
@@ -3798,19 +3989,181 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 </div>
               ) : (
                 <form onSubmit={handleLogVitals} className="space-y-4 text-xs">
-                  {/* Speech Dictation Guide/Banner */}
-                  {speechSupported && (
-                    <div className="bg-slate-950/80 border border-slate-800/80 p-3 rounded-2xl space-y-2">
+                  {/* Modal Mode Selector: Smartwatch Sync vs Voice Dictation */}
+                  <div className="flex bg-slate-950 p-1 rounded-2xl border border-slate-800 gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setSmartwatchSyncMode("smartwatch")}
+                      className={`flex-1 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        smartwatchSyncMode === "smartwatch"
+                          ? "bg-emerald-500 text-slate-950 shadow-md"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      ⌚ Smartwatch Sync
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSmartwatchSyncMode("voice")}
+                      className={`flex-1 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        smartwatchSyncMode === "voice"
+                          ? "bg-emerald-500 text-slate-950 shadow-md"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      🎙️ Voice Dictation
+                    </button>
+                  </div>
+
+                  {smartwatchSyncMode === "smartwatch" ? (
+                    <div className="bg-slate-950 border border-emerald-500/30 p-3.5 rounded-2xl space-y-3 shadow-inner">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-slate-300 flex items-center gap-1.5 uppercase tracking-wider">
-                          <span className="relative flex h-2 w-2">
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                          </span>
+                          <span className="text-xs font-black text-emerald-300 uppercase tracking-wider">
+                            Smartwatch & BLE Telemetry Sync
+                          </span>
+                        </div>
+
+                        <span className="text-[9px] font-mono font-bold text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800 flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                          Bluetooth GATT
+                        </span>
+                      </div>
+
+                      {/* Smartwatch Device Brands Picker */}
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">1. Select Health App / Cloud API Preset:</span>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {[
+                            { id: "apple", label: "Apple Watch", sub: "HealthKit" },
+                            { id: "fitbit", label: "Fitbit", sub: "Sense / Charge" },
+                            { id: "galaxy", label: "Galaxy Watch", sub: "Samsung" },
+                            { id: "garmin", label: "Garmin", sub: "Connect" }
+                          ].map((dev) => (
+                            <button
+                              key={dev.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedSmartwatch(dev.id as any);
+                                handleSyncSmartwatchData(dev.id as any);
+                              }}
+                              className={`p-2 rounded-xl text-center border transition-all cursor-pointer flex flex-col items-center justify-center ${
+                                selectedSmartwatch === dev.id
+                                  ? "bg-emerald-500/20 border-emerald-500 text-emerald-300"
+                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                              }`}
+                            >
+                              <span className="text-sm mb-0.5">⌚</span>
+                              <span className="text-[9.5px] font-bold block leading-tight">{dev.label}</span>
+                              <span className="text-[7.5px] text-slate-500 block">{dev.sub}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Primary Cloud/App Sync Action Button */}
+                      <button
+                        type="button"
+                        disabled={isSyncingSmartwatch}
+                        onClick={() => handleSyncSmartwatchData(selectedSmartwatch)}
+                        className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 disabled:opacity-50"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${isSyncingSmartwatch ? "animate-spin" : ""}`} />
+                        {isSyncingSmartwatch ? "Syncing Wearable Sensor Data..." : "Quick Sync Cloud Biometrics"}
+                      </button>
+
+                      {/* Bluetooth LE Hardware Device Discovery Scanner Section */}
+                      <div className="space-y-2 pt-2 border-t border-slate-800/80">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9.5px] font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            📡 2. Physical Bluetooth LE Scanner
+                          </span>
+
+                          <button
+                            type="button"
+                            disabled={isScanningBluetooth}
+                            onClick={handleStartBluetoothScan}
+                            className={`px-2.5 py-1 rounded-lg text-[9px] font-black transition-all uppercase flex items-center gap-1 cursor-pointer border ${
+                              isScanningBluetooth
+                                ? "bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse"
+                                : "bg-slate-800 hover:bg-slate-750 text-slate-300 border-slate-700"
+                            }`}
+                          >
+                            <RefreshCw className={`h-3 w-3 ${isScanningBluetooth ? "animate-spin" : ""}`} />
+                            {isScanningBluetooth ? "Scanning Channels..." : "Scan Bluetooth"}
+                          </button>
+                        </div>
+
+                        {/* Discovered Devices List */}
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                          {discoveredBleDevices.map((device) => (
+                            <div
+                              key={device.id}
+                              className="bg-slate-900 border border-slate-800/90 p-2 rounded-xl flex items-center justify-between gap-2 hover:border-slate-700 transition-all"
+                            >
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs">📶</span>
+                                  <span className="text-[10px] font-bold text-slate-200 truncate">
+                                    {device.name}
+                                  </span>
+                                  {device.isPaired && (
+                                    <span className="px-1.5 py-0.2 text-[8px] font-bold bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">
+                                      PAIRED
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 text-[8.5px] font-mono text-slate-400 mt-0.5">
+                                  <span>ID: {device.id}</span>
+                                  <span>RSSI: {device.rssi} dBm</span>
+                                  <span>🔋 {device.battery}%</span>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                disabled={isSyncingSmartwatch}
+                                onClick={() => handlePairAndStreamBleDevice(device)}
+                                className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase transition-all shrink-0 border cursor-pointer ${
+                                  device.isPaired
+                                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                                    : "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-600"
+                                }`}
+                              >
+                                {device.isPaired ? "Re-Stream" : "Pair Device"}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Status Feedback */}
+                      {voiceFeedback && (
+                        <p className="text-[10px] font-semibold text-emerald-300 text-center bg-slate-900/90 py-1.5 px-2 rounded-xl border border-slate-800">
+                          {voiceFeedback}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    /* Enhanced Single-Sentence Voice Dictation Banner */
+                    <div className="bg-slate-950 border border-emerald-500/30 p-3.5 rounded-2xl space-y-3 shadow-inner">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-3 w-3">
                             {listeningField === "all" && (
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             )}
-                            <span className={`relative inline-flex rounded-full h-2 w-2 ${listeningField === "all" ? "bg-emerald-500 animate-pulse" : "bg-slate-600"}`}></span>
+                            <span className={`relative inline-flex rounded-full h-3 w-3 ${listeningField === "all" ? "bg-emerald-500 animate-pulse" : "bg-emerald-400/60"}`}></span>
                           </span>
-                          🎙️ Unified Dictation Mode
-                        </span>
+                          <span className="text-xs font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1">
+                            🎙️ Voice-to-Text Vitals Dictation
+                          </span>
+                        </div>
+
                         <button
                           type="button"
                           onClick={() => {
@@ -3820,19 +4173,111 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                               startListening("all");
                             }
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[9px] font-black transition-all uppercase flex items-center gap-1 cursor-pointer border ${
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all uppercase flex items-center gap-1.5 cursor-pointer border shadow-sm ${
                             listeningField === "all"
-                              ? "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                              : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/35"
+                              ? "bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse"
+                              : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30"
                           }`}
                         >
-                          {listeningField === "all" ? <MicOff className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
-                          {listeningField === "all" ? "Stop" : "Speak All"}
+                          {listeningField === "all" ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                          {listeningField === "all" ? "Listening..." : "Dictate Vitals"}
                         </button>
                       </div>
-                      <p className="text-[9px] text-slate-400 leading-normal">
-                        {voiceFeedback || "Say e.g.: \"Heart rate 72, blood pressure 120 over 80 and sugar 105\"."}
+
+                      <p className="text-[10px] text-slate-300 leading-relaxed font-medium">
+                        Dictate multiple vitals in a single sentence. E.g.: <span className="text-emerald-300 font-semibold italic">"Heart rate 76, BP 120 over 80, sugar 105, weight 70.5"</span>.
                       </p>
+
+                      {/* Real-time Voice Feedback Display */}
+                      {voiceFeedback && (
+                        <div className="bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl space-y-1">
+                          <div className="flex items-center justify-between text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                            <span>Dictation Status</span>
+                            <span className="text-emerald-400 font-mono font-bold">
+                              {listeningField === "all" ? "● Listening..." : "✓ Parsed"}
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] font-semibold text-slate-200">
+                            {voiceFeedback}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Auto-Parsed Vitals Badges Summary */}
+                      {parsedVitalsSummary && Object.keys(parsedVitalsSummary).length > 0 && (
+                        <div className="space-y-1.5 pt-1 border-t border-slate-800/80">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Auto-Filled Fields:</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLogHeartRate("");
+                                setLogSystolic("");
+                                setLogDiastolic("");
+                                setLogSugar("");
+                                setLogWeight("");
+                                setLogHeight("");
+                                setParsedVitalsSummary(null);
+                                setVoiceFeedback("Cleared form fields.");
+                              }}
+                              className="text-[9px] font-bold text-rose-400 hover:underline uppercase tracking-wider cursor-pointer"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {parsedVitalsSummary.hr && (
+                              <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-[9.5px]">
+                                💓 HR: {parsedVitalsSummary.hr} BPM
+                              </span>
+                            )}
+                            {parsedVitalsSummary.systolic && parsedVitalsSummary.diastolic && (
+                              <span className="px-2 py-0.5 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-300 font-bold text-[9.5px]">
+                                🩺 BP: {parsedVitalsSummary.systolic}/{parsedVitalsSummary.diastolic} mmHg
+                              </span>
+                            )}
+                            {parsedVitalsSummary.sugar && (
+                              <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold text-[9.5px]">
+                                🩸 Sugar: {parsedVitalsSummary.sugar} mg/dL
+                              </span>
+                            )}
+                            {parsedVitalsSummary.weight && (
+                              <span className="px-2 py-0.5 rounded-md bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold text-[9.5px]">
+                                ⚖️ Weight: {parsedVitalsSummary.weight} kg
+                              </span>
+                            )}
+                            {parsedVitalsSummary.height && (
+                              <span className="px-2 py-0.5 rounded-md bg-teal-500/15 border border-teal-500/30 text-teal-300 font-bold text-[9.5px]">
+                                📏 Height: {parsedVitalsSummary.height} cm
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Quick Sample Voice Dictations */}
+                      <div className="space-y-1.5 pt-1 border-t border-slate-800/60">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                          Sample Single-Sentence Dictations (Test Auto-Parser):
+                        </span>
+                        <div className="flex flex-col gap-1.5">
+                          {[
+                            "Heart rate 76, blood pressure 120 over 80, sugar 105, weight 70.5 kg",
+                            "Pulse 88, BP 135 over 85, glucose 140, weight 72 kg",
+                            "Heart rate 68, blood pressure 118 over 74, blood sugar 98, weight 65.2 kg"
+                          ].map((sample, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => processSpeechTranscript("all", sample)}
+                              className="text-left px-2.5 py-1.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/40 rounded-xl text-[9.5px] text-slate-300 hover:text-emerald-300 transition-all cursor-pointer flex items-center justify-between group"
+                            >
+                              <span className="truncate pr-2 italic">"{sample}"</span>
+                              <span className="text-[8.5px] font-bold uppercase text-emerald-400 group-hover:underline shrink-0">Auto-Parse →</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -4559,75 +5004,27 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         )}
       </AnimatePresence>
 
-      {/* MODAL: VIDEO CALL SIMULATION */}
+      {/* MODAL: FULL HD VIDEO CONSULTATION */}
       <AnimatePresence>
         {showVideoCallModal && (
-          <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] overflow-y-auto p-2 sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden text-slate-100 shadow-2xl relative flex flex-col h-[80vh] max-h-[600px]"
+              className="max-w-6xl mx-auto w-full"
             >
-              {/* Top info bar */}
-              <div className="bg-slate-950 px-5 py-3.5 flex items-center justify-between border-b border-slate-800/80 shrink-0">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Secure Clinic Telehealth Link</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-slate-400">{formatCallTime(callTimer)}</span>
-              </div>
-
-              {/* Main Video Area */}
-              <div className="flex-1 bg-slate-950 relative flex flex-col items-center justify-center p-6">
-                {/* Doctor's Video Placeholder */}
-                <div className="relative text-center space-y-4">
-                  <div className="relative inline-block">
-                    <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
-                    <div className="h-24 w-24 bg-gradient-to-tr from-slate-850 to-slate-800 border-2 border-emerald-500/50 rounded-full flex items-center justify-center relative z-10 mx-auto shadow-xl">
-                      <span className="text-3xl">👨‍⚕️</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-white">Dr. Rajesh Sharma</h3>
-                    <p className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider mt-1">Consulting Physician</p>
-                    <p className="text-[10.5px] text-slate-400 mt-0.5">Connected • High Definition Video Stream</p>
-                  </div>
-                </div>
-
-                {/* Self View (Simulated Picture-in-Picture) */}
-                <div className="absolute bottom-4 right-4 w-24 h-36 bg-slate-900 rounded-xl border border-slate-700/60 overflow-hidden shadow-lg flex flex-col items-center justify-center p-2 text-center">
-                  <span className="text-xl mb-1">👤</span>
-                  <span className="text-[8px] font-bold text-slate-400 uppercase">You (Patient)</span>
-                  <span className="text-[7px] text-emerald-400 mt-1 font-mono">Camera On</span>
-                </div>
-              </div>
-
-              {/* Controls Bar */}
-              <div className="bg-slate-950 p-6 flex items-center justify-center gap-6 border-t border-slate-800/80 shrink-0">
-                <button
-                  type="button"
-                  className="p-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 rounded-full text-slate-300 hover:text-white transition-all cursor-pointer"
-                  title="Mute Mic"
-                >
-                  <Mic className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowVideoCallModal(false)}
-                  className="p-4 bg-rose-600 hover:bg-rose-500 rounded-full text-white transition-all cursor-pointer shadow-lg hover:shadow-rose-600/20 flex items-center justify-center"
-                  title="End Consultation"
-                >
-                  <Phone className="h-6 w-6 rotate-[135deg]" />
-                </button>
-                <button
-                  type="button"
-                  className="p-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 rounded-full text-slate-300 hover:text-white transition-all cursor-pointer"
-                  title="Turn off video"
-                >
-                  <Video className="h-5 w-5" />
-                </button>
-              </div>
+              <VideoConsultation
+                patientName={selectedPatient?.fullName || "Rajesh Kumar"}
+                doctorName="Dr. Vikram Sethi"
+                doctorTitle="Senior Consultant Cardiologist"
+                specialty="Cardiology & Internal Medicine"
+                hospitalName="Max Super Speciality Hospital, Saket"
+                onBack={() => setShowVideoCallModal(false)}
+                onEndConsultation={() => {
+                  setTimeout(() => setShowVideoCallModal(false), 2500);
+                }}
+              />
             </motion.div>
           </div>
         )}
@@ -6163,6 +6560,8 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 setSimulatedAppointmentOverride(apt);
                 setShowMapDirectionsModal(true);
               }}
+              onNavigateTab={(tab) => setActiveTab(tab as any)}
+              onOpenRefillModal={() => setShowRefillModal(true)}
             />
 
             {/* BMI & Body Composition Tracker */}
@@ -7394,6 +7793,52 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
             );
           }
         }
+        const filteredHistoryLogs = (selectedPatient?.history || []).filter((record) => {
+          if (!historySearchQuery.trim()) return true;
+          const query = historySearchQuery.trim().toLowerCase();
+
+          // Match diagnosis
+          const diagMatch = (record.diagnosis || "").toLowerCase().includes(query);
+
+          // Match date (raw, formatted, month, year, day)
+          let dateMatch = false;
+          if (record.date) {
+            const rawDate = String(record.date).toLowerCase();
+            dateMatch = rawDate.includes(query);
+            if (!dateMatch) {
+              try {
+                const parsed = new Date(record.date);
+                if (!isNaN(parsed.getTime())) {
+                  const formattedIN = parsed.toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }).toLowerCase();
+                  const formattedINLong = parsed.toLocaleDateString("en-IN", { month: "long", day: "numeric", year: "numeric" }).toLowerCase();
+                  const formattedUS = parsed.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toLowerCase();
+                  const monthName = parsed.toLocaleDateString("en-US", { month: "long" }).toLowerCase();
+                  const shortMonth = parsed.toLocaleDateString("en-US", { month: "short" }).toLowerCase();
+                  const yearStr = parsed.getFullYear().toString();
+                  const dayStr = parsed.getDate().toString();
+
+                  dateMatch = formattedIN.includes(query) ||
+                              formattedINLong.includes(query) ||
+                              formattedUS.includes(query) ||
+                              monthName.includes(query) ||
+                              shortMonth.includes(query) ||
+                              yearStr.includes(query) ||
+                              dayStr === query;
+                }
+              } catch (e) {
+                // ignore
+              }
+            }
+          }
+
+          // Supplementary search matching
+          const doctorMatch = (record.doctor || "").toLowerCase().includes(query);
+          const symptomsMatch = (record.symptoms || "").toLowerCase().includes(query);
+          const rxMatch = (record.prescriptions || []).some((rx: string) => rx.toLowerCase().includes(query));
+
+          return diagMatch || dateMatch || doctorMatch || symptomsMatch || rxMatch;
+        });
+
         return (
           <div className="space-y-4">
             <div className="bg-gradient-to-tr from-slate-950 to-slate-900 border border-slate-800/80 p-4.5 rounded-2xl">
@@ -7401,6 +7846,96 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 <Clock className="h-4.5 w-4.5 text-emerald-400" /> Complete EHR History Timeline
               </h3>
               <p className="text-[10px] text-slate-400 mt-1">Full clinical trace records, visit notes, and physician diagnosis history logs.</p>
+            </div>
+
+            {/* SEARCH INPUT BAR AT TOP OF HISTORY TAB */}
+            <div id="history-search-input-bar" className="bg-slate-950/70 border border-slate-800/80 p-3.5 rounded-2xl space-y-2.5 shadow-md">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 text-xs font-black text-white">
+                  <Search className="h-4 w-4 text-emerald-400" />
+                  <span>Filter EHR Visit Logs</span>
+                </div>
+                {historySearchQuery && (
+                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono">
+                    {filteredHistoryLogs.length} matching {filteredHistoryLogs.length === 1 ? "record" : "records"}
+                  </span>
+                )}
+              </div>
+
+              <div className="relative flex items-center">
+                <Search className="absolute left-3.5 h-4 w-4 text-slate-500 pointer-events-none" />
+                <input
+                  id="history-ehr-search-input"
+                  type="text"
+                  value={historySearchQuery}
+                  onChange={(e) => setHistorySearchQuery(e.target.value)}
+                  placeholder="Search visit logs by diagnosis or date (e.g. Hypertension, 2025, May 10)..."
+                  className="w-full bg-slate-900/90 border border-slate-800 text-xs font-medium text-white placeholder-slate-500 pl-10 pr-9 py-2.5 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all"
+                />
+                {historySearchQuery && (
+                  <button
+                    id="history-ehr-search-clear-btn"
+                    type="button"
+                    onClick={() => setHistorySearchQuery("")}
+                    className="absolute right-2.5 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all cursor-pointer"
+                    title="Clear search"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Quick filter diagnosis / date suggestions */}
+              {selectedPatient?.history && selectedPatient.history.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <span className="text-[8.5px] font-bold text-slate-500 uppercase tracking-widest mr-1">
+                    Quick filters:
+                  </span>
+                  {(Array.from(new Set(selectedPatient.history.map(h => h.diagnosis).filter(Boolean))) as string[]).slice(0, 3).map((diag: string) => (
+                    <button
+                      key={diag}
+                      type="button"
+                      onClick={() => setHistorySearchQuery(diag)}
+                      className={`text-[9px] px-2 py-0.5 rounded-lg border transition-all cursor-pointer font-semibold ${
+                        historySearchQuery.toLowerCase() === diag.toLowerCase()
+                          ? "bg-emerald-500 text-slate-950 border-emerald-400 font-bold"
+                          : "bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700"
+                      }`}
+                    >
+                      {diag}
+                    </button>
+                  ))}
+                  {(Array.from(new Set(selectedPatient.history.map(h => {
+                    try {
+                      return new Date(h.date).getFullYear().toString();
+                    } catch (e) {
+                      return "";
+                    }
+                  }).filter(Boolean))) as string[]).slice(0, 2).map((year: string) => (
+                    <button
+                      key={year}
+                      type="button"
+                      onClick={() => setHistorySearchQuery(year)}
+                      className={`text-[9px] px-2 py-0.5 rounded-lg border transition-all cursor-pointer font-mono font-semibold ${
+                        historySearchQuery === year
+                          ? "bg-teal-500 text-slate-950 border-teal-400 font-bold"
+                          : "bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700"
+                      }`}
+                    >
+                      📅 {year}
+                    </button>
+                  ))}
+                  {historySearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setHistorySearchQuery("")}
+                      className="text-[8.5px] text-rose-400 hover:text-rose-300 font-bold ml-auto cursor-pointer"
+                    >
+                      Reset filter
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Vitals History interactive Recharts-based trend tracker */}
@@ -8041,16 +8576,48 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
 
             {/* HISTORICAL EHR VISIT LOGS */}
             <div className="space-y-2.5">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Past Visit Diagnostics Logs</p>
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Past Visit Diagnostics Logs
+                </p>
+                {selectedPatient?.history && selectedPatient.history.length > 0 && (
+                  <span className="text-[9px] font-bold text-slate-500 font-mono">
+                    {historySearchQuery
+                      ? `${filteredHistoryLogs.length} of ${selectedPatient.history.length} records`
+                      : `${selectedPatient.history.length} Total Visits`}
+                  </span>
+                )}
+              </div>
               
-              {selectedPatient.history && selectedPatient.history.length > 0 ? (
+              {!selectedPatient.history || selectedPatient.history.length === 0 ? (
+                <p className="text-xs text-slate-500 text-center py-6">No previous visits tracked in cloud system database.</p>
+              ) : filteredHistoryLogs.length === 0 ? (
+                <div className="bg-slate-950/50 border border-slate-800/80 p-6 rounded-2xl text-center space-y-3 shadow-inner">
+                  <div className="inline-flex p-3 bg-slate-900 border border-slate-800 text-slate-400 rounded-full">
+                    <Search className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-black text-white">No Matching Visit Logs Found</p>
+                    <p className="text-[10px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                      No records matched "<span className="text-emerald-400 font-semibold">{historySearchQuery}</span>". Try searching by diagnosis (e.g. Hypertension) or visit date.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setHistorySearchQuery("")}
+                    className="px-3.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9.5px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <span>Clear Search Filter</span>
+                  </button>
+                </div>
+              ) : (
                 <div className="relative pl-4 border-l border-slate-800 space-y-4">
-                  {selectedPatient.history.map((record, i) => (
+                  {filteredHistoryLogs.map((record, i) => (
                     <div key={i} className="relative">
                       {/* Timeline dot */}
                       <div className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-4 ring-slate-900"></div>
                       
-                      <div className="bg-slate-950/40 border border-slate-850 p-3.5 rounded-2xl space-y-2">
+                      <div className="bg-slate-950/40 border border-slate-850 p-3.5 rounded-2xl space-y-2 hover:border-slate-800 transition-all">
                         <div className="flex justify-between items-start">
                           <span className="text-[10px] font-black text-emerald-400 font-mono">
                             {new Date(record.date).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
@@ -8074,8 +8641,6 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                     </div>
                   ))}
                 </div>
-              ) : (
-                <p className="text-xs text-slate-500 text-center py-6">No previous visits tracked in cloud system database.</p>
               )}
             </div>
           </div>

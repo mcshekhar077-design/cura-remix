@@ -176,33 +176,8 @@ const promptVersionsStore: PromptVersion[] = [
 
 const backgroundTasksStore: BackgroundTask[] = [];
 
-// Preseeded external records for ABDM sandbox linking
-const abdmExternalRecords: ABDMRecord[] = [
-  {
-    abhaId: "ABHA2612345678",
-    externalHospital: "Apollo Hospitals, Bangalore",
-    records: [
-      {
-        date: "2024-08-12",
-        doctor: "Dr. K. S. Murthy (Cardiologist)",
-        diagnosis: "Mild Mitral Regurgitation",
-        treatment: "Advised salt restriction. Monitor BP. Echo scheduled in 12 months."
-      }
-    ]
-  },
-  {
-    abhaId: "ABHA2687654321",
-    externalHospital: "Fortis Escorts Heart Institute, Delhi",
-    records: [
-      {
-        date: "2025-02-19",
-        doctor: "Dr. Sandeep Sen (Endocrinologist)",
-        diagnosis: "Prediabetes & Borderline Hyperlipidemia",
-        treatment: "Metformin 500mg OD. Restricted glycemic load diet. Follow up in 3 months."
-      }
-    ]
-  }
-];
+// ABDM records for external health record linking
+const abdmExternalRecords: ABDMRecord[] = [];
 
 // Configuration for row-level encryption simulation and tenant isolation switching
 let rowLevelEncryptionEnabled = false;
@@ -1134,131 +1109,13 @@ const bedOccupancyHistoryStore: BedOccupancyHistory[] = [
   }
 ];
 
-const admissionsStore: Admission[] = [
-  { id: "ADM-101", patientId: "PAT-01", patientName: "Amit Patel", bedId: "BED-101", doctorName: "Dr. K. S. Murthy", admissionNumber: "ADM-2026-0001", admissionDate: "2026-06-25T10:00:00Z", diagnosis: "Myocardial Infarction Post-Angioplasty Monitoring", status: "active", notes: "Strict absolute bed rest. Keep oxygen flow 4L/min." },
-  { id: "ADM-102", patientId: "PAT-02", patientName: "Neha Sharma", bedId: "BED-103", doctorName: "Dr. Sanjay Roy", admissionNumber: "ADM-2026-0002", admissionDate: "2026-06-28T14:30:00Z", diagnosis: "Post-Operative Acute Appendectomy Recovery", status: "active", notes: "Assess incision twice daily. Administer IV analgesics." },
-  { id: "ADM-103", patientId: "PAT-03", patientName: "Rajesh Kumar", bedId: "BED-201", doctorName: "Dr. Sandeep Sen", admissionNumber: "ADM-2026-0003", admissionDate: "2026-07-01T08:15:00Z", diagnosis: "Severe Diabetic Ketoacidosis & Dehydration", status: "active", notes: "Insulin infusion sliding scale active. Hydration charting continuous." },
-  { id: "ADM-104", patientId: "PAT-04", patientName: "Anjali Gupta", bedId: "BED-301", doctorName: "Dr. Anjali Gupta", admissionNumber: "ADM-2026-0004", admissionDate: "2026-07-02T19:00:00Z", diagnosis: "Asthma Exacerbation with Respiratory Distress", status: "active", notes: "Nebulization every 4 hours. Keep head-end elevated." }
-];
+const admissionsStore: Admission[] = [];
 
-const dailyNotesStore: DailyNote[] = [
-  {
-    id: "NOTE-1001",
-    admissionId: "ADM-101",
-    date: "2026-07-08T08:00:00Z",
-    noteType: "clinical",
-    vitals: { bpSystolic: 122, bpDiastolic: 78, pulse: 74, temperature: 98.4, spo2: 99 },
-    subjective: "Patient reports feeling stable. No chest tightness or shortness of breath overnight. Slept 6 hours.",
-    objective: "Heart rate stable at 74 bpm. Chest clear on auscultation. Minimal edema in lower extremities. Surgical entry point in groin is clean without haematoma.",
-    assessment: "Status post-angioplasty is highly satisfactory. Haemodynamics stable.",
-    plan: "Continue current medications (Aspirin + Clopidogrel). Keep on cardiac low-sodium diet. Ambulatory trial under nurse supervision today.",
-    medications: [
-      { name: "Aspirin", dosage: "75mg", frequency: "Once daily" },
-      { name: "Clopidogrel", dosage: "75mg", frequency: "Once daily" },
-      { name: "Atorvastatin", dosage: "40mg", frequency: "Once daily (night)" }
-    ],
-    notes: "Patient is compliant with clinical instructions.",
-    recordedBy: "Dr. K. S. Murthy"
-  },
-  {
-    id: "NOTE-1002",
-    admissionId: "ADM-101",
-    date: "2026-07-09T09:15:00Z",
-    noteType: "nursing",
-    vitals: { bpSystolic: 118, bpDiastolic: 76, pulse: 70, temperature: 98.6, spo2: 98 },
-    subjective: "Patient is comfortable, did not complain of any chest pain during morning walk around the ICU ward.",
-    objective: "Vitals stable. Urine output 1200ml/24hr. Normal bowel sounds present.",
-    assessment: "Post-op status improving, mobilising well.",
-    plan: "Monitor vitals Q4 hours. Encourage oral fluid intake.",
-    medications: [
-      { name: "Metoprolol", dosage: "25mg", frequency: "Twice daily" }
-    ],
-    notes: "Incision area clean.",
-    recordedBy: "Nurse Margaret D'Souza, RN"
-  },
-  {
-    id: "NOTE-1003",
-    admissionId: "ADM-102",
-    date: "2026-07-08T07:30:00Z",
-    noteType: "clinical",
-    vitals: { bpSystolic: 110, bpDiastolic: 70, pulse: 82, temperature: 99.1, spo2: 98 },
-    subjective: "Slight pain around the laparoscopic entry site (rated 3/10). No nausea or vomiting.",
-    objective: "Abdomen soft, mild tenderness at the umbilical port. Dry dressing intact. Afebrile.",
-    assessment: "Post-operative Day 2 appendectomy. Recovering well.",
-    plan: "Progress from clear liquid to soft solid diet. Mobilise actively. Pain control with paracetamol IV PRN.",
-    medications: [
-      { name: "Paracetamol", dosage: "1g", frequency: "IV Q8H PRN" },
-      { name: "Cefuroxime", dosage: "500mg", frequency: "Twice daily" }
-    ],
-    notes: "Wound check scheduled for tomorrow.",
-    recordedBy: "Dr. Sanjay Roy"
-  },
-  {
-    id: "NOTE-1004",
-    admissionId: "ADM-103",
-    date: "2026-07-09T11:00:00Z",
-    noteType: "clinical",
-    vitals: { bpSystolic: 132, bpDiastolic: 84, pulse: 80, temperature: 98.8, spo2: 97 },
-    subjective: "Patient feels less fatigued. Thirst has significantly reduced. No nausea.",
-    objective: "Hydrated. Mucous membranes moist. Capillary refill <2s. Fingerstick blood glucose 156 mg/dL. Urine ketones trace negative.",
-    assessment: "Resolution of Diabetic Ketoacidosis. Transitioning to subcutaneous insulin.",
-    plan: "Discontinue insulin infusion pump. Initiate SC Insulin Glargine 10 units at bedtime and NovoRapid 4 units pre-meals.",
-    medications: [
-      { name: "Insulin Glargine", dosage: "10 units", frequency: "Once daily (night)" },
-      { name: "Insulin Aspart", dosage: "4 units", frequency: "Before meals (TID)" }
-    ],
-    notes: "Continuous diabetic monitoring is critical.",
-    recordedBy: "Dr. Sandeep Sen"
-  }
-];
+const dailyNotesStore: DailyNote[] = [];
 
-const proceduresStore: Procedure[] = [
-  {
-    id: "PROC-1001",
-    admissionId: "ADM-101",
-    procedureName: "Percutaneous Transluminal Coronary Angioplasty (PTCA)",
-    procedureDate: "2026-06-25T11:30:00Z",
-    procedureType: "Surgical",
-    performedBy: "Dr. K. S. Murthy",
-    assistedBy: ["Dr. S. K. Mitra", "Dr. A. Verma"],
-    notes: "Successful deployment of drug-eluting stent (DES) in the Left Anterior Descending (LAD) artery. Post-dilatation showed 0% residual stenosis and TIMI III flow.",
-    outcome: "Excellent. Patient haemodynamically stable.",
-    complications: "None. Groin access secured using Angio-Seal."
-  },
-  {
-    id: "PROC-1002",
-    admissionId: "ADM-102",
-    procedureName: "Laparoscopic Appendectomy",
-    procedureDate: "2026-06-28T15:30:00Z",
-    procedureType: "Surgical",
-    performedBy: "Dr. Sanjay Roy",
-    assistedBy: ["Dr. R. Verma"],
-    notes: "Three-port entry. Retrocecal appendix was found highly inflamed, turgid, and covered with fibrinous exudate. Mobilised and dissected cleanly. Stump secured with Endoloop.",
-    outcome: "Successfully removed inflamed appendix without rupture.",
-    complications: "None. Minimal blood loss (<20ml)."
-  }
-];
+const proceduresStore: Procedure[] = [];
 
-const dietPlansStore: DietPlan[] = [
-  {
-    id: "DIET-1001",
-    admissionId: "ADM-101",
-    dietType: "Cardiac Diet (Low Sodium, Low Fat)",
-    restrictions: "Strictly restrict sodium (<2g per day). Avoid saturated fats, fried foods, and refined sugars.",
-    instructions: "Provide plenty of green leafy vegetables, steamed fish, oats, and fruits. Keep oral fluid intake to maximum 1.5 Liters per 24 hours.",
-    startDate: "2026-06-25T13:00:00Z",
-    prescribedBy: "Dr. K. S. Murthy"
-  },
-  {
-    id: "DIET-1002",
-    admissionId: "ADM-103",
-    dietType: "Diabetic Diet (1500 kcal, Low Carb)",
-    restrictions: "No simple sugars, refined grains, sweets, or high-glycemic fruits.",
-    instructions: "High fiber, complex carbohydrates distributed evenly across three meals and two snacks. Coordinate meals with insulin administration.",
-    startDate: "2026-07-01T09:00:00Z",
-    prescribedBy: "Dr. Sandeep Sen"
-  }
-];
+const dietPlansStore: DietPlan[] = [];
 
 const operationTheatresStore: OperationTheatre[] = [
   { id: "OT-01", name: "Operation Theatre 1 (Cardiovascular)", otNumber: "OT-A", floor: 4, building: "Main Block A", status: "available", hasVentilator: true, hasCautery: true, hasLaparoscopy: false, hasMicroscope: true, hasCarm: true, otType: "cardiac", maxSurgeriesPerDay: 4, averageSurgeryDuration: 180, nurseInCharge: "Mary Kutty (RN)", contactNumber: "+91 99881 22331", notes: "Laminar flow system certified on June 2026." },
@@ -1274,20 +1131,11 @@ const otEquipmentStore: OTEquipment[] = [
   { id: "EQ-105", name: "Electrosurgical Cautery (Valleylab)", equipmentType: "cautery", serialNumber: "VV-99021", model: "ForceTriad", manufacturer: "Covidien", status: "available", location: "OT-03", lastMaintenanceDate: "2026-06-10", nextMaintenanceDate: "2026-12-10" }
 ];
 
-const otMaintenanceStore: OTMaintenance[] = [
-  { id: "MNT-201", otId: "OT-01", maintenanceType: "routine", scheduledDate: "2026-07-01T08:00:00Z", completedDate: "2026-07-01T11:00:00Z", description: "HEPA filter replacement and positive pressure validation.", performedBy: "BioMed Engineering Services", cost: 12000, status: "completed" },
-  { id: "MNT-202", otId: "OT-02", maintenanceType: "preventive", scheduledDate: "2026-07-05T06:00:00Z", completedDate: "2026-07-05T09:00:00Z", description: "Laparoscopy light source and fiber optic cable inspection.", performedBy: "Karl Storz Service", cost: 8500, status: "completed" },
-  { id: "MNT-203", otId: "OT-03", maintenanceType: "routine", scheduledDate: "2026-07-15T09:00:00Z", description: "Backup power generator auto-switch sync testing.", performedBy: "Internal Facilities Team", cost: 0, status: "scheduled" }
-];
+const otMaintenanceStore: OTMaintenance[] = [];
 
-const otEquipmentUsageStore: OTEquipmentUsage[] = [
-  { id: "EQ-USE-501", scheduleId: "OTS-02", equipmentId: "EQ-103", usedFrom: "2026-07-05T11:00:00Z", usedUntil: "2026-07-05T12:00:00Z", notes: "Operation successful. Sterilized after use." }
-];
+const otEquipmentUsageStore: OTEquipmentUsage[] = [];
 
-const otSchedulesStore: OTSchedule[] = [
-  { id: "OTS-01", otId: "OT-01", otName: "Operation Theatre 1 (Cardiovascular)", patientId: "PAT-01", patientName: "Amit Patel", surgeonName: "Dr. K. S. Murthy", anesthetistName: "Dr. R. P. Deshpande", assistantSurgeonName: "Dr. S. K. Mitra", surgeryType: "Coronary Artery Bypass Graft (CABG)", procedureName: "Triple Bypass Surgery", priority: "urgent", scheduledDate: "2026-07-07T09:00:00Z", durationMinutes: 180, status: "scheduled", notes: "Prepare 4 units of O-positive packed red blood cells.", diagnosis: "Severe Triple Vessel Disease (CAD)", specialInstructions: "Administer pre-op antibiotic prophylaxis 30 mins before incision." },
-  { id: "OTS-02", otId: "OT-02", otName: "Operation Theatre 2 (Neuro & Orthopedics)", patientId: "PAT-02", patientName: "Neha Sharma", surgeonName: "Dr. Sanjay Roy", anesthetistName: "Dr. K. G. Nair", assistantSurgeonName: "Dr. R. Verma", surgeryType: "Laparoscopic Appendectomy", procedureName: "Incision & Removal of Appendix", priority: "normal", scheduledDate: "2026-07-05T11:00:00Z", durationMinutes: 60, status: "completed", notes: "Success. Post-op orders written.", diagnosis: "Acute Appendicitis with Local Peritonitis", outcome: "Appendix excised cleanly, minimal blood loss, stump closed with Endoloop.", complications: "None" }
-];
+const otSchedulesStore: OTSchedule[] = [];
 
 const insuranceProvidersStore: InsuranceProvider[] = [
   { id: "INS-01", name: "Star Health & Allied Insurance", code: "STAR-HLTH-01", type: "private", settlementDays: 14, isActive: true },
@@ -4825,6 +4673,109 @@ async function startServer() {
       return res.status(200).json(activeDoctorProfile);
     } catch (e: any) {
       return res.status(500).json({ detail: e.message });
+    }
+  });
+
+  // === PATIENT AUTHENTICATION APIS (HTTP-ONLY COOKIES & PERSISTENT SESSION) ===
+  app.post("/api/v1/auth/login", (req, res) => {
+    try {
+      const { identifier, password } = req.body;
+      if (!identifier) {
+        return res.status(400).json({ detail: "Identifier is required" });
+      }
+
+      const q = String(identifier).trim().toLowerCase();
+      const cleanPhone = String(identifier).replace(/\s+/g, "");
+
+      const match = patientStore.find(p => 
+        p.id.toLowerCase() === q ||
+        (p.patientCode && p.patientCode.toLowerCase() === q) ||
+        (p.email && p.email.toLowerCase() === q) ||
+        (p.abhaId && p.abhaId.toLowerCase() === q) ||
+        (p.phone && p.phone.replace(/\s+/g, "").includes(cleanPhone))
+      );
+
+      if (!match) {
+        return res.status(404).json({ detail: "Patient record not found for given identifier" });
+      }
+
+      // Set HTTP-only secure cookie for persistent session
+      const cookieOptions = [
+        `cura_patient_session=${encodeURIComponent(match.id)}`,
+        `Path=/`,
+        `HttpOnly`,
+        `SameSite=Lax`,
+        `Max-Age=${30 * 24 * 60 * 60}` // 30 days persistence
+      ].join("; ");
+
+      res.setHeader("Set-Cookie", cookieOptions);
+      logAudit("LOGIN", "patients", match.id, `Patient ${match.fullName} logged in successfully. Persistent cookie set.`, req);
+
+      return res.status(200).json({
+        success: true,
+        patient: match,
+        token: `PAT_TOKEN_${match.id}`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ detail: err.message });
+    }
+  });
+
+  app.get("/api/v1/auth/me", (req, res) => {
+    try {
+      // Check HTTP-only cookie first
+      let patientId: string | null = null;
+      const rawCookies = req.headers.cookie;
+      if (rawCookies) {
+        const parsedCookies = Object.fromEntries(
+          rawCookies.split(";").map(c => {
+            const [k, ...v] = c.trim().split("=");
+            return [k, decodeURIComponent(v.join("="))];
+          })
+        );
+        patientId = parsedCookies["cura_patient_session"] || null;
+      }
+
+      // Fallback check Authorization header or query param
+      if (!patientId && req.headers.authorization) {
+        const authHeader = req.headers.authorization;
+        if (authHeader.startsWith("Bearer PAT_TOKEN_")) {
+          patientId = authHeader.replace("Bearer PAT_TOKEN_", "");
+        }
+      }
+      if (!patientId && req.query.patientId) {
+        patientId = String(req.query.patientId);
+      }
+
+      if (!patientId) {
+        return res.status(200).json({ authenticated: false, patient: null });
+      }
+
+      const match = patientStore.find(p => p.id === patientId || p.patientCode === patientId);
+      if (match) {
+        return res.status(200).json({ authenticated: true, patient: match });
+      } else {
+        return res.status(200).json({ authenticated: false, patient: null });
+      }
+    } catch (err: any) {
+      return res.status(500).json({ detail: err.message });
+    }
+  });
+
+  app.post("/api/v1/auth/logout", (req, res) => {
+    try {
+      const cookieOptions = [
+        `cura_patient_session=`,
+        `Path=/`,
+        `HttpOnly`,
+        `SameSite=Lax`,
+        `Max-Age=0` // Expire immediately
+      ].join("; ");
+
+      res.setHeader("Set-Cookie", cookieOptions);
+      return res.status(200).json({ success: true, message: "Logged out successfully" });
+    } catch (err: any) {
+      return res.status(500).json({ detail: err.message });
     }
   });
 

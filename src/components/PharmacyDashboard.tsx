@@ -88,209 +88,11 @@ interface PharmacyDashboardProps {
   onBackToLanding: () => void;
 }
 
-const INITIAL_MEDICINES: Medicine[] = [
-  {
-    id: "med-1",
-    name: "Amoxicillin 500mg",
-    genericName: "Amoxicillin Trihydrate",
-    category: "capsule",
-    manufacturer: "Abbott Pharmaceuticals",
-    currentStock: 450,
-    minStockLevel: 50,
-    maxStockLevel: 1000,
-    reorderLevel: 100,
-    purchasePrice: 4.5,
-    sellingPrice: 8.0,
-    expiryDate: "2027-03-15",
-    batchNumber: "AMX-7762",
-    requiresPrescription: true,
-    isActive: true
-  },
-  {
-    id: "med-2",
-    name: "Metformin 850mg",
-    genericName: "Metformin Hydrochloride",
-    category: "tablet",
-    manufacturer: "Cipla Ltd",
-    currentStock: 80,
-    minStockLevel: 100,
-    maxStockLevel: 1200,
-    reorderLevel: 150, // Low stock!
-    purchasePrice: 2.2,
-    sellingPrice: 4.5,
-    expiryDate: "2026-11-30",
-    batchNumber: "MET-1120",
-    requiresPrescription: true,
-    isActive: true
-  },
-  {
-    id: "med-3",
-    name: "Cough-Relief Syrup",
-    genericName: "Dextromethorphan HBr",
-    category: "syrup",
-    manufacturer: "Sun Pharma",
-    currentStock: 12,
-    minStockLevel: 20,
-    maxStockLevel: 200,
-    reorderLevel: 25, // Critically Low stock!
-    purchasePrice: 35.0,
-    sellingPrice: 75.0,
-    expiryDate: "2026-07-28", // Expiring soon!
-    batchNumber: "CRS-8812",
-    requiresPrescription: false,
-    isActive: true
-  },
-  {
-    id: "med-4",
-    name: "Lisinopril 10mg",
-    genericName: "Lisinopril Dihydrate",
-    category: "tablet",
-    manufacturer: "Lupin Pharmaceuticals",
-    currentStock: 340,
-    minStockLevel: 40,
-    maxStockLevel: 800,
-    reorderLevel: 80,
-    purchasePrice: 1.8,
-    sellingPrice: 5.0,
-    expiryDate: "2027-08-10",
-    batchNumber: "LIS-5541",
-    requiresPrescription: true,
-    isActive: true
-  },
-  {
-    id: "med-5",
-    name: "Atorvastatin 20mg",
-    genericName: "Atorvastatin Calcium",
-    category: "tablet",
-    manufacturer: "Pfizer Healthcare",
-    currentStock: 510,
-    minStockLevel: 60,
-    maxStockLevel: 1000,
-    reorderLevel: 120,
-    purchasePrice: 5.5,
-    sellingPrice: 12.0,
-    expiryDate: "2026-06-12", // Expired! (current date is 2026-07)
-    batchNumber: "ATR-9021",
-    requiresPrescription: true,
-    isActive: true
-  },
-  {
-    id: "med-6",
-    name: "Paracetamol 650mg",
-    genericName: "Acetaminophen",
-    category: "tablet",
-    manufacturer: "GSK Consumer Healthcare",
-    currentStock: 1200,
-    minStockLevel: 150,
-    maxStockLevel: 3000,
-    reorderLevel: 250,
-    purchasePrice: 0.8,
-    sellingPrice: 2.0,
-    expiryDate: "2028-01-20",
-    batchNumber: "PAR-3301",
-    requiresPrescription: false,
-    isActive: true
-  },
-  {
-    id: "med-7",
-    name: "Budecort Inhaler 200mcg",
-    genericName: "Budesonide",
-    category: "inhaler",
-    manufacturer: "AstraZeneca",
-    currentStock: 45,
-    minStockLevel: 10,
-    maxStockLevel: 100,
-    reorderLevel: 15,
-    purchasePrice: 180.0,
-    sellingPrice: 290.0,
-    expiryDate: "2027-05-05",
-    batchNumber: "BDC-0094",
-    requiresPrescription: true,
-    isActive: true
-  }
-];
+const INITIAL_MEDICINES: Medicine[] = [];
 
-const INITIAL_SALES: Sale[] = [
-  {
-    id: "sal-1001",
-    medicineId: "med-1",
-    medicineName: "Amoxicillin 500mg",
-    patientName: "Arun Kumar",
-    patientPhone: "+91 98765 43210",
-    quantity: 15,
-    unitPrice: 8.0,
-    totalAmount: 120.0,
-    discountAmount: 10.0,
-    netAmount: 110.0,
-    paymentMethod: "upi",
-    saleDate: "2026-06-28"
-  },
-  {
-    id: "sal-1002",
-    medicineId: "med-4",
-    medicineName: "Lisinopril 10mg",
-    patientName: "Meera Nair",
-    patientPhone: "+91 91234 56789",
-    quantity: 30,
-    unitPrice: 5.0,
-    totalAmount: 150.0,
-    discountAmount: 0,
-    netAmount: 150.0,
-    paymentMethod: "cash",
-    saleDate: "2026-06-29"
-  },
-  {
-    id: "sal-1003",
-    medicineId: "med-6",
-    medicineName: "Paracetamol 650mg",
-    patientName: "Rajesh Sharma",
-    patientPhone: "+91 94567 12345",
-    quantity: 20,
-    unitPrice: 2.0,
-    totalAmount: 40.0,
-    discountAmount: 2.0,
-    netAmount: 38.0,
-    paymentMethod: "upi",
-    saleDate: "2026-06-30"
-  },
-  {
-    id: "sal-1004",
-    medicineId: "med-2",
-    medicineName: "Metformin 850mg",
-    patientName: "Sanjay Gupta",
-    patientPhone: "+91 93321 88990",
-    quantity: 60,
-    unitPrice: 4.5,
-    totalAmount: 270.0,
-    discountAmount: 15.0,
-    netAmount: 255.0,
-    paymentMethod: "card",
-    saleDate: "2026-07-01"
-  }
-];
+const INITIAL_SALES: Sale[] = [];
 
-const INITIAL_PURCHASE_ORDERS: PurchaseOrder[] = [
-  {
-    id: "po-501",
-    supplierName: "Apex Med Distributors",
-    medicineName: "Metformin 850mg",
-    quantity: 500,
-    unitPrice: 2.2,
-    totalCost: 1100.0,
-    orderDate: "2026-06-25",
-    status: "received"
-  },
-  {
-    id: "po-502",
-    supplierName: "Abbott Direct Channels",
-    medicineName: "Amoxicillin 500mg",
-    quantity: 300,
-    unitPrice: 4.5,
-    totalCost: 1350.0,
-    orderDate: "2026-06-30",
-    status: "pending"
-  }
-];
+const INITIAL_PURCHASE_ORDERS: PurchaseOrder[] = [];
 
 export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboardProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "inventory" | "dispensing" | "alerts" | "orders">("overview");
@@ -631,32 +433,20 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
 
   // Sales Trends chart data
   const getSalesTrendData = () => {
-    // Return sample timeline of sales by date
-    const daily: Record<string, number> = {
-      "2026-06-25": 180,
-      "2026-06-26": 240,
-      "2026-06-27": 195,
-      "2026-06-28": 120,
-      "2026-06-29": 150,
-      "2026-06-30": 40,
-      "2026-07-01": 270,
-      "2026-07-02": 310,
-      "2026-07-03": dispenseSuccess ? 180 : 0
-    };
-
-    // Override or append actual sales
+    if (sales.length === 0) {
+      return [];
+    }
+    const daily: Record<string, number> = {};
     sales.forEach(sale => {
-      if (daily[sale.saleDate] !== undefined) {
-        daily[sale.saleDate] += sale.netAmount;
-      } else {
-        daily[sale.saleDate] = sale.netAmount;
-      }
+      daily[sale.saleDate] = (daily[sale.saleDate] || 0) + sale.netAmount;
     });
 
-    return Object.entries(daily).map(([date, amount]) => ({
-      date: new Date(date).toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
-      amount
-    })).slice(-7); // Last 7 days
+    return Object.entries(daily)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, amount]) => ({
+        date: new Date(date).toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+        amount
+      })).slice(-7);
   };
 
   const COLORS = ["#0ea5e9", "#10b981", "#8b5cf6", "#f59e0b", "#ec4899", "#3b82f6", "#14b8a6"];

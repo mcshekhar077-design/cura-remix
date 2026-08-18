@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { 
   Heart, 
   ArrowRight, 
@@ -17,7 +17,21 @@ import {
   Briefcase, 
   Terminal,
   Play,
-  ChevronDown
+  ChevronDown,
+  ChevronRight,
+  Stethoscope,
+  Leaf,
+  Activity,
+  Zap,
+  Smartphone,
+  Pill,
+  Compass,
+  Menu,
+  X,
+  Layers,
+  LayoutDashboard,
+  ShieldCheck,
+  Brain
 } from "lucide-react";
 import { ClinicLead } from "../types";
 import ProductTour from "./ProductTour";
@@ -49,14 +63,18 @@ interface LandingPageProps {
   onNavigateToAnalytics?: () => void;
   onNavigateToDentistry?: () => void;
   onNavigateToPhysiology?: () => void;
+  onNavigateToVideoConsultation?: () => void;
+  onNavigateToCareNavigation?: () => void;
 }
 
-export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, onNavigateToPatient, onNavigateToPharmacy, onNavigateToAyush, onNavigateToMR, onNavigateToMentalHealth, onNavigateToCardiology, onNavigateToPediatrics, onNavigateToWomensHealth, onNavigateToOrthopedics, onNavigateToDermatology, onNavigateToNeurology, onNavigateToOncology, onNavigateToEmergency, onNavigateToENT, onNavigateToAICore, onNavigateToOphthalmology, onNavigateToHematology, onNavigateToNephrology, onNavigateToRheumatology, onNavigateToCriticalCare, onNavigateToGastroenterology, onNavigateToAnalytics, onNavigateToDentistry, onNavigateToPhysiology }: LandingPageProps) {
+export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, onNavigateToPatient, onNavigateToPharmacy, onNavigateToAyush, onNavigateToMR, onNavigateToMentalHealth, onNavigateToCardiology, onNavigateToPediatrics, onNavigateToWomensHealth, onNavigateToOrthopedics, onNavigateToDermatology, onNavigateToNeurology, onNavigateToOncology, onNavigateToEmergency, onNavigateToENT, onNavigateToAICore, onNavigateToOphthalmology, onNavigateToHematology, onNavigateToNephrology, onNavigateToRheumatology, onNavigateToCriticalCare, onNavigateToGastroenterology, onNavigateToAnalytics, onNavigateToDentistry, onNavigateToPhysiology, onNavigateToVideoConsultation, onNavigateToCareNavigation }: LandingPageProps) {
   // Signup Form State
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [isTourOpen, setIsTourOpen] = useState(false);
-  const [allopathyDropdownOpen, setAllopathyDropdownOpen] = useState(false);
+  const [specialtiesDropdownOpen, setSpecialtiesDropdownOpen] = useState(false);
+  const [portalsDropdownOpen, setPortalsDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const [clinicName, setClinicName] = useState("");
   const [doctorCount, setDoctorCount] = useState("1");
@@ -114,230 +132,538 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
   return (
     <div className="min-h-screen bg-white">
       {/* NAVIGATION */}
-      <nav className="bg-white/90 backdrop-blur-md fixed w-full z-50 border-b border-slate-100">
+      <nav className="bg-white/90 backdrop-blur-xl fixed w-full z-50 border-b border-slate-200/70 shadow-xs transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <Heart className="h-6 w-6 text-red-600 fill-red-600" />
-              <span className="text-2xl font-black text-cura-primary-dark">
-                CURA<span className="text-red-600">.</span>
-              </span>
+            {/* BRAND LOGO */}
+            <div className="flex items-center gap-6">
+              <div 
+                className="flex items-center gap-2 cursor-pointer group" 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                <div className="h-8 w-8 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center transition-transform group-hover:scale-105">
+                  <Heart className="h-4.5 w-4.5 text-red-600 fill-red-600 animate-pulse" />
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl font-black text-slate-900 tracking-tight">
+                    CURA<span className="text-red-600">.</span>
+                  </span>
+                  <span className="hidden sm:inline-block text-[9px] font-extrabold uppercase tracking-widest text-sky-700 bg-sky-50 border border-sky-200/70 px-1.5 py-0.5 rounded-md">
+                    AI-EHR
+                  </span>
+                </div>
+              </div>
+
+              {/* CORE NAV ANCHOR LINKS */}
+              <div className="hidden lg:flex items-center space-x-1 pl-2 border-l border-slate-200">
+                <a href="#features" className="text-xs font-semibold text-slate-600 hover:text-sky-600 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">Features</a>
+                <a href="#how-it-works" className="text-xs font-semibold text-slate-600 hover:text-sky-600 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">How It Works</a>
+                <a href="#pricing" className="text-xs font-semibold text-slate-600 hover:text-sky-600 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">Pricing</a>
+              </div>
             </div>
             
-            <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-              <a href="#features" className="text-xs font-semibold text-slate-600 hover:text-cura-primary transition-colors">Features</a>
-              <a href="#how-it-works" className="text-xs font-semibold text-slate-600 hover:text-cura-primary transition-colors">How It Works</a>
-              <a href="#pricing" className="text-xs font-semibold text-slate-600 hover:text-cura-primary transition-colors">Pricing</a>
+            {/* CENTER MENUS - SPECIALTIES & ECOSYSTEM DROPDOWNS */}
+            <div className="hidden md:flex items-center space-x-2">
+              {/* 1. CLINICAL SPECIALTIES MEGA-DROPDOWN */}
+              <div className="relative" onMouseLeave={() => setSpecialtiesDropdownOpen(false)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSpecialtiesDropdownOpen(!specialtiesDropdownOpen);
+                    setPortalsDropdownOpen(false);
+                  }}
+                  onMouseEnter={() => {
+                    setSpecialtiesDropdownOpen(true);
+                    setPortalsDropdownOpen(false);
+                  }}
+                  className={`text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer border ${
+                    specialtiesDropdownOpen 
+                      ? "bg-sky-50 text-sky-900 border-sky-300 shadow-xs" 
+                      : "bg-slate-50 hover:bg-sky-50/80 text-slate-700 hover:text-sky-800 border-slate-200 hover:border-sky-200"
+                  }`}
+                >
+                  <Stethoscope className="h-3.5 w-3.5 text-sky-600" />
+                  <span>Clinical Specialties</span>
+                  <ChevronDown className={`h-3 w-3 text-slate-500 transition-transform duration-200 ${specialtiesDropdownOpen ? "rotate-180 text-sky-700" : ""}`} />
+                </button>
 
-              {/* 1. ALLOPATHY WITH DROPDOWN MENU */}
-              <div className="relative" onMouseLeave={() => setAllopathyDropdownOpen(false)}>
-                <div className="flex items-center">
-                  <button 
-                    onClick={onNavigateToDashboard} 
-                    className="text-xs font-black uppercase tracking-wider text-sky-800 bg-sky-100 hover:bg-sky-200 px-3 py-1.5 rounded-l-xl flex items-center gap-1 transition-all border border-sky-300 cursor-pointer shadow-xs"
-                  >
-                    🏥 Allopathy
-                  </button>
-                  <button
-                    onClick={() => setAllopathyDropdownOpen(!allopathyDropdownOpen)}
-                    onMouseEnter={() => setAllopathyDropdownOpen(true)}
-                    className="text-xs font-black text-sky-800 bg-sky-200 hover:bg-sky-300 px-1.5 py-1.5 rounded-r-xl border border-l-0 border-sky-300 cursor-pointer transition-all"
-                    title="View Allopathy Specialty Modules"
-                  >
-                    <ChevronDown className={`h-3.5 w-3.5 transition-transform ${allopathyDropdownOpen ? "rotate-180" : ""}`} />
-                  </button>
-                </div>
-
-                {/* ALLOPATHY SPECIALTY DROPDOWN POPUP */}
-                {allopathyDropdownOpen && (
+                {/* SPECIALTIES MEGA DROPDOWN MENU */}
+                {specialtiesDropdownOpen && (
                   <div 
-                    onMouseEnter={() => setAllopathyDropdownOpen(true)}
-                    className="absolute top-full left-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 z-50 animate-fadeIn space-y-2"
+                    onMouseEnter={() => setSpecialtiesDropdownOpen(true)}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[540px] bg-white border border-slate-200/90 rounded-2xl shadow-xl p-4 z-50 animate-fadeIn space-y-3.5"
                   >
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-2 px-1">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Allopathy Specialty Suites</span>
+                    {/* Header */}
+                    <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                      <div>
+                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-800">Clinical Systems & Verticals</span>
+                        <p className="text-[10px] text-slate-400">Integrated OPD, IPD, and specialized care suites</p>
+                      </div>
                       <button
-                        onClick={() => { setAllopathyDropdownOpen(false); onNavigateToDashboard(); }}
-                        className="text-[10px] font-bold text-sky-700 hover:underline flex items-center gap-0.5"
+                        onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDashboard(); }}
+                        className="text-[11px] font-bold text-sky-700 hover:text-sky-800 hover:underline flex items-center gap-1 cursor-pointer bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-200/60"
                       >
-                        Main Portal →
+                        <span>Main EHR</span>
+                        <ArrowRight className="h-3 w-3" />
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-1 max-h-[380px] overflow-y-auto pr-1">
-                      <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToDashboard(); }} className="p-2 text-left rounded-xl hover:bg-sky-50 text-slate-700 hover:text-sky-900 transition-all flex items-center gap-2 text-xs font-bold">
-                        <span>🏥 Main Dashboard</span>
+                    {/* Primary 4 Medical Systems */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button 
+                        onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDashboard(); }} 
+                        className="p-2.5 rounded-xl border border-sky-200/80 bg-sky-50/50 hover:bg-sky-100/80 text-left transition-all group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🏥</span>
+                          <div>
+                            <div className="text-xs font-bold text-sky-900 group-hover:text-sky-950 flex items-center gap-1">
+                              Allopathy Suite
+                              <span className="text-[8px] bg-sky-200 text-sky-800 font-extrabold px-1 rounded">CORE</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 line-clamp-1">General Medicine, OPD & IPD</div>
+                          </div>
+                        </div>
                       </button>
-                      {onNavigateToCardiology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToCardiology(); }} className="p-2 text-left rounded-xl hover:bg-rose-50 text-slate-700 hover:text-rose-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>❤️ Cardiology</span>
+
+                      <button 
+                        onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToAyush(); }} 
+                        className="p-2.5 rounded-xl border border-purple-200/80 bg-purple-50/50 hover:bg-purple-100/80 text-left transition-all group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🌿</span>
+                          <div>
+                            <div className="text-xs font-bold text-purple-900 group-hover:text-purple-950 flex items-center gap-1">
+                              AYUSH Suite
+                              <span className="text-[8px] bg-purple-200 text-purple-800 font-extrabold px-1 rounded">HOLISTIC</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 line-clamp-1">Ayurveda, Yoga, Siddha, Homeo</div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {onNavigateToDentistry && (
+                        <button 
+                          onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDentistry(); }} 
+                          className="p-2.5 rounded-xl border border-cyan-200/80 bg-cyan-50/50 hover:bg-cyan-100/80 text-left transition-all group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">🦷</span>
+                            <div>
+                              <div className="text-xs font-bold text-cyan-900 group-hover:text-cyan-950">Dentistry</div>
+                              <div className="text-[10px] text-slate-500 line-clamp-1">Tooth Charting, Perio & Odontogram</div>
+                            </div>
+                          </div>
                         </button>
                       )}
-                      {onNavigateToPediatrics && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToPediatrics(); }} className="p-2 text-left rounded-xl hover:bg-pink-50 text-slate-700 hover:text-pink-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>👶 Pediatrics</span>
+
+                      {onNavigateToPhysiology && (
+                        <button 
+                          onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToPhysiology(); }} 
+                          className="p-2.5 rounded-xl border border-teal-200/80 bg-teal-50/50 hover:bg-teal-100/80 text-left transition-all group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">⚡</span>
+                            <div>
+                              <div className="text-xs font-bold text-teal-900 group-hover:text-teal-950">Physiology & Rehab</div>
+                              <div className="text-[10px] text-slate-500 line-clamp-1">Biomarkers, Vitals & Therapy</div>
+                            </div>
+                          </div>
                         </button>
                       )}
-                      {onNavigateToWomensHealth && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToWomensHealth(); }} className="p-2 text-left rounded-xl hover:bg-fuchsia-50 text-slate-700 hover:text-fuchsia-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>👩 Women&apos;s Health</span>
-                        </button>
-                      )}
-                      {onNavigateToOrthopedics && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToOrthopedics(); }} className="p-2 text-left rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🦴 Orthopedics</span>
-                        </button>
-                      )}
-                      {onNavigateToDermatology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToDermatology(); }} className="p-2 text-left rounded-xl hover:bg-amber-50 text-slate-700 hover:text-amber-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>☀️ Dermatology</span>
-                        </button>
-                      )}
-                      {onNavigateToMentalHealth && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToMentalHealth(); }} className="p-2 text-left rounded-xl hover:bg-purple-50 text-slate-700 hover:text-purple-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🧠 Psychiatry</span>
-                        </button>
-                      )}
-                      {onNavigateToNeurology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToNeurology(); }} className="p-2 text-left rounded-xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>⚡ Neurology</span>
-                        </button>
-                      )}
-                      {onNavigateToOncology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToOncology(); }} className="p-2 text-left rounded-xl hover:bg-rose-50 text-slate-700 hover:text-rose-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🎗️ Oncology</span>
-                        </button>
-                      )}
-                      {onNavigateToEmergency && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToEmergency(); }} className="p-2 text-left rounded-xl hover:bg-red-50 text-slate-700 hover:text-red-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🚑 Emergency</span>
-                        </button>
-                      )}
-                      {onNavigateToENT && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToENT(); }} className="p-2 text-left rounded-xl hover:bg-purple-50 text-slate-700 hover:text-purple-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>👂 ENT</span>
-                        </button>
-                      )}
-                      {onNavigateToOphthalmology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToOphthalmology(); }} className="p-2 text-left rounded-xl hover:bg-sky-50 text-slate-700 hover:text-sky-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>👁️ Ophthalmology</span>
-                        </button>
-                      )}
-                      {onNavigateToHematology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToHematology(); }} className="p-2 text-left rounded-xl hover:bg-red-50 text-slate-700 hover:text-red-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🩸 Hematology</span>
-                        </button>
-                      )}
-                      {onNavigateToNephrology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToNephrology(); }} className="p-2 text-left rounded-xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🫘 Nephrology</span>
-                        </button>
-                      )}
-                      {onNavigateToRheumatology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToRheumatology(); }} className="p-2 text-left rounded-xl hover:bg-pink-50 text-slate-700 hover:text-pink-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🦴 Rheumatology</span>
-                        </button>
-                      )}
-                      {onNavigateToCriticalCare && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToCriticalCare(); }} className="p-2 text-left rounded-xl hover:bg-red-50 text-slate-700 hover:text-red-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🏥 Critical Care</span>
-                        </button>
-                      )}
-                      {onNavigateToGastroenterology && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToGastroenterology(); }} className="p-2 text-left rounded-xl hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🩺 Gastroenterology</span>
-                        </button>
-                      )}
-                      {onNavigateToAnalytics && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToAnalytics(); }} className="p-2 text-left rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>📊 Analytics</span>
-                        </button>
-                      )}
-                      {onNavigateToAICore && (
-                        <button onClick={() => { setAllopathyDropdownOpen(false); onNavigateToAICore(); }} className="p-2 text-left rounded-xl hover:bg-cyan-50 text-slate-700 hover:text-cyan-900 transition-all flex items-center gap-2 text-xs font-bold">
-                          <span>🧠 AI Core</span>
-                        </button>
-                      )}
+                    </div>
+
+                    {/* Allopathy Sub-Specialties Grid */}
+                    <div className="pt-2 border-t border-slate-100">
+                      <div className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
+                        Allopathy Sub-Specialties
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 max-h-[220px] overflow-y-auto pr-1">
+                        {onNavigateToCardiology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToCardiology(); }} className="px-2 py-1.5 rounded-lg hover:bg-rose-50 text-slate-700 hover:text-rose-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>❤️ Cardiology</span>
+                          </button>
+                        )}
+                        {onNavigateToPediatrics && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToPediatrics(); }} className="px-2 py-1.5 rounded-lg hover:bg-pink-50 text-slate-700 hover:text-pink-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>👶 Pediatrics</span>
+                          </button>
+                        )}
+                        {onNavigateToWomensHealth && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToWomensHealth(); }} className="px-2 py-1.5 rounded-lg hover:bg-fuchsia-50 text-slate-700 hover:text-fuchsia-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>👩 Women&apos;s Health</span>
+                          </button>
+                        )}
+                        {onNavigateToOrthopedics && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToOrthopedics(); }} className="px-2 py-1.5 rounded-lg hover:bg-blue-50 text-slate-700 hover:text-blue-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🦴 Orthopedics</span>
+                          </button>
+                        )}
+                        {onNavigateToDermatology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDermatology(); }} className="px-2 py-1.5 rounded-lg hover:bg-amber-50 text-slate-700 hover:text-amber-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>☀️ Dermatology</span>
+                          </button>
+                        )}
+                        {onNavigateToMentalHealth && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToMentalHealth(); }} className="px-2 py-1.5 rounded-lg hover:bg-purple-50 text-slate-700 hover:text-purple-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🧠 Psychiatry</span>
+                          </button>
+                        )}
+                        {onNavigateToNeurology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToNeurology(); }} className="px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>⚡ Neurology</span>
+                          </button>
+                        )}
+                        {onNavigateToOncology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToOncology(); }} className="px-2 py-1.5 rounded-lg hover:bg-rose-50 text-slate-700 hover:text-rose-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🎗️ Oncology</span>
+                          </button>
+                        )}
+                        {onNavigateToEmergency && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToEmergency(); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🚑 Emergency</span>
+                          </button>
+                        )}
+                        {onNavigateToENT && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToENT(); }} className="px-2 py-1.5 rounded-lg hover:bg-purple-50 text-slate-700 hover:text-purple-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>👂 ENT</span>
+                          </button>
+                        )}
+                        {onNavigateToOphthalmology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToOphthalmology(); }} className="px-2 py-1.5 rounded-lg hover:bg-sky-50 text-slate-700 hover:text-sky-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>👁️ Ophthalmology</span>
+                          </button>
+                        )}
+                        {onNavigateToHematology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToHematology(); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🩸 Hematology</span>
+                          </button>
+                        )}
+                        {onNavigateToNephrology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToNephrology(); }} className="px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🫘 Nephrology</span>
+                          </button>
+                        )}
+                        {onNavigateToRheumatology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToRheumatology(); }} className="px-2 py-1.5 rounded-lg hover:bg-pink-50 text-slate-700 hover:text-pink-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🦴 Rheumatology</span>
+                          </button>
+                        )}
+                        {onNavigateToCriticalCare && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToCriticalCare(); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🏥 Critical Care</span>
+                          </button>
+                        )}
+                        {onNavigateToGastroenterology && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToGastroenterology(); }} className="px-2 py-1.5 rounded-lg hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🩺 Gastroenterology</span>
+                          </button>
+                        )}
+                        {onNavigateToAnalytics && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToAnalytics(); }} className="px-2 py-1.5 rounded-lg hover:bg-blue-50 text-slate-700 hover:text-blue-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>📊 Analytics</span>
+                          </button>
+                        )}
+                        {onNavigateToAICore && (
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToAICore(); }} className="px-2 py-1.5 rounded-lg hover:bg-cyan-50 text-slate-700 hover:text-cyan-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <span>🧠 AI Core</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* 2. AYUSH */}
-              <button 
-                onClick={onNavigateToAyush} 
-                className="text-xs font-black uppercase tracking-wider text-purple-800 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-xl flex items-center gap-1 transition-all border border-purple-200 cursor-pointer shadow-xs"
-              >
-                🌿 AYUSH
-              </button>
-
-              {/* 3. DENTISTRY */}
-              {onNavigateToDentistry && (
-                <button 
-                  onClick={onNavigateToDentistry} 
-                  className="text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-50 hover:bg-cyan-100 px-3 py-1.5 rounded-xl flex items-center gap-1 transition-all border border-cyan-200 cursor-pointer shadow-xs"
+              {/* 2. ECOSYSTEM & PORTALS DROPDOWN */}
+              <div className="relative" onMouseLeave={() => setPortalsDropdownOpen(false)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPortalsDropdownOpen(!portalsDropdownOpen);
+                    setSpecialtiesDropdownOpen(false);
+                  }}
+                  onMouseEnter={() => {
+                    setPortalsDropdownOpen(true);
+                    setSpecialtiesDropdownOpen(false);
+                  }}
+                  className={`text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer border ${
+                    portalsDropdownOpen 
+                      ? "bg-emerald-50 text-emerald-900 border-emerald-300 shadow-xs" 
+                      : "bg-slate-50 hover:bg-emerald-50/80 text-slate-700 hover:text-emerald-800 border-slate-200 hover:border-emerald-200"
+                  }`}
                 >
-                  🦷 Dentistry
+                  <Layers className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Portals & Apps</span>
+                  <ChevronDown className={`h-3 w-3 text-slate-500 transition-transform duration-200 ${portalsDropdownOpen ? "rotate-180 text-emerald-700" : ""}`} />
                 </button>
-              )}
 
-              {/* 4. PHYSIOLOGY */}
-              {onNavigateToPhysiology && (
-                <button 
-                  onClick={onNavigateToPhysiology} 
-                  className="text-xs font-black uppercase tracking-wider text-teal-800 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-xl flex items-center gap-1 transition-all border border-teal-200 cursor-pointer shadow-xs"
-                >
-                  ⚡ Physiology
-                </button>
-              )}
+                {/* PORTALS DROPDOWN POPUP */}
+                {portalsDropdownOpen && (
+                  <div 
+                    onMouseEnter={() => setPortalsDropdownOpen(true)}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[460px] bg-white border border-slate-200/90 rounded-2xl shadow-xl p-4 z-50 animate-fadeIn space-y-3"
+                  >
+                    <div className="pb-2 border-b border-slate-100">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-800">Ecosystem Portals</span>
+                      <p className="text-[10px] text-slate-400">Dedicated interfaces for patients, pharmacy, teleconsult & operations</p>
+                    </div>
 
-              {/* SECONDARY PORTAL LINK BUTTONS */}
-              <button 
-                onClick={onNavigateToPatient} 
-                className="text-[11px] font-mono text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded flex items-center gap-1 transition-all border border-emerald-200 cursor-pointer"
-                title="Patient Mobile App"
-              >
-                📱 Patient
-              </button>
-              <button 
-                onClick={onNavigateToPharmacy} 
-                className="text-[11px] font-mono text-cyan-700 bg-cyan-50 hover:bg-cyan-100 px-2 py-1 rounded flex items-center gap-1 transition-all border border-cyan-200 cursor-pointer"
-                title="Pharmacy Dashboard"
-              >
-                💊 Pharmacy
-              </button>
-              <button 
-                onClick={onNavigateToMR} 
-                className="text-[11px] font-mono text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded flex items-center gap-1 transition-all border border-indigo-200 cursor-pointer"
-                title="MR Partner Referral Portal"
-              >
-                🤝 MR
-              </button>
-              <button 
-                onClick={onNavigateToAdmin} 
-                className="text-[10px] font-mono text-slate-500 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
-                title="Clinic Leads"
-              >
-                <Terminal className="h-3 w-3" /> Leads
-              </button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToPatient(); }}
+                        className="p-2.5 rounded-xl border border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/40 text-left transition-all group cursor-pointer"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover:scale-105 transition-transform">
+                            <Smartphone className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-900">Patient App</div>
+                            <div className="text-[10px] text-slate-500">PHR, Vitals & Self-Booking</div>
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToPharmacy(); }}
+                        className="p-2.5 rounded-xl border border-slate-200/80 hover:border-cyan-300 hover:bg-cyan-50/40 text-left transition-all group cursor-pointer"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-600 group-hover:scale-105 transition-transform">
+                            <Pill className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-800 group-hover:text-cyan-900">Pharmacy Console</div>
+                            <div className="text-[10px] text-slate-500">Dispensing & Inventory Hub</div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {onNavigateToCareNavigation && (
+                        <button
+                          onClick={() => { setPortalsDropdownOpen(false); onNavigateToCareNavigation(); }}
+                          className="p-2.5 rounded-xl border border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/40 text-left transition-all group cursor-pointer"
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 group-hover:scale-105 transition-transform">
+                              <Compass className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="text-xs font-bold text-slate-800 group-hover:text-blue-900">AI Care Navigation</div>
+                              <div className="text-[10px] text-slate-500">Doctor Discovery & Triage</div>
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      {onNavigateToVideoConsultation && (
+                        <button
+                          onClick={() => { setPortalsDropdownOpen(false); onNavigateToVideoConsultation(); }}
+                          className="p-2.5 rounded-xl border border-slate-200/80 hover:border-purple-300 hover:bg-purple-50/40 text-left transition-all group cursor-pointer"
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-600 group-hover:scale-105 transition-transform">
+                              <Video className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="text-xs font-bold text-slate-800 group-hover:text-purple-900">Video Teleconsult</div>
+                              <div className="text-[10px] text-slate-500">HD WebRTC Video Consults</div>
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToMR(); }}
+                        className="p-2.5 rounded-xl border border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/40 text-left transition-all group cursor-pointer"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 group-hover:scale-105 transition-transform">
+                            <Briefcase className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-800 group-hover:text-indigo-900">MR Partner Portal</div>
+                            <div className="text-[10px] text-slate-500">Pharma Reps & Referrals</div>
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToAdmin(); }}
+                        className="p-2.5 rounded-xl border border-slate-200/80 hover:border-slate-300 hover:bg-slate-50 text-left transition-all group cursor-pointer"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <div className="p-1.5 rounded-lg bg-slate-500/10 text-slate-600 group-hover:scale-105 transition-transform">
+                            <Terminal className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-800 group-hover:text-slate-950">Clinic Leads CRM</div>
+                            <div className="text-[10px] text-slate-500">Inbound Onboarding Queue</div>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            {/* RIGHT ACTION BUTTONS */}
+            <div className="flex items-center gap-2.5">
               <button 
                 onClick={onNavigateToDashboard} 
-                className="hidden sm:inline-flex text-sm font-semibold text-cura-primary-dark hover:text-cura-primary transition-colors px-4 py-2"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-700 bg-white hover:bg-sky-50/60 border border-slate-200/90 hover:border-sky-300 px-3.5 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
               >
-                Launch Demo Portal
+                <LayoutDashboard className="h-3.5 w-3.5 text-sky-600" />
+                <span>Doctor EHR</span>
               </button>
+
               <a 
                 href="#signup" 
-                className="gradient-btn-cura text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-md shadow-sky-500/10 hover:shadow-lg hover:shadow-sky-500/20 hover:scale-[1.02]"
+                className="gradient-btn-cura text-white px-4.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm shadow-sky-500/20 hover:shadow-md hover:shadow-sky-500/30 hover:scale-[1.02] flex items-center gap-1.5"
               >
-                Start Free Trial
+                <span>Start Free Trial</span>
+                <ArrowRight className="h-3 w-3" />
               </a>
+
+              {/* Mobile menu toggle */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
+                aria-label="Toggle navigation menu"
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* MOBILE SLIDE-DOWN DRAWER MENU */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-b border-slate-200 shadow-xl px-4 py-4 space-y-4 max-h-[85vh] overflow-y-auto animate-fadeIn">
+            {/* Quick Links */}
+            <div className="flex items-center justify-around py-2 bg-slate-50 rounded-xl border border-slate-200/70 text-xs font-bold text-slate-700">
+              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="hover:text-sky-600 py-1">Features</a>
+              <span className="text-slate-300">•</span>
+              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="hover:text-sky-600 py-1">How It Works</a>
+              <span className="text-slate-300">•</span>
+              <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="hover:text-sky-600 py-1">Pricing</a>
+            </div>
+
+            {/* Core Systems */}
+            <div className="space-y-2">
+              <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-1">
+                Clinical Suites
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onNavigateToDashboard(); }}
+                  className="p-2 bg-sky-50 border border-sky-200 rounded-xl text-left text-xs font-bold text-sky-900 flex items-center gap-1.5"
+                >
+                  <span>🏥 Allopathy</span>
+                </button>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onNavigateToAyush(); }}
+                  className="p-2 bg-purple-50 border border-purple-200 rounded-xl text-left text-xs font-bold text-purple-900 flex items-center gap-1.5"
+                >
+                  <span>🌿 AYUSH</span>
+                </button>
+                {onNavigateToDentistry && (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onNavigateToDentistry(); }}
+                    className="p-2 bg-cyan-50 border border-cyan-200 rounded-xl text-left text-xs font-bold text-cyan-900 flex items-center gap-1.5"
+                  >
+                    <span>🦷 Dentistry</span>
+                  </button>
+                )}
+                {onNavigateToPhysiology && (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onNavigateToPhysiology(); }}
+                    className="p-2 bg-teal-50 border border-teal-200 rounded-xl text-left text-xs font-bold text-teal-900 flex items-center gap-1.5"
+                  >
+                    <span>⚡ Physiology</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Portals */}
+            <div className="space-y-2">
+              <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-1">
+                Portals & Modules
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs font-medium">
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onNavigateToPatient(); }}
+                  className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
+                >
+                  <Smartphone className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Patient App</span>
+                </button>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onNavigateToPharmacy(); }}
+                  className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
+                >
+                  <Pill className="h-3.5 w-3.5 text-cyan-600" />
+                  <span>Pharmacy</span>
+                </button>
+                {onNavigateToCareNavigation && (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onNavigateToCareNavigation(); }}
+                    className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
+                  >
+                    <Compass className="h-3.5 w-3.5 text-blue-600" />
+                    <span>AI Care Nav</span>
+                  </button>
+                )}
+                {onNavigateToVideoConsultation && (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onNavigateToVideoConsultation(); }}
+                    className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
+                  >
+                    <Video className="h-3.5 w-3.5 text-purple-600" />
+                    <span>Video Consult</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onNavigateToMR(); }}
+                  className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
+                >
+                  <Briefcase className="h-3.5 w-3.5 text-indigo-600" />
+                  <span>MR Portal</span>
+                </button>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onNavigateToAdmin(); }}
+                  className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
+                >
+                  <Terminal className="h-3.5 w-3.5 text-slate-600" />
+                  <span>Clinic Leads</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile CTAs */}
+            <div className="pt-2 flex flex-col gap-2">
+              <button
+                onClick={() => { setMobileMenuOpen(false); onNavigateToDashboard(); }}
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2"
+              >
+                <LayoutDashboard className="h-4 w-4 text-sky-600" />
+                <span>Launch Doctor EHR</span>
+              </button>
+              <a
+                href="#signup"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-2.5 rounded-xl gradient-btn-cura text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm"
+              >
+                <span>Start Free 14-Day Trial</span>
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* HERO SECTION */}
@@ -1020,7 +1346,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                   className="mt-1 h-4.5 w-4.5 text-cura-primary border-slate-300 rounded focus:ring-cura-primary"
                 />
                 <label htmlFor="agree" className="text-xs font-semibold text-slate-500 select-none cursor-pointer">
-                  I agree to CURA&apos;s <a href="#" className="text-cura-primary hover:underline">Terms of Service</a>, <a href="#" className="text-cura-primary hover:underline">Privacy Policy</a> and consent to receiving a mock confirmation message on WhatsApp.
+                  I agree to CURA&apos;s <a href="#" className="text-cura-primary hover:underline">Terms of Service</a>, <a href="#" className="text-cura-primary hover:underline">Privacy Policy</a> and consent to receiving a confirmation message on WhatsApp.
                 </label>
               </div>
 
