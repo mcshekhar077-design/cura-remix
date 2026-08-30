@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Patient, Appointment } from "../types";
 import VoiceCommandOverlay from "./VoiceCommandOverlay";
+import VoiceSymptomDictationModal, { DictatedSymptomLog } from "./VoiceSymptomDictationModal";
 
 interface PatientDashboardProps {
   patient: Patient;
@@ -34,6 +35,8 @@ interface PatientDashboardProps {
   onViewRouteClick?: (appointment: Appointment) => void;
   onNavigateTab?: (tab: string) => void;
   onOpenRefillModal?: () => void;
+  onSaveVoiceSymptomLog?: (log: DictatedSymptomLog) => void;
+  onOpenVoiceSymptomModal?: () => void;
 }
 
 export default function PatientDashboard({
@@ -46,9 +49,13 @@ export default function PatientDashboard({
   onJoinCallClick,
   onViewRouteClick,
   onNavigateTab,
-  onOpenRefillModal
+  onOpenRefillModal,
+  onSaveVoiceSymptomLog,
+  onOpenVoiceSymptomModal
 }: PatientDashboardProps) {
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showVoiceSymptomModal, setShowVoiceSymptomModal] = useState(false);
+  const [localLogs, setLocalLogs] = useState<any[]>([]);
   
   // Sort and filter upcoming appointments (status is scheduled/confirmed/in_progress)
   const upcomingAppointments = appointments
@@ -58,8 +65,11 @@ export default function PatientDashboard({
     )
     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
+  // Combined vitals history (prop + local voice logs)
+  const allVitalsHistory = [...vitalsHistory, ...localLogs];
+
   // Get last 5 vitals logs (most recent first)
-  const last5Vitals = [...vitalsHistory]
+  const last5Vitals = [...allVitalsHistory]
     .reverse()
     .slice(0, 5);
 
@@ -142,16 +152,29 @@ export default function PatientDashboard({
           
           <div className="flex items-center gap-2 flex-wrap">
             <button
+              onClick={() => {
+                if (onOpenVoiceSymptomModal) {
+                  onOpenVoiceSymptomModal();
+                } else {
+                  setShowVoiceSymptomModal(true);
+                }
+              }}
+              className="py-2 px-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-lg shadow-emerald-500/20 uppercase tracking-wider flex items-center gap-1.5 shrink-0 border-0 active:scale-95"
+              title="Dictate daily symptoms using voice-to-text"
+            >
+              <Mic className="h-3.5 w-3.5 animate-pulse" /> Voice-to-Text
+            </button>
+            <button
               onClick={() => setShowVoiceOverlay(true)}
               className="py-2 px-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/40 text-emerald-300 font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-md uppercase tracking-wider flex items-center gap-1.5 shrink-0"
             >
-              <Mic className="h-3.5 w-3.5 text-emerald-400 animate-pulse" /> Voice Command
+              <Mic className="h-3.5 w-3.5 text-emerald-400" /> Voice Assistant
             </button>
             <button
               onClick={onAddVitalsClick}
-              className="py-2 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-md uppercase tracking-wider flex items-center gap-1.5 border-0 shrink-0"
+              className="py-2 px-3 bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-md uppercase tracking-wider flex items-center gap-1.5 border border-slate-700/80 shrink-0"
             >
-              <Plus className="h-3.5 w-3.5" /> Log Daily Vitals
+              <Plus className="h-3.5 w-3.5 text-emerald-400" /> Manual Log
             </button>
             <button
               onClick={onBookAppointmentClick}
@@ -229,6 +252,42 @@ export default function PatientDashboard({
           </div>
         </div>
 
+      </div>
+
+      {/* VOICE-TO-TEXT DAILY SYMPTOM LOGGER HERO PROMPT */}
+      <div className="bg-gradient-to-r from-teal-950/70 via-slate-900 to-emerald-950/70 border border-emerald-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-lg relative overflow-hidden">
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="p-3 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl text-slate-950 shadow-md shrink-0">
+            <Mic className="h-5 w-5 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                Voice-to-Text Dictation
+              </span>
+              <span className="text-[8.5px] text-teal-300 font-bold flex items-center gap-1">
+                <Sparkles className="h-3 w-3" /> Instant NLP Auto-Tagging
+              </span>
+            </div>
+            <h3 className="text-xs font-black text-white mt-1">Daily Symptom & Vitals Dictation</h3>
+            <p className="text-[10px] text-slate-300 mt-0.5 leading-tight">
+              Tap the microphone and speak how you are feeling (e.g. "mild headache, slight fever, and BP 120/80"). Auto-saved directly to your vitals history.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => {
+            if (onOpenVoiceSymptomModal) {
+              onOpenVoiceSymptomModal();
+            } else {
+              setShowVoiceSymptomModal(true);
+            }
+          }}
+          className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-[11px] rounded-xl transition-all cursor-pointer shadow-lg shadow-emerald-500/25 uppercase tracking-wider flex items-center justify-center gap-2 shrink-0 border-0 active:scale-95 z-10"
+        >
+          <Mic className="h-4 w-4" /> Dictate Symptoms
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -442,9 +501,24 @@ export default function PatientDashboard({
                   </div>
                   <h3 className="text-xs font-black text-white uppercase tracking-wider font-sans">Recent Vitals Timeline</h3>
                 </div>
-                <span className="text-[9.5px] text-slate-400 font-bold font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-                  Last 5 Logs
-                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    onClick={() => {
+                      if (onOpenVoiceSymptomModal) {
+                        onOpenVoiceSymptomModal();
+                      } else {
+                        setShowVoiceSymptomModal(true);
+                      }
+                    }}
+                    className="px-2 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/40 text-emerald-300 font-extrabold text-[9px] rounded-lg transition-all cursor-pointer flex items-center gap-1 uppercase tracking-wider shadow-sm"
+                    title="Dictate symptoms and vitals using Voice-to-Text"
+                  >
+                    <Mic className="h-3 w-3 text-emerald-400 animate-pulse" /> Voice Dictate
+                  </button>
+                  <span className="text-[9.5px] text-slate-400 font-bold font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                    Last 5 Logs
+                  </span>
+                </div>
               </div>
               <p className="text-[10px] text-slate-500">Quickly monitor biometric variances, symptoms logs, and trends over time.</p>
             </div>
@@ -589,6 +663,17 @@ export default function PatientDashboard({
             onViewRouteClick?.(upcomingAppointments[0]);
           }
         }}
+      />
+
+      {/* Voice-to-Text Symptom Dictation Modal */}
+      <VoiceSymptomDictationModal
+        isOpen={showVoiceSymptomModal}
+        onClose={() => setShowVoiceSymptomModal(false)}
+        onSave={(log) => {
+          setLocalLogs(prev => [...prev, log]);
+          onSaveVoiceSymptomLog?.(log);
+        }}
+        latestVitals={latestVitals}
       />
 
     </div>
