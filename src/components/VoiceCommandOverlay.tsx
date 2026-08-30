@@ -46,6 +46,7 @@ interface VoiceCommandOverlayProps {
   onOpenScanner?: () => void;
   onOpenProfile?: () => void;
   onViewHistory?: () => void;
+  onOpenLiveVoice?: () => void;
 }
 
 interface VoiceMatchResult {
@@ -166,7 +167,8 @@ export default function VoiceCommandOverlay({
   onViewRouteClick,
   onOpenScanner,
   onOpenProfile,
-  onViewHistory
+  onViewHistory,
+  onOpenLiveVoice
 }: VoiceCommandOverlayProps): React.ReactElement | null {
   // State
   const [isListening, setIsListening] = useState<boolean>(false);
@@ -541,7 +543,41 @@ export default function VoiceCommandOverlay({
           </div>
 
           {/* Body */}
-          <div className="p-5 space-y-5">
+          <div className="p-5 space-y-4">
+            {/* Live API Voice Conversation Switch Banner */}
+            {onOpenLiveVoice && (
+              <button
+                id="btn-switch-to-live-voice"
+                type="button"
+                onClick={() => {
+                  stopListening();
+                  onClose();
+                  onOpenLiveVoice();
+                }}
+                className="w-full p-3 bg-gradient-to-r from-emerald-950/90 via-slate-900 to-teal-950/80 hover:from-emerald-900/90 hover:to-teal-900/80 border border-emerald-500/40 rounded-xl flex items-center justify-between transition-all group cursor-pointer shadow-lg shadow-emerald-950/40 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400 group-hover:scale-110 transition-transform">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                      Live Voice Conversation
+                      <span className="text-[8px] bg-emerald-500/30 text-emerald-200 px-1.5 py-0.2 rounded-full">
+                        Gemini 3.1 Flash Live
+                      </span>
+                    </span>
+                    <p className="text-[10px] text-slate-400">
+                      Real-time bidirectional spoken AI dialogue
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+                  Launch →
+                </span>
+              </button>
+            )}
+
             {/* Listening Visualizer */}
             <div className="flex flex-col items-center justify-center py-4 space-y-3">
               <div className="relative flex items-center justify-center">

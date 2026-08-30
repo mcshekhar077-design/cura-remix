@@ -509,7 +509,7 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-slate-900/95 border-2 border-emerald-500/40 p-4.5 rounded-2xl shadow-2xl shadow-emerald-500/10 backdrop-blur-lg"
+            className="fixed bottom-24 right-6 z-50 max-w-sm w-full bg-slate-900/95 border-2 border-emerald-500/40 p-4.5 rounded-2xl shadow-2xl shadow-emerald-500/10 backdrop-blur-lg"
           >
             <div className="flex items-start gap-3">
               <div className="p-2 bg-emerald-500 text-slate-950 rounded-xl">

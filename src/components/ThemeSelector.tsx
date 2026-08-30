@@ -309,7 +309,7 @@ export default function ThemeSelectorWidget() {
   const [compact, setCompact] = useState(false);
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 font-sans">
+    <div className="fixed bottom-5 left-5 z-40 font-sans">
       
       {/* FLOATING QUICK TOGGLE TRIGGER BUTTON */}
       {!isOpen && (

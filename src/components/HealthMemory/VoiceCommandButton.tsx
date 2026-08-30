@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Mic, Sparkles } from "lucide-react";
+import { Mic, Sparkles, Radio } from "lucide-react";
 import VoiceCommandOverlay from "../VoiceCommandOverlay";
+import LiveVoiceConversationModal from "../LiveVoiceConversationModal";
 
 interface VoiceCommandButtonProps {
   onNavigateTab?: (tab: string) => void;
@@ -12,6 +13,7 @@ interface VoiceCommandButtonProps {
   onOpenScanner?: () => void;
   onOpenProfile?: () => void;
   onViewHistory?: () => void;
+  patientName?: string;
   className?: string;
 }
 
@@ -25,9 +27,11 @@ export default function VoiceCommandButton({
   onOpenScanner,
   onOpenProfile,
   onViewHistory,
+  patientName = "Patient",
   className = ""
 }: VoiceCommandButtonProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLiveOpen, setIsLiveOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const toggleOverlay = (): void => {
@@ -37,7 +41,20 @@ export default function VoiceCommandButton({
   return (
     <>
       {/* Floating Action Button */}
-      <div className={`fixed bottom-6 right-6 z-40 ${className}`}>
+      <div className={`fixed bottom-24 right-5 sm:bottom-24 sm:right-6 z-40 flex items-center gap-2 ${className}`}>
+        {/* Quick Direct Live Voice Button */}
+        <button
+          id="btn-floating-live-voice"
+          type="button"
+          onClick={() => setIsLiveOpen(true)}
+          className="relative group flex items-center gap-1.5 px-3 py-2 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          title="Open Gemini 3.1 Flash Live Voice Conversation"
+        >
+          <Radio className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+          <span className="hidden sm:inline">Live Voice</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+        </button>
+
         <button
           id="btn-floating-voice-command"
           type="button"
@@ -72,7 +89,7 @@ export default function VoiceCommandButton({
             ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
           `}>
             <Sparkles className="inline h-3 w-3 mr-1 text-emerald-400" />
-            Voice Commands
+            Voice Commands & Live AI
           </span>
         </button>
 
@@ -95,6 +112,14 @@ export default function VoiceCommandButton({
         onOpenScanner={onOpenScanner}
         onOpenProfile={onOpenProfile}
         onViewHistory={onViewHistory}
+        onOpenLiveVoice={() => setIsLiveOpen(true)}
+      />
+
+      {/* Gemini 3.1 Flash Live Real-Time Voice Conversation Modal */}
+      <LiveVoiceConversationModal
+        isOpen={isLiveOpen}
+        onClose={() => setIsLiveOpen(false)}
+        patientName={patientName}
       />
 
       {/* Keyboard shortcut listener */}

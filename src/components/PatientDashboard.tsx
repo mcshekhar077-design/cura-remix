@@ -18,11 +18,13 @@ import {
   TrendingUp,
   Scale,
   Brain,
-  Mic
+  Mic,
+  Radio
 } from "lucide-react";
 import { Patient, Appointment } from "../types";
 import VoiceCommandOverlay from "./VoiceCommandOverlay";
 import VoiceSymptomDictationModal, { DictatedSymptomLog } from "./VoiceSymptomDictationModal";
+import LiveVoiceConversationModal from "./LiveVoiceConversationModal";
 
 interface PatientDashboardProps {
   patient: Patient;
@@ -54,6 +56,7 @@ export default function PatientDashboard({
   onOpenVoiceSymptomModal
 }: PatientDashboardProps) {
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
+  const [showLiveVoiceModal, setShowLiveVoiceModal] = useState(false);
   const [showVoiceSymptomModal, setShowVoiceSymptomModal] = useState(false);
   const [localLogs, setLocalLogs] = useState<any[]>([]);
   
@@ -151,6 +154,16 @@ export default function PatientDashboard({
           </div>
           
           <div className="flex items-center gap-2 flex-wrap">
+            <button
+              id="btn-patient-live-voice"
+              onClick={() => setShowLiveVoiceModal(true)}
+              className="py-2 px-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-400 hover:from-emerald-400 hover:to-cyan-300 text-slate-950 font-black text-[10.5px] rounded-xl transition-all cursor-pointer shadow-lg shadow-emerald-500/25 uppercase tracking-wider flex items-center gap-1.5 shrink-0 border-0 active:scale-95"
+              title="Start real-time voice consultation with Gemini 3.1 Flash Live"
+            >
+              <Radio className="h-3.5 w-3.5 animate-pulse text-slate-950" />
+              <span>Live Voice</span>
+              <span className="text-[8px] bg-slate-950/20 text-slate-950 font-black px-1 rounded">Live API</span>
+            </button>
             <button
               onClick={() => {
                 if (onOpenVoiceSymptomModal) {
@@ -634,14 +647,14 @@ export default function PatientDashboard({
 
       </div>
 
-      {/* Floating Voice Command FAB */}
-      <div className="fixed bottom-6 right-6 z-40">
+      {/* Floating Voice Command FAB (Positioned cleanly above SOS button) */}
+      <div className="fixed bottom-24 right-5 sm:bottom-24 sm:right-6 z-40">
         <button
           onClick={() => setShowVoiceOverlay(true)}
-          className="h-12 w-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/30 flex items-center justify-center cursor-pointer transition-all border-2 border-slate-900 group"
+          className="h-12 w-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-xl shadow-emerald-500/30 flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 border-2 border-slate-900 group"
           title="Open Voice Assistant Commands"
         >
-          <Mic className="h-6 w-6 group-hover:scale-110 transition-transform" />
+          <Mic className="h-5 w-5 group-hover:scale-110 transition-transform text-slate-950" />
         </button>
       </div>
 
@@ -663,6 +676,14 @@ export default function PatientDashboard({
             onViewRouteClick?.(upcomingAppointments[0]);
           }
         }}
+        onOpenLiveVoice={() => setShowLiveVoiceModal(true)}
+      />
+
+      {/* Real-time Gemini 3.1 Flash Live Voice Conversation Modal */}
+      <LiveVoiceConversationModal
+        isOpen={showLiveVoiceModal}
+        onClose={() => setShowLiveVoiceModal(false)}
+        patientName={patient.fullName}
       />
 
       {/* Voice-to-Text Symptom Dictation Modal */}

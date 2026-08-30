@@ -629,7 +629,7 @@ export default function OfflineSyncEngine({
   return (
     <>
       {/* FLOATING STATUS BAR */}
-      <div id="offline-sync-floating-bar" className="fixed bottom-4 right-4 z-40 flex items-center gap-2 bg-slate-900/95 text-slate-100 backdrop-blur-md border border-slate-700/80 p-2.5 rounded-2xl shadow-2xl transition-all max-w-sm sm:max-w-md">
+      <div id="offline-sync-floating-bar" className="fixed bottom-18 left-5 z-40 flex items-center gap-2 bg-slate-900/95 text-slate-100 backdrop-blur-md border border-slate-700/80 p-2.5 rounded-2xl shadow-2xl transition-all max-w-xs sm:max-w-sm">
         {/* Status Icon */}
         <div className={`p-2 rounded-xl flex items-center justify-center shrink-0 ${
           effectiveOnline 

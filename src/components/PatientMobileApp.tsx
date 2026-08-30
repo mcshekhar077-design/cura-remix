@@ -3696,7 +3696,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                   </div>
 
                   {/* FLOATING ACTION BUTTON FOR CAMERA SCANNER (RESPONSIVE WEB DESIGN) */}
-                  <div className="fixed bottom-6 right-6 z-40">
+                  <div className="fixed bottom-24 right-5 sm:bottom-24 sm:right-6 z-40">
                     <button
                       onClick={() => {
                         setPatientScannerMode("camera");
@@ -9890,166 +9890,14 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 </h5>
                 <p className="text-slate-350 font-medium">
                   {consentLang === "en" ? "Under the Digital Personal Data Protection (DPDP) Act, 2023, we collect your vital telemetries, clinical scan uploads, and medical history solely to provide telemedicine, RMP diagnosis support, and automated emergency alerts. Your data is stored securely in row-level isolated sandboxes encrypted with AES-256 and is not shared with third parties without your explicit opt-in." :
-                   consentLang === "hi" ? "рдбрд┐рдЬрд┐рдЯрд▓ рд╡реНрдпрдХреНрддрд┐рдЧрдд рдбреЗрдЯрд╛ рд╕рдВрд░рдХреНрд╖рдг (DPDP) рдЕрдзрд┐рдирд┐рдпрдо, 2023 рдХреЗ рддрд╣рдд, рд╣рдо рдЖрдкрдХреА рдЯреЗрд▓реАрдореЗрдбрд┐рд╕рд┐рди, рдбреЙрдХреНрдЯрд░ рдирд┐рджрд╛рди рд╕рд╣рд╛рдпрддрд╛ рдФрд░ рдЖрдкрд╛рддрдХрд╛рд▓реАрди рдЕрд▓рд░реНрдЯ рдкреНрд░рджрд╛рди рдХрд░рдиреЗ рдХреЗ рд▓рд┐рдП рдЖрдкрдХреЗ рдорд╣рддреНрд╡рдкреВрд░реНрдг рдЯреЗрд▓реАрдореЗрдЯреНрд░реА, рдиреИрджрд╛рдирд┐рдХ рд╕реНрдХреИрди рдФрд░ рдЪрд┐рдХрд┐рддреНрд╕рд╛ рдЗрддрд┐рд╣рд╛рд╕ рдХреЛ рдПрдХрддреНрд░ рдХрд░рддреЗ рд╣реИрдВред рдЖрдкрдХрд╛ рдбреЗрдЯрд╛ рд╕реБрд░рдХреНрд╖рд┐рдд рд░реВрдк рд╕реЗ рдПрдИрдПрд╕ -256 рдПрдиреНрдХреНрд░рд┐рдкреНрдЯреЗрдб рд╕реИрдВрдбрдмреЙрдХреНрд╕ рдореЗрдВ рд╕рдВрдЧреНрд░рд╣реАрдд рд╣реИред" :
-                   consentLang === "ta" ? "роЯро┐роЬро┐роЯрпНроЯро▓рпН родройро┐роирокро░рпН родро░ро╡рпБ рокро╛родрпБроХро╛рокрпНрокрпБ (DPDP) роЪроЯрпНроЯроорпН, 2023 роЗройрпН роХрпАро┤рпН, роЯрпЖро▓ро┐роорпЖроЯро┐роЪро┐ройрпН, рооро░рпБродрпНродрпБро╡ро░рпН роирпЛропро▒ро┐родро▓рпН роЖродро░ро╡рпБ рооро▒рпНро▒рпБроорпН роЕро╡роЪро░ роОроЪрпНроЪро░ро┐роХрпНроХрпИроХро│рпИ ро╡ро┤роЩрпНроХ роЙроЩрпНроХро│рпН роорпБроХрпНроХро┐роп роЯрпЖро▓ро┐роорпЖроЯрпНро░ро┐, рооро░рпБродрпНродрпБро╡ ро╕рпНроХрпЗройрпН рооро▒рпНро▒рпБроорпН рооро░рпБродрпНродрпБро╡ ро╡ро░ро▓ро╛ро▒рпНро▒рпИ роиро╛роЩрпНроХро│рпН роЪрпЗроХро░ро┐роХрпНроХро┐ро▒рпЛроорпН." :
-                   "р░бр░┐р░Ьр░┐р░Яр░▓р▒Н р░╡р▒Нр░пр░Хр▒Нр░др░┐р░Чр░д р░бр▒Зр░Яр░╛ р░░р░Хр▒Нр░╖р░г (DPDP) р░Ър░Яр▒Нр░Яр░В, 2023 р░кр░░р░┐р░зр░┐р░▓р▒Л, р░Яр▒Жр░▓р░┐р░ор▒Жр░бр░┐р░╕р░┐р░ир▒Н, р░бр░╛р░Хр▒Нр░Яр░░р▒Н р░ир░┐р░░р▒Нр░зр░╛р░░р░г р░╕р░╣р░╛р░пр░В р░ор░░р░┐р░пр▒Б р░Ер░др▒Нр░пр░╡р░╕р░░ р░╣р▒Жр░Ър▒Нр░Ър░░р░┐р░Хр░▓ р░Хр▒Лр░╕р░В р░ор▒А р░Хр▒Ар░▓р░Х р░мр░пр▒Лр░ор▒Жр░Яр▒Нр░░р░┐р░Хр▒Н р░Яр▒Жр░▓р░┐р░ор▒Жр░Яр▒Нр░░р▒А, р░╡р▒Ир░жр▒Нр░п р░ир░┐р░╡р▒Зр░жр░┐р░Хр░▓р░ир▒Б р░╕р▒Зр░Хр░░р░┐р░╕р▒Нр░др▒Бр░ир▒Нр░ир░╛р░ор▒Б."}
-                </p>
-                <div className="text-[10px] text-slate-455 border-t border-slate-800/60 pt-2 font-mono">
-                  <strong>
-                    {consentLang === "en" ? "Data Category: " :
-                     consentLang === "hi" ? "рдбреЗрдЯрд╛ рдХреА рд╢реНрд░реЗрдгреА: " :
-                     consentLang === "ta" ? "родро░ро╡рпБ ро╡роХрпИ: " :
-                     "р░бр▒Зр░Яр░╛ р░╡р░░р▒Нр░Чр░В: "}
-                  </strong>
-                  {consentLang === "en" ? "Demographics, Heart Rate, Blood Pressure, HbA1c, EMR Diagnosis scans, Family share tokens." :
-                   consentLang === "hi" ? "рдЬрдирд╕рд╛рдВрдЦреНрдпрд┐рдХреА, рд╣реГрджрдп рдЧрддрд┐, рд░рдХреНрддрдЪрд╛рдк, рдЧреНрд▓реВрдХреЛрдЬ, рдирд┐рджрд╛рди рд░рд┐рдкреЛрд░реНрдЯ, рдкрд╛рд░рд┐рд╡рд╛рд░рд┐рдХ рдЯреЛрдХрдиред" :
-                   consentLang === "ta" ? "рокрпБро│рпНро│ро┐ро╡ро┐ро╡ро░роЩрпНроХро│рпН, роЗродроп родрпБроЯро┐рокрпНрокрпБ, роЗро░родрпНрод роЕро┤рпБродрпНродроорпН, роХрпБро│рпБроХрпНроХрпЛро╕рпН, рооро░рпБродрпНродрпБро╡ роЕро▒ро┐роХрпНроХрпИроХро│рпН." :
-                   "р░Ьр░ир░╛р░нр░╛ р░╡р░┐р░╡р░░р░╛р░▓р▒Б, р░╣р▒Гр░жр░п р░╕р▒Нр░кр░Вр░жр░и р░░р▒Зр░Яр▒Б, р░░р░Хр▒Нр░др░кр▒Лр░Яр▒Б, р░╡р▒Ир░жр▒Нр░п р░ир░┐р░╡р▒Зр░жр░┐р░Хр░▓р▒Б."}
-                </div>
-              </div>
-
-              {/* Granular Consent Checkboxes */}
-              <div className="space-y-2 border-t border-slate-800 pt-3">
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Granular Processing Authorizations</p>
-                
-                <label className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-all ${patientConsent.accepted ? "hover:bg-slate-850" : "opacity-40 cursor-not-allowed"}`}>
-                  <input
-                    type="checkbox"
-                    disabled={!patientConsent.accepted}
-                    checked={patientConsent.granularPreferences?.historySharing || false}
-                    onChange={(e) => {
-                      const updated = { ...patientConsent.granularPreferences, historySharing: e.target.checked };
-                      updatePatientConsent(consentLang, updated);
-                    }}
-                    className="mt-0.5 rounded text-emerald-500 focus:ring-0 bg-slate-950 border-slate-700 h-3.5 w-3.5 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                  <div className="text-[11px]">
-                    <p className="font-extrabold text-slate-200">EHR History Decryption & Processing</p>
-                    <p className="text-[9px] text-slate-500 font-medium">Allows registered doctors to decrypt and view clinical histories.</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-all ${patientConsent.accepted ? "hover:bg-slate-850" : "opacity-40 cursor-not-allowed"}`}>
-                  <input
-                    type="checkbox"
-                    disabled={!patientConsent.accepted}
-                    checked={patientConsent.granularPreferences?.aiCdssProcessing || false}
-                    onChange={(e) => {
-                      const updated = { ...patientConsent.granularPreferences, aiCdssProcessing: e.target.checked };
-                      updatePatientConsent(consentLang, updated);
-                    }}
-                    className="mt-0.5 rounded text-emerald-500 focus:ring-0 bg-slate-950 border-slate-700 h-3.5 w-3.5 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                  <div className="text-[11px]">
-                    <p className="font-extrabold text-slate-200">AI-CDSS Model Assist</p>
-                    <p className="text-[9px] text-slate-500 font-medium">Permits Gemini models to process clinical notes for physician decision support.</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-all ${patientConsent.accepted ? "hover:bg-slate-850" : "opacity-40 cursor-not-allowed"}`}>
-                  <input
-                    type="checkbox"
-                    disabled={!patientConsent.accepted}
-                    checked={patientConsent.granularPreferences?.familySharing || false}
-                    onChange={(e) => {
-                      const updated = { ...patientConsent.granularPreferences, familySharing: e.target.checked };
-                      updatePatientConsent(consentLang, updated);
-                    }}
-                    className="mt-0.5 rounded text-emerald-500 focus:ring-0 bg-slate-950 border-slate-700 h-3.5 w-3.5 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                  <div className="text-[11px]">
-                    <p className="font-extrabold text-slate-200">Caregiver Secure Sharing</p>
-                    <p className="text-[9px] text-slate-500 font-medium">Permits generation of one-time codes for authorized family access.</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-all ${patientConsent.accepted ? "hover:bg-slate-850" : "opacity-40 cursor-not-allowed"}`}>
-                  <input
-                    type="checkbox"
-                    disabled={!patientConsent.accepted}
-                    checked={patientConsent.granularPreferences?.vitalTelemetry || false}
-                    onChange={(e) => {
-                      const updated = { ...patientConsent.granularPreferences, vitalTelemetry: e.target.checked };
-                      updatePatientConsent(consentLang, updated);
-                    }}
-                    className="mt-0.5 rounded text-emerald-500 focus:ring-0 bg-slate-950 border-slate-700 h-3.5 w-3.5 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                  <div className="text-[11px]">
-                    <p className="font-extrabold text-slate-200">Physiological Telemetry Logger</p>
-                    <p className="text-[9px] text-slate-500 font-medium">Enables active recording of heart rates, BP levels, and glucose markers.</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-all ${patientConsent.accepted ? "hover:bg-slate-850" : "opacity-40 cursor-not-allowed"}`}>
-                  <input
-                    type="checkbox"
-                    disabled={!patientConsent.accepted}
-                    checked={patientConsent.granularPreferences?.emergencyBreakGlass || false}
-                    onChange={(e) => {
-                      const updated = { ...patientConsent.granularPreferences, emergencyBreakGlass: e.target.checked };
-                      updatePatientConsent(consentLang, updated);
-                    }}
-                    className="mt-0.5 rounded text-emerald-500 focus:ring-0 bg-slate-950 border-slate-700 h-3.5 w-3.5 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                  <div className="text-[11px]">
-                    <p className="font-extrabold text-slate-200">Emergency Break-Glass Alerts</p>
-                    <p className="text-[9px] text-slate-500 font-medium">Enables SMS rules to override standard freezes during life-threatening anomalies.</p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-2 border-t border-slate-800">
-                {patientConsent.accepted ? (
-                  <button
-                    onClick={revokePatientConsent}
-                    className="w-full py-2.5 bg-red-950/40 hover:bg-red-900/40 border border-red-500/30 text-red-400 hover:text-red-300 font-black text-[11px] rounded-xl transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1"
-                  >
-                    <span>тЪая╕П One-Click Withdraw Consent & Freeze Processing</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      const defaultPrefs = {
-                        historySharing: true,
-                        aiCdssProcessing: true,
-                        familySharing: true,
-                        vitalTelemetry: true,
-                        emergencyBreakGlass: true
-                      };
-                      updatePatientConsent(consentLang, defaultPrefs);
-                    }}
-                    className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] rounded-xl transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 shadow-md"
-                  >
-                    <span>ЁЯЫбя╕П Accept Privacy Notice & Grant Consent</span>
-                  </button>
-                )}
-                {consentSaveSuccess && (
-                  <p className="text-[10px] text-center font-extrabold text-emerald-400 uppercase tracking-wider mt-2 animate-pulse">
-                    тЬУ DPDP compliance states updated on server ledger
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={handleDownloadPDFSummary}
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
-            >
-              <Download className="h-3.5 w-3.5 text-slate-950" /> Download 30-Day Health Report (PDF)
-            </button>
-
-            <button
-              onClick={() => window.print()}
-              className="w-full py-3 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white font-extrabold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
-            >
-              <Printer className="h-3.5 w-3.5 text-emerald-400" /> Print Digital Identity Card
-            </button>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  }
-}
+                   consentLang === "hi" ? "рдбрд┐рдЬрд┐рдЯрд▓ рд╡реНрдпрдХреНрддрд┐рдЧрдд рдбреЗрдЯрд╛ рд╕рдВрд░рдХреНрд╖рдг (DPDP) рдЕрдзрд┐рдирд┐рдпрдо, 2023 рдХреЗ рддрд╣рдд, рд╣рдо рдЖрдкрдХреА рдЯреЗрд▓реАрдореЗрдбрд┐рд╕рд┐рди, рдбреЙрдХреНрдЯрд░ рдирд┐рджрд╛рди рд╕рд╣рд╛рдпрддрд╛ рдФрд░ рдЖрдкрд╛рддрдХрд╛рд▓реАрди рдЕрд▓рд░реНрдЯ рдкреНрд░рджрд╛рди рдХрд░рдиреЗ рдХреЗ рд▓рд┐рдП рдЖрдкрдХреЗ рдорд╣рддреНрд╡рдкреВрд░реНрдг рдЯреЗрд▓реАрдореЗрдЯреНрд░реА, рдиреИрджрд╛рдирд┐рдХ рд╕реНрдХреИрди рдФрд░ рдЪрд┐рдХрд┐рддреНрд╕рд╛ рдЗрддрд┐рд╣рд╛рд╕ рдХреЛ рдПрдХрддреНрд░ рдХрд░рддреЗ рд╣реИрдВреxЬьZ_o▄╞ўзШ
+CОз│dеН)Р% 	зВUаEБм╚╜;V<Є@юI║(,▒n
+5иj@5rr!=Q╢╒╚/ЄW!Є┌П╨Щ┘уЙ╟#█qkРихюь╠ь№∙═Р╟6Dэ█Q{/joFэc╝yэ▄Й┌█·ц(┌YЛ┌!-ю▄Л┌?DэgQ╗4╡│О╗4╔№ўU╘╛╦╫#0F╞▐╒3╗╝KяyяП╖Y╞╜╖нУ╪Ўў╤╬Ч1їоuШjЭйИфыШ╧╙hчЦVу)m▀i`№■ЩЮHW}$▄*LLL@AЙ| Еи│uЮEЭ√|▌ОЎяё╠#@╘iGЭяxa7ъьEЭ░7FЭ├hx·ШжЎ╫в╬&ПўШ╔-═╠╬╠^@княК0R┼Е;$Б╣nF√╖в╬^dъ█д	яЁXы╣┼╫я║T╓iНх▀Л╡8ь)║эoDЭ¤иs└╗┌╜s▌NвC$─сА9t4╒╠%Жxєg╔o|╞
+▀уы]>∙c яxu■ж╫Ё■╦▐У▄ci┌X▌Yd╡Яsbв a∙g┼ЕгXП[fЯ'Ч[МD'Ў▌e╥TZ -╡Щ╢Н╪т$пФИЕ(|Е╧вЁ>_╖гЁQtА\├C№Е√Q╕╔Г6/НаwШ1cТвЁЫ^ИЕ[D@╙H╢╟W╕╟Ї╚щ[╛вм4&Q▐ж;ЪыЁX+u─╫]фSd▒сq,lЫ▒в╗LЄь╖LТ"╝∙)▀у!0UСqWЎ~tАQ~AзъЄР╔1░pЙ▀тЕнx╟&*,zГ	5╗Г[zюлО╤~╧╠7тCh─,X█┴У╞D╖К┌ьwгЁб╓лw║C6°├Ю.lУ5>#-l╞BО║╛:X╙Vу¤╟,iнTXАўЗУГУЦ╜ж#ВрcQЧ%ЧХёЗЛх╞ЄБ╟Б#Ф4.НН┴╝ч[╥7T<╨+┐.ЧЗ▀-CC#Pё\e╘=╫+
+BQБЄ=╖Ъ╡░2 Т╥eРЬJ└4Jкz~kr";dk╢┘■JВ░ООl лЛс┤ЄN╜уzў┴╪бЖгSR╣t2&┌:юЇ∙,▀h∙&УuпъЛF═6Г"\Ч┬Wp-XД╦ОчY0ы╦ h·x}~ъвYД+7n┬М-ко╪жpq▀UQ╖Э5сKP▐ВtГ<\╔╖¤}*╛T7П╣t■Х═╛╧%Ш<Q╘╡єєи¤зБjk╗НлEHT{Ь╪b{EИля#о√╕╛Б2hzЧy>d║]HФ∙v3{"█c╜xШc>S7░┴э╟ю╦ФЄ=FЇ╟М╟ППуkШВёво╜m]{t)╨Ўд|wi┬^┴╨5ёI_щЦsО<-<Q█иЭZл5╦ГЬВzZ╣c═?{б№м╨4ЛHO x¤ЬСlb╕┬Ъ░╬S╗\Mt:hъ0Q~ЎXуХч─╔<╪CИKчOw25╗2№\єЕ█tД╙┌╒0]Уц┬╝╖,xg8═>ЯACШ╥h!цв%Aхh@╛▀─сўЖUчa.$y95щЫ"└№Їq┘vл╞ТН┬
+У╜S╠·ЮЙ┘ОK0╒T5╧╖?╩╞гeVГAе1/ЭДb+ЯT╣╢Тї└AKU4МQhрЩ}пщZ╥2Ь*ШM?Ё|гс┘оТ>щч6	6Ду└/WиZ╖kфТ0M┘P╥в\кyЛ╥Яп╞&+c B┴C╙┌кe\*╟╠]O7oIZЕ╒OV3kОэ6Ъ*ПUлБv6╗▐-d╥Xv цiMм№"Gс,╨FШ о┤-╡л┌u"pE·╥E╫|Pк┘Б┬┌6З@Kn·ь3и'Р┘Ь=w║ЖрГОТ`bV▓Л#Х┬▒ЩuVаT*¤┤:EшWgd	╜\Хк╘=м■&Gд6█'c(БШ┼XЭ┘VsМyТueФKcqЬщtРuщ╟тДиxf3'╜Н2Ї"ш╜▒r■
+Ik╞(rZтk*XcпПg─YЖЖ├ЩБЧ▌W]─Д╬lО╥∙╧IП{|1я9V2ёG╩х┬фХы7с║v╠H╙o5(╖р|"▀3|PPhRшв╗9i┘═zarК╬А/л(c┼╦3Q|АнXZоЛ╢\B■╢kЫ┬щУ-ГRО:ЩшL╙<}ЖH DЎ┤Й╥ё║1)н╨*╜Си4їб1=377<St
+]иWC│╥п█*Аk▓Оu─╘╨▒qВ<hь╪*ЮНZ+░M[╕ДSv@8`чф∙ъФb¤▀PкЁєшЫ╥%їisGo$MjW0K`NвЦ║ю·▀@RU║hcn├╝
+Fа4Ф]ЧaVЗDў∙}вг(;В│╓из [АBЛ╢╬ядГ	е░ў~▌0╘п╬╜С84KИчxUnLNВч#пZХ■лEг+.Y#@hQИ|°╝fв-й`"&╒°M0bE╬хYpф"vOE~lл:M╙$╘Е┐ ¤3Lъщ `%V│u┘ЧbсЩ·╡SЖNgшЇFв╙Х╪S└о2t№L9╥W┘/Й%╝ 6═▌Ш┐I#|pг\їmKbБk	Ы#_╩Oq╤jrзя╪lеjиЫТ.M╫лчg╝S╩д╬°)`╩фnюrS)М╝чx√╧?Вц╛°╧p╓)(6Фu░yV%/е█\ШXёхв╖РJЭЯ╠Ж%г╥DXm┤МbwQГ}┴▓з<Wц9}╢°И┤А▐-k ╙¤еr╝│75Dт╟╟=р_v╥HЯJи╝Я< QUL╔дj╩о┤т[к2│Т.'┬ГЖp'▄·╟┐П╛В▀b7╧цЕ▀█кf∙bйўє╨y╕╩ё┌ўцХўfFжЎрр┌мP/эЄбч└pKVD╙Q╥y1╝ W~Ssй▀╠ЭNЯzn>Э8▌▌ЮNЭYrhK╬ОЯQ|Т╞|щ
+4Рs╔Є╙K║xТЄ)оTИ^s.╤зЦ╖d╘3K┘iYїЯэ┐?а┤Ъb╕├╠▒╓ЯП=eЫ3К~╜TqЖ╜T6?■ZbN,╩╣&?x├∙є┘9ЧQ▄_─tmРUVУ╬╩╡nЭкДpэ:∙▒╤─&-зМ x /@_Xa╫О-░│в*Iя5уОМ▐eJЯ^q`УБЩV╩(Т╩иЩYЕ1Оz@ДMех╚o╔u<a═╬\Эk╓ёЙвХЦЦЩгп"ЦГSт ╣тz$Э&9a>╨G─╟NЮ.┘Ўk^└fz[F╦╞Мh╤╖:Ок┴MIoзax!хТ8т_─+║<,┘.г╘@рUC■╧ў╚ЙнS╧U╪
+д·АУogэoЦjшА╠фyНоЫї5¤iЮK!√Оў└М]е"Zи>]┬4╢░9>K╬їeЦРю╕[XN╛╗ёеj·.рЦгы9nї▄ъ╣       ьэn

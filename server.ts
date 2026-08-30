@@ -1,8 +1,10 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import dotenv from "dotenv";
+import { WebSocketServer, WebSocket } from "ws";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, LiveServerMessage, Modality, Type } from "@google/genai";
 import { 
   sendEmail, 
   sendSMS, 
@@ -1124,7 +1126,7 @@ const operationTheatresStore: OperationTheatre[] = [
 ];
 
 const otEquipmentStore: OTEquipment[] = [
-  { id: "EQ-101", name: "High-End Ventilator (DrÃ¤ger)", equipmentType: "ventilator", serialNumber: "DRG-88712", model: "Evita V800", manufacturer: "DrÃ¤ger", status: "available", location: "OT-01", lastMaintenanceDate: "2026-06-15", nextMaintenanceDate: "2026-12-15" },
+  { id: "EQ-101", name: "High-End Ventilator (DrÃƒÂƒÃ‚Â¤ger)", equipmentType: "ventilator", serialNumber: "DRG-88712", model: "Evita V800", manufacturer: "DrÃƒÂƒÃ‚Â¤ger", status: "available", location: "OT-01", lastMaintenanceDate: "2026-06-15", nextMaintenanceDate: "2026-12-15" },
   { id: "EQ-102", name: "C-Arm Fluoroscopy (Siemens)", equipmentType: "c_arm", serialNumber: "SI-33928", model: "Cios Spin", manufacturer: "Siemens Healthineers", status: "available", location: "OT-01", lastMaintenanceDate: "2026-05-10", nextMaintenanceDate: "2026-11-10" },
   { id: "EQ-103", name: "Laparoscopic Stack (Storz)", equipmentType: "laparoscopy", serialNumber: "SZ-55610", model: "IMAGE1 S", manufacturer: "Karl Storz", status: "available", location: "OT-02", lastMaintenanceDate: "2026-05-20", nextMaintenanceDate: "2026-11-20" },
   { id: "EQ-104", name: "Surgical Microscope (Zeiss)", equipmentType: "microscope", serialNumber: "ZE-22104", model: "OPMI PENTERO 800", manufacturer: "Zeiss", status: "available", location: "OT-02", lastMaintenanceDate: "2026-04-12", nextMaintenanceDate: "2026-10-12" },
@@ -1597,7 +1599,7 @@ const crmLeads: CrmLead[] = [
     source: "website",
     status: "qualified",
     interests: ["ipd", "opd", "pharmacy"],
-    budgetRange: "â‚¹2,00,000 - â‚¹5,00,000",
+    budgetRange: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹2,00,000 - ÃƒÂ¢Ã‚Â‚Ã‚Â¹5,00,000",
     lastContact: "2026-07-10T11:00:00Z",
     nextFollowUp: "2026-07-14T10:00:00Z",
     notes: "Very interested in the integrated IPD Bed management & Ward tracker. Wants a detailed custom price quote.",
@@ -1618,7 +1620,7 @@ const crmLeads: CrmLead[] = [
     source: "referral",
     status: "contacted",
     interests: ["ayush"],
-    budgetRange: "â‚¹50,005 - â‚¹1,00,000",
+    budgetRange: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹50,005 - ÃƒÂ¢Ã‚Â‚Ã‚Â¹1,00,000",
     lastContact: "2026-07-11T14:30:00Z",
     nextFollowUp: "2026-07-15T16:00:00Z",
     notes: "Referred by Dr. Rajesh. Extremely interested in AYUSH modules (Ayurveda Panchakarma calendar and Prakriti logging). Needs some assistance with local language support.",
@@ -2219,7 +2221,7 @@ const radiologyRequestsStore: RadiologyRequest[] = [
     performedDate: "2026-07-08T12:15:00Z",
     contrastUsed: true,
     contrastType: "Gadobutrol (Gadovist)",
-    allergyNotes: "No known contrast allergy. GFR is 88 ml/min/1.73mÂ² (Normal).",
+    allergyNotes: "No known contrast allergy. GFR is 88 ml/min/1.73mÃƒÂ‚Ã‚Â² (Normal).",
     pregnancyStatus: false,
     radiationSafetyNotes: "MRI safety screening checklist completed. No metallic implants.",
     createdAt: "2026-07-08T10:05:00Z"
@@ -3506,7 +3508,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "sent",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ğŸ’Š Medication Reminder: Paracetamol 500mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 09:00 AM. Instructions: After meals.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Paracetamol 500mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 09:00 AM. Instructions: After meals.",
     scheduledAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     processedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     sentAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -3526,7 +3528,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ğŸ’Š Medication Reminder: Amlodipine 5mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 08:00 AM. Instructions: For Hypertension.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Amlodipine 5mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 08:00 AM. Instructions: For Hypertension.",
     scheduledAt: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(), // 1 hour from now
     retryCount: 0,
     maxRetries: 3,
@@ -3544,7 +3546,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ğŸ’Š Medication Reminder: Multivitamin for Rajesh Kumar. Dosage: 1 Cap. Scheduled: Daily at 01:00 PM. Instructions: After lunch.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Multivitamin for Rajesh Kumar. Dosage: 1 Cap. Scheduled: Daily at 01:00 PM. Instructions: After lunch.",
     scheduledAt: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours from now
     retryCount: 0,
     maxRetries: 3,
@@ -3562,7 +3564,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ğŸ’Š Medication Reminder: Ferrous Ascorbate for Anjali Gupta. Dosage: 1 Tab. Scheduled: Daily at 09:00 PM. Instructions: Before sleep.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Ferrous Ascorbate for Anjali Gupta. Dosage: 1 Tab. Scheduled: Daily at 09:00 PM. Instructions: Before sleep.",
     scheduledAt: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
     retryCount: 0,
     maxRetries: 3,
@@ -3580,7 +3582,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ğŸ’Š Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 AM. Instructions: Take with breakfast.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 AM. Instructions: Take with breakfast.",
     scheduledAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
     retryCount: 0,
     maxRetries: 3,
@@ -3598,7 +3600,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ğŸ’Š Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 PM. Instructions: Take with dinner.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 PM. Instructions: Take with dinner.",
     scheduledAt: new Date(Date.now() + 10 * 60 * 60 * 1000).toISOString(),
     retryCount: 0,
     maxRetries: 3,
@@ -3616,7 +3618,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "follow_up",
     status: "pending",
     templateName: "FOLLOW_UP_REMINDER",
-    messageContent: "ğŸ“… Follow-Up Reminder: Hello Anjali Gupta, Dr. Rajesh Sharma has scheduled a follow-up review on your Hemoglobin tests. Reason: Severe Fatigue & Anemia check.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… Follow-Up Reminder: Hello Anjali Gupta, Dr. Rajesh Sharma has scheduled a follow-up review on your Hemoglobin tests. Reason: Severe Fatigue & Anemia check.",
     scheduledAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 mins from now
     retryCount: 0,
     maxRetries: 3,
@@ -3630,7 +3632,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "reminder",
     status: "pending",
     templateName: "APPOINTMENT_REMINDER",
-    messageContent: "ğŸ”” Appointment Reminder: Hello Srinivas Rao, you have a Diabetes review with Dr. Rajesh Sharma tomorrow at 04:00 PM. Type: IN_PERSON.",
+    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â”Ã‚Â” Appointment Reminder: Hello Srinivas Rao, you have a Diabetes review with Dr. Rajesh Sharma tomorrow at 04:00 PM. Type: IN_PERSON.",
     scheduledAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 mins from now
     retryCount: 0,
     maxRetries: 3,
@@ -3696,7 +3698,7 @@ export const TIER_LIMITS = {
     maxPatients: 500,
     maxAiCalls: 200,
     maxWhatsappMessages: 300,
-    price: "â‚¹1,499 / month",
+    price: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹1,499 / month",
     label: "Solo Clinic Plan",
     features: ["1 Doctor, 2 Staff", "Full voice AI clinical companion", "Up to 500 patients", "WhatsApp broadcasting"]
   },
@@ -3704,7 +3706,7 @@ export const TIER_LIMITS = {
     maxPatients: 10000,
     maxAiCalls: 2000,
     maxWhatsappMessages: 3000,
-    price: "â‚¹4,999 / month",
+    price: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹4,999 / month",
     label: "Nursing Home Plan",
     features: ["Up to 10 Doctors, 5 Staff", "All AI engines & Context timeline", "Standard video calls integration", "Diagnostic timeline tracker"]
   },
@@ -3861,7 +3863,7 @@ let whitelabelConfig: WhiteLabelConfig = {
   companyTagline: "The Operating System for Smarter Healthcare",
   emailFromName: "CURA Support",
   emailFromAddress: "support@cura.in",
-  emailFooterText: "Â© 2026 CURA Healthcare Technologies. All rights reserved.",
+  emailFooterText: "ÃƒÂ‚Ã‚Â© 2026 CURA Healthcare Technologies. All rights reserved.",
   sidebarConfig: {
     modules: [
       { id: "dashboard", label: "Dashboard", icon: "LayoutDashboard", visible: true },
@@ -4286,7 +4288,7 @@ async function startServer() {
           mr.successfulReferrals += 1;
           mr.totalEarnings += commission;
 
-          console.log(`[MR REFERRAL] Recorded conversion of ${clinicName} for MR ${mr.fullName} (${mr.referralCode}). Commission: â‚¹${commission}`);
+          console.log(`[MR REFERRAL] Recorded conversion of ${clinicName} for MR ${mr.fullName} (${mr.referralCode}). Commission: ÃƒÂ¢Ã‚Â‚Ã‚Â¹${commission}`);
         } else {
           console.warn(`[MR REFERRAL] Invalid referral code used during signup: ${referralCode}`);
         }
@@ -5222,7 +5224,7 @@ async function startServer() {
         "UPDATE",
         "patient_consent",
         id,
-        `âš ï¸ CRITICAL SEC_NOTICE: Patient explicitly REVOKED all DPDP consent processing authorizations. Data processing frozen.`,
+        `ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â CRITICAL SEC_NOTICE: Patient explicitly REVOKED all DPDP consent processing authorizations. Data processing frozen.`,
         req
       );
 
@@ -5623,7 +5625,7 @@ async function startServer() {
           title: manualTitle || "Complete Blood Count (EHR Scan)",
           date: manualDate || new Date().toISOString().split("T")[0],
           category: manualCategory || "Lab Report",
-          aiSummary: "Your overall blood health looks wonderful! All your essential markersâ€”like your red blood cells, infection-fighting white blood cells, and clotting plateletsâ€”are safely within the standard healthy limits.",
+          aiSummary: "Your overall blood health looks wonderful! All your essential markersÃƒÂ¢Ã‚Â€Ã‚Â”like your red blood cells, infection-fighting white blood cells, and clotting plateletsÃƒÂ¢Ã‚Â€Ã‚Â”are safely within the standard healthy limits.",
           keyFindings: [
             "Hemoglobin is 14.2 g/dL: This is right in the healthy sweet spot (13.5 - 17.5), meaning your body has plenty of oxygen-carrying capacity and energy.",
             "White Blood Cell Count is 6,800: A perfectly healthy level showing your immune system is quiet and there is no active infection.",
@@ -6166,6 +6168,108 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
     }
     throw err;
   }
+}
+
+function generateMockClinicalResponse(symptoms: string, patientInfo?: any, selectedHistory?: any, medicalSystem: string = "allopathy") {
+  const symLower = (symptoms || "").toLowerCase();
+  
+  if (medicalSystem === "ayurveda") {
+    return {
+      diagnoses: ["Amavata / Sandhigata Vata [NAMASTE: AMD-02]", "Agnimandya [NAMASTE: DIG-01]"],
+      medications: [
+        { name: "Yograj Guggulu", dosage: "500mg", frequency: "Twice daily after meals", duration: "14 days", instructions: "With warm water" },
+        { name: "Triphala Churna", dosage: "3g", frequency: "Once daily at bedtime", duration: "21 days", instructions: "With lukewarm water" }
+      ],
+      tests: ["Prakriti Pariksha Assessment", "Erythrocyte Sedimentation Rate (ESR)"],
+      advice: "Avoid cold, heavy, dry foods (Ahara). Practice gentle Sukshma Vyayama and Nadi Shodhana pranayama (Vihara).",
+      summary: "Patient displays clinical signs of Vata-Kapha vitiation with mild Agnimandya and accumulation of Ama in channels.",
+      confidence: 0.88
+    };
+  } else if (medicalSystem === "homeopathy") {
+    return {
+      diagnoses: ["Acute Respiratory Catarrh", "General Malaise"],
+      medications: [
+        { name: "Arsenicum Album 30C", dosage: "4 globules", frequency: "Thrice daily", duration: "5 days", instructions: "Dissolve on tongue, avoid coffee/raw onions" },
+        { name: "Bryonia Alba 200C", dosage: "4 globules", frequency: "Twice daily", duration: "3 days", instructions: "Take 30 mins away from meals" }
+      ],
+      tests: ["Complete Blood Count (CBC)"],
+      advice: "Rest in a well-ventilated room. Stay hydrated with warm fluids.",
+      summary: "Homeopathic evaluation shows characteristic acute constitutional pattern matching Arsenicum Album modality.",
+      confidence: 0.86
+    };
+  } else {
+    // Allopathy
+    let diag = ["Upper Respiratory Tract Infection (ICD-10: J06.9)", "Acute Bronchitis (ICD-10: J20.9)"];
+    let meds = [
+      { name: "Paracetamol", dosage: "650mg", frequency: "Thrice daily (TID) SOS", duration: "5 days", instructions: "After meals" },
+      { name: "Cetirizine", dosage: "10mg", frequency: "Once daily at bedtime (HS)", duration: "5 days", instructions: "May cause drowsiness" }
+    ];
+
+    if (symLower.includes("chest") || symLower.includes("pressure") || symLower.includes("hypertension") || symLower.includes("bp")) {
+      diag = ["Essential Hypertension (ICD-10: I10)", "Chest Wall Discomfort"];
+      meds = [
+        { name: "Amlodipine", dosage: "5mg", frequency: "Once daily in morning (OD)", duration: "30 days", instructions: "Take before breakfast" },
+        { name: "Telmisartan", dosage: "40mg", frequency: "Once daily (OD)", duration: "30 days", instructions: "Monitor BP weekly" }
+      ];
+    } else if (symLower.includes("sugar") || symLower.includes("diabetes") || symLower.includes("glucose")) {
+      diag = ["Type 2 Diabetes Mellitus (ICD-10: E11.9)"];
+      meds = [
+        { name: "Metformin Hydrochloride", dosage: "500mg", frequency: "Twice daily with meals (BD)", duration: "30 days", instructions: "Take with food" }
+      ];
+    }
+
+    return {
+      diagnoses: diag,
+      medications: meds,
+      tests: ["Complete Blood Count (CBC)", "Fasting Blood Sugar / HbA1c", "Routine Urine Analysis"],
+      advice: "Maintain adequate hydration, avoid heavy exertion, monitor vital parameters, and report back if symptoms persist beyond 48 hours.",
+      summary: `Clinical assessment based on presenting symptoms: "${symptoms}". Patient parameters reviewed.`,
+      confidence: 0.88
+    };
+  }
+}
+
+function generateMockAyurvedicResponse(symptoms: string) {
+  const symLower = (symptoms || "").toLowerCase();
+  const isVata = symLower.includes("pain") || symLower.includes("dry") || symLower.includes("anxiety") || symLower.includes("joint");
+  const isPitta = symLower.includes("burn") || symLower.includes("acid") || symLower.includes("fever") || symLower.includes("inflamm");
+
+  return {
+    doshaImbalance: {
+      vata: isVata ? 55 : 30,
+      pitta: isPitta ? 50 : 35,
+      kapha: (!isVata && !isPitta) ? 45 : 20,
+      dominantImbalance: isVata ? "Vata-Pitta Vitiation" : isPitta ? "Pitta Dominant Imbalance" : "Kapha Sanchaya",
+      explanation: "Presenting symptoms indicate mild accumulation of Ama in the Rasavaha and Annavaha srotas with metabolic Agnimandya."
+    },
+    agniStatus: isPitta ? "Tikshnagni (Intense / Acidic Fire)" : "Vishamagni (Irregular Digestive Fire)",
+    amaStatus: "Medium Ama Accumulation",
+    ahara: {
+      favor: ["Warm mung dal soup", "Cooked seasonal vegetables with cumin & ghee", "Boiled warm ginger water", "Pomegranate & sweet fruits"],
+      avoid: ["Deep-fried & refrigerated leftovers", "Excessive sour/spicy condiments", "Carbonated chilled drinks", "Curd at night"],
+      notes: "Consume meals at regular intervals with mindful chewing. Avoid snacking before previous meal is digested."
+    },
+    vihara: {
+      yogaAsanas: ["Pavanamuktasana (Wind-relieving pose)", "Bhujangasana (Cobra pose)", "Nadi Shodhana Pranayama (Alternate nostril breathing)"],
+      lifestyleTips: ["Abhyanga (Warm sesame oil self-massage) twice weekly", "Retire to bed before 10:30 PM", "Daily 20-minute morning sunlight walk"],
+      notes: "Balance physical activity with restful meditation and grounding routine."
+    },
+    herbs: [
+      {
+        name: "Triphala Churna",
+        dosage: "3 to 5 grams",
+        frequency: "Once daily at bedtime with warm water",
+        benefits: "Gently detoxifies gastrointestinal tract, supports healthy peristalsis, and balances all three doshas."
+      },
+      {
+        name: "Guduchi (Tinospora cordifolia)",
+        dosage: "500mg (1 capsule/tablet)",
+        frequency: "Twice daily after meals",
+        benefits: "Potent Rasayana immunomodulator that neutralizes metabolic Ama and soothes inflammatory Pitta."
+      }
+    ],
+    disclaimer: "Ayurvedic recommendations provided for supportive health and wellness purposes. Consult a certified Vaidya / Ayurvedic practitioner for individualized prescription."
+  };
 }
 
   // API 6: Server-side Gemini / DeepSeek AI Assisted Clinical Helper & Auto-Switch Router
@@ -6904,7 +7008,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
                   );
                   if (apt) {
                     apt.status = "confirmed";
-                    replyMessage = `âœ… Thank you, ${patient.fullName}. Your appointment with ${apt.doctorName} is confirmed for ${new Date(apt.scheduledAt).toLocaleString()}. See you there!`;
+                    replyMessage = `ÃƒÂ¢Ã‚ÂœÃ‚Â… Thank you, ${patient.fullName}. Your appointment with ${apt.doctorName} is confirmed for ${new Date(apt.scheduledAt).toLocaleString()}. See you there!`;
                     actionLogged = `Appointment ${apt.id} auto-confirmed via WhatsApp Webhook.`;
                   } else {
                     replyMessage = `Hi ${patient.fullName}, we couldn't find an upcoming scheduled appointment. To book a new one, please reply 'Book'.`;
@@ -6919,7 +7023,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
                   );
                   if (apt) {
                     apt.status = "cancelled";
-                    replyMessage = `âŒ Your appointment with ${apt.doctorName} has been cancelled as requested. Reply 'Book' or visit our portal if you'd like to reschedule.`;
+                    replyMessage = `ÃƒÂ¢Ã‚ÂÃ‚ÂŒ Your appointment with ${apt.doctorName} has been cancelled as requested. Reply 'Book' or visit our portal if you'd like to reschedule.`;
                     actionLogged = `Appointment ${apt.id} auto-cancelled via WhatsApp Webhook.`;
                   } else {
                     replyMessage = `Hi ${patient.fullName}, no active scheduled appointment was found to cancel.`;
@@ -6928,22 +7032,22 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
                 }
                 // 3. RESCHEDULE REQUEST
                 else if (textLower.includes("reschedule") || textLower.includes("change")) {
-                  replyMessage = `ğŸ“… No problem, ${patient.fullName}. Please click here to select a new slot on our live scheduler portal: https://app.cura.in/reschedule`;
+                  replyMessage = `ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… No problem, ${patient.fullName}. Please click here to select a new slot on our live scheduler portal: https://app.cura.in/reschedule`;
                   actionLogged = `Sent self-reschedule link.`;
                 }
                 // 4. REFILL REQUEST
                 else if (textLower.includes("refill") || textLower.includes("repeat") || textLower.includes("medicine")) {
-                  replyMessage = `ğŸ’Š Your prescription refill request has been logged into CURA. Dr. Siddharth is reviewing it, and we will ping you with the digital Rx once approved!`;
+                  replyMessage = `ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Your prescription refill request has been logged into CURA. Dr. Siddharth is reviewing it, and we will ping you with the digital Rx once approved!`;
                   actionLogged = `Logged RX refill request for doctor review.`;
                 }
                 // 5. DEFAULT / HELP
                 else {
-                  replyMessage = `ğŸ¤– Hi ${patient.fullName}! I am your CURA virtual health assistant. I can handle immediate requests:\n\n` +
-                    `â€¢ Reply "Yes" or "Confirm" to confirm your visit\n` +
-                    `â€¢ Reply "Cancel" to abort an appointment\n` +
-                    `â€¢ Reply "Reschedule" to move your slot\n` +
-                    `â€¢ Reply "Refill" to request Rx refills\n` +
-                    `â€¢ Reply "Address" to get clinic directions`;
+                  replyMessage = `ÃƒÂ°Ã‚ÂŸÃ‚Â¤Ã‚Â– Hi ${patient.fullName}! I am your CURA virtual health assistant. I can handle immediate requests:\n\n` +
+                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Yes" or "Confirm" to confirm your visit\n` +
+                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Cancel" to abort an appointment\n` +
+                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Reschedule" to move your slot\n` +
+                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Refill" to request Rx refills\n` +
+                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Address" to get clinic directions`;
                   actionLogged = `Dispatched automated interactive chatbot helper text.`;
                 }
               } else if (msgType === "interactive") {
@@ -6952,14 +7056,14 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
                   const apt = appointmentStore.find(a => a.patientId === patient.id && (a.status === "scheduled" || a.status === "confirmed"));
                   if (apt) {
                     apt.status = "confirmed";
-                    replyMessage = `âœ… Confirmed via button click. Thank you!`;
+                    replyMessage = `ÃƒÂ¢Ã‚ÂœÃ‚Â… Confirmed via button click. Thank you!`;
                     actionLogged = `Appointment ${apt.id} auto-confirmed via WhatsApp Interactive Button click.`;
                   }
                 } else if (buttonId === "cancel_appointment") {
                   const apt = appointmentStore.find(a => a.patientId === patient.id && (a.status === "scheduled" || a.status === "confirmed"));
                   if (apt) {
                     apt.status = "cancelled";
-                    replyMessage = `âŒ Cancelled via button click.`;
+                    replyMessage = `ÃƒÂ¢Ã‚ÂÃ‚ÂŒ Cancelled via button click.`;
                     actionLogged = `Appointment ${apt.id} auto-cancelled via WhatsApp Interactive Button click.`;
                   }
                 }
@@ -7176,7 +7280,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         scheduleType: "reminder",
         status: "pending",
         templateName: "APPOINTMENT_REMINDER",
-        messageContent: `ğŸ”” Appointment Reminder: Hello ${newAppointment.patientName}, you have a ${newAppointment.type.toUpperCase()} appointment with ${newAppointment.doctorName} scheduled on ${new Date(scheduledAt).toLocaleString("en-IN")}. Reason: ${newAppointment.reason}.`,
+        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚Â”Ã‚Â” Appointment Reminder: Hello ${newAppointment.patientName}, you have a ${newAppointment.type.toUpperCase()} appointment with ${newAppointment.doctorName} scheduled on ${new Date(scheduledAt).toLocaleString("en-IN")}. Reason: ${newAppointment.reason}.`,
         scheduledAt: reminderTime.toISOString(),
         appointmentId: newAppointment.id,
         retryCount: 0,
@@ -7294,7 +7398,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         scheduleType: "follow_up",
         status: "pending",
         templateName: "FOLLOW_UP_REMINDER",
-        messageContent: `ğŸ“… Follow-Up Reminder: Hello ${patient.fullName}, Dr. ${doctorName} has scheduled a follow-up review on your diagnostic reports. Reason: ${reason || "Routine review"}. Date: ${new Date(followUpDate).toLocaleDateString("en-IN")}.`,
+        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… Follow-Up Reminder: Hello ${patient.fullName}, Dr. ${doctorName} has scheduled a follow-up review on your diagnostic reports. Reason: ${reason || "Routine review"}. Date: ${new Date(followUpDate).toLocaleDateString("en-IN")}.`,
         scheduledAt: scheduledAt.toISOString(),
         retryCount: 0,
         maxRetries: 3,
@@ -7343,7 +7447,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         scheduleType: "medication",
         status: "pending",
         templateName: "MEDICATION_REMINDER",
-        messageContent: `ğŸ’Š Medication Reminder: Paracetamol ${dosage} for ${patient.fullName}. Name: ${medicineName}. Timing: Daily at ${time}. Instructions: ${instructions || "Take as directed by doctor"}.`,
+        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Paracetamol ${dosage} for ${patient.fullName}. Name: ${medicineName}. Timing: Daily at ${time}. Instructions: ${instructions || "Take as directed by doctor"}.`,
         scheduledAt: scheduledAt.toISOString(),
         retryCount: 0,
         maxRetries: 3,
@@ -7384,7 +7488,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         scheduleType: "refill",
         status: "pending",
         templateName: "REFILL_REQUEST",
-        messageContent: `ğŸš¨ Refill Request Alert: Patient ${patient.fullName} requests a prescription renewal refill for medication "${medicineName}" (${dosage || "As prescribed"}). Assigned doctor review: ${doctorName || "Dr. Rajesh Sharma"}.`,
+        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Refill Request Alert: Patient ${patient.fullName} requests a prescription renewal refill for medication "${medicineName}" (${dosage || "As prescribed"}). Assigned doctor review: ${doctorName || "Dr. Rajesh Sharma"}.`,
         scheduledAt: new Date().toISOString(),
         retryCount: 0,
         maxRetries: 3,
@@ -10190,7 +10294,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
     report.deliveryMethod = deliveryMethod || "whatsapp";
     report.deliveredDate = new Date().toISOString();
 
-    console.log(`\n=========================================\nğŸ“² [SIMULATED RADIOLOGY REPORT DELIVERY]\nTo Patient: ${report.patientName}\nMethod: ${report.deliveryMethod.toUpperCase()}\nReport ID: ${report.id}\nFindings Summary:\n"${report.impression.slice(0, 100)}..."\n=========================================\n`);
+    console.log(`\n=========================================\nÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â² [SIMULATED RADIOLOGY REPORT DELIVERY]\nTo Patient: ${report.patientName}\nMethod: ${report.deliveryMethod.toUpperCase()}\nReport ID: ${report.id}\nFindings Summary:\n"${report.impression.slice(0, 100)}..."\n=========================================\n`);
 
     return res.status(200).json({ success: true, report, mode: "simulated" });
   });
@@ -10782,7 +10886,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
 
     // Double entry check: Round to 2 decimal places to avoid floating point issues
     if (Math.abs(totalDebits - totalCredits) > 0.01) {
-      return res.status(400).json({ detail: `Unbalanced Entry! Total debits (â‚¹${totalDebits}) must equal total credits (â‚¹${totalCredits}).` });
+      return res.status(400).json({ detail: `Unbalanced Entry! Total debits (ÃƒÂ¢Ã‚Â‚Ã‚Â¹${totalDebits}) must equal total credits (ÃƒÂ¢Ã‚Â‚Ã‚Â¹${totalCredits}).` });
     }
 
     // Verify all accounts exist
@@ -10914,7 +11018,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
 
     const newAmountPaid = inv.amountPaid + payAmt;
     if (newAmountPaid > inv.totalAmount) {
-      return res.status(400).json({ detail: `Payment exceeds total outstanding invoice liability (Remaining: â‚¹${inv.totalAmount - inv.amountPaid}).` });
+      return res.status(400).json({ detail: `Payment exceeds total outstanding invoice liability (Remaining: ÃƒÂ¢Ã‚Â‚Ã‚Â¹${inv.totalAmount - inv.amountPaid}).` });
     }
 
     inv.amountPaid = newAmountPaid;
@@ -11022,7 +11126,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
 
     const newAmountPaid = bill.amountPaid + payAmt;
     if (newAmountPaid > bill.totalAmount) {
-      return res.status(400).json({ detail: `Payment exceeds total outstanding bill liability (Remaining: â‚¹${bill.totalAmount - bill.amountPaid}).` });
+      return res.status(400).json({ detail: `Payment exceeds total outstanding bill liability (Remaining: ÃƒÂ¢Ã‚Â‚Ã‚Â¹${bill.totalAmount - bill.amountPaid}).` });
     }
 
     bill.amountPaid = newAmountPaid;
@@ -11524,7 +11628,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       priceMonthly: 2500,
       revenueSharePercent: 20,
       status: "Active",
-      logoUrl: "ğŸ«€",
+      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â«Ã‚Â€",
       installsCount: 14
     },
     {
@@ -11536,7 +11640,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       priceMonthly: 1500,
       revenueSharePercent: 25,
       status: "Active",
-      logoUrl: "ğŸ‘¶",
+      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â‘Ã‚Â¶",
       installsCount: 22
     },
     {
@@ -11548,7 +11652,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       priceMonthly: 4000,
       revenueSharePercent: 20,
       status: "Active",
-      logoUrl: "ğŸ©»",
+      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â©Ã‚Â»",
       installsCount: 9
     },
     {
@@ -11560,7 +11664,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       priceMonthly: 3000,
       revenueSharePercent: 20,
       status: "Needs Authorization",
-      logoUrl: "ğŸ”¬",
+      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â”Ã‚Â¬",
       installsCount: 0
     }
   ];
@@ -11787,15 +11891,15 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         referral_study: "ALLHAT Trial (2002) - Confirmed equivalence of Amlodipine to Chlorthalidone in reducing major coronary events.",
         drug_interactions: ["Simvastatin (increased risk of myopathy, limit Simvastatin to 20mg daily)", "Grapefruit juice (increases bioavailability)"],
         contraindications: ["Severe aortic stenosis", "Cardiogenic shock"],
-        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("amlodipine") || a.toLowerCase().includes("calcium channel")) ? "ğŸš¨ ALLERGY WARNING: Patient has documented hypersensitivity to calcium channel blockers!" : "No active drug allergies detected."
+        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("amlodipine") || a.toLowerCase().includes("calcium channel")) ? "ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to calcium channel blockers!" : "No active drug allergies detected."
       },
       "metformin": {
         rationale: "Biguanide. Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity.",
         guideline: "ADA (American Diabetes Association) Standards of Medical Care in Diabetes (2026) recommends Metformin as the preferred first-line pharmacological agent for the treatment of Type 2 Diabetes.",
         referral_study: "UKPDS Study (1998) - Showed significant reduction in diabetes-related deaths and myocardial infarction in patients treated with Metformin.",
         drug_interactions: ["Contrast dye (stop Metformin 48 hours before contrast imaging to prevent lactic acidosis)", "Cimetidine (increases metformin levels)"],
-        contraindications: ["eGFR < 30 mL/min/1.73mÂ² (severe renal impairment)", "Acute or chronic metabolic acidosis"],
-        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("metformin")) ? "ğŸš¨ ALLERGY WARNING: Patient has documented hypersensitivity to Metformin!" : "No active drug allergies detected."
+        contraindications: ["eGFR < 30 mL/min/1.73mÃƒÂ‚Ã‚Â² (severe renal impairment)", "Acute or chronic metabolic acidosis"],
+        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("metformin")) ? "ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to Metformin!" : "No active drug allergies detected."
       },
       "azithromycin": {
         rationale: "Macrolide antibiotic. Binds to 50S ribosomal subunit of susceptible microorganisms, interfering with microbial protein synthesis.",
@@ -11803,7 +11907,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         referral_study: "CATALYST trial (2018) - Evaluated effectiveness in atypical respiratory infections.",
         drug_interactions: ["Amiodarone / QT-prolonging drugs (increased risk of QT prolongation and torsades de pointes)", "Warfarin (increases bleeding risk)"],
         contraindications: ["History of cholestatic jaundice/hepatic dysfunction associated with prior azithromycin use", "QT prolongation history"],
-        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("azithromycin") || a.toLowerCase().includes("macrolide")) ? "ğŸš¨ ALLERGY WARNING: Patient has documented hypersensitivity to Macrolide antibiotics!" : "No active drug allergies detected."
+        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("azithromycin") || a.toLowerCase().includes("macrolide")) ? "ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to Macrolide antibiotics!" : "No active drug allergies detected."
       }
     };
     
@@ -11849,7 +11953,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("amitriptyline") || lower.includes("diazepam") || lower.includes("zolpidem")) {
-          alerts.push(`âš ï¸ Geriatric Alert (Beer's Criteria): ${med} is on the high-risk medication list for patients over 65 (increased risk of falls, sedation, cognitive impairment).`);
+          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Geriatric Alert (Beer's Criteria): ${med} is on the high-risk medication list for patients over 65 (increased risk of falls, sedation, cognitive impairment).`);
           riskScore = "High";
         }
       });
@@ -11857,7 +11961,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("aspirin")) {
-          alerts.push(`ğŸš¨ Pediatric Alert: Aspirin is strictly contraindicated in children under 12 due to high risk of Reye's Syndrome (severe encephalopathy and liver fatty infiltration).`);
+          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Pediatric Alert: Aspirin is strictly contraindicated in children under 12 due to high risk of Reye's Syndrome (severe encephalopathy and liver fatty infiltration).`);
           riskScore = "Emergency";
         }
       });
@@ -11868,10 +11972,10 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("telmisartan") || lower.includes("losartan") || lower.includes("enalapril") || lower.includes("lisinopril")) {
-          alerts.push(`ğŸš¨ Pregnancy Alert (FDA Category D/X): ARBs/ACE inhibitors like ${med} cause direct fetal renal toxicity and skull anomalies. DISCONTINUE immediately!`);
+          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Pregnancy Alert (FDA Category D/X): ARBs/ACE inhibitors like ${med} cause direct fetal renal toxicity and skull anomalies. DISCONTINUE immediately!`);
           riskScore = "Emergency";
         } else if (lower.includes("atorvastatin") || lower.includes("simvastatin")) {
-          alerts.push(`ğŸš¨ Pregnancy Alert (FDA Category X): Statins like ${med} are strictly contraindicated due to disruption of fetal cholesterol synthesis critical for membrane development.`);
+          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Pregnancy Alert (FDA Category X): Statins like ${med} are strictly contraindicated due to disruption of fetal cholesterol synthesis critical for membrane development.`);
           riskScore = "Emergency";
         }
       });
@@ -11882,10 +11986,10 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("metformin")) {
-          alerts.push(`ğŸš¨ Renal Safety Alert: Metformin is contraindicated or requires drastic dosage restriction in renal impairment (eGFR < 30) due to severe risk of lactic acidosis.`);
+          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Renal Safety Alert: Metformin is contraindicated or requires drastic dosage restriction in renal impairment (eGFR < 30) due to severe risk of lactic acidosis.`);
           riskScore = "High";
         } else if (lower.includes("ibuprofen") || lower.includes("diclofenac") || lower.includes("naproxen")) {
-          alerts.push(`âš ï¸ Renal Safety Alert: NSAIDs like ${med} cause acute vasoconstriction of afferent renal arterioles, risking acute kidney injury.`);
+          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Renal Safety Alert: NSAIDs like ${med} cause acute vasoconstriction of afferent renal arterioles, risking acute kidney injury.`);
           riskScore = "High";
         }
       });
@@ -11896,10 +12000,10 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("paracetamol") || lower.includes("acetaminophen")) {
-          alerts.push(`âš ï¸ Hepatic Safety Alert: Acetaminophen/Paracetamol clearance is reduced in active liver disease. Strict limit of <2g per 24 hours to avoid hepatotoxicity.`);
+          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Hepatic Safety Alert: Acetaminophen/Paracetamol clearance is reduced in active liver disease. Strict limit of <2g per 24 hours to avoid hepatotoxicity.`);
           riskScore = "High";
         } else if (lower.includes("atorvastatin") || lower.includes("statins")) {
-          alerts.push(`âš ï¸ Hepatic Safety Alert: Statins can cause active transaminase elevations. Monitor liver enzymes closely.`);
+          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Hepatic Safety Alert: Statins can cause active transaminase elevations. Monitor liver enzymes closely.`);
           riskScore = "Medium";
         }
       });
@@ -11912,7 +12016,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
         patient.allergies.forEach((allergy: string) => {
           const lowerAllergy = allergy.toLowerCase();
           if (lowerMed.includes(lowerAllergy) || lowerAllergy.includes(lowerMed)) {
-            alerts.push(`ğŸš¨ DRUG ALLERGY MATCH: Documented patient allergy to "${allergy}" matches proposed prescription containing "${med}".`);
+            alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ DRUG ALLERGY MATCH: Documented patient allergy to "${allergy}" matches proposed prescription containing "${med}".`);
             riskScore = "Emergency";
           }
         });
@@ -11920,7 +12024,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
     }
     
     if (alerts.length === 0) {
-      alerts.push("âœ… Safe: No active clinical safety flags triggered for this patient profile and medicine combo.");
+      alerts.push("ÃƒÂ¢Ã‚ÂœÃ‚Â… Safe: No active clinical safety flags triggered for this patient profile and medicine combo.");
     }
     
     return res.status(200).json({
@@ -12205,17 +12309,17 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
   };
 
   const TOUR_STEPS_DEFINITION = [
-    { id: "welcome", title: "ğŸ‘‹ Welcome to CURA!", description: "I'm your AI clinical assistant. Let me show you what CURA can do for your practice.", duration: 6, target: "body" },
-    { id: "dashboard", title: "ğŸ“Š Your Command Center", description: "Everything you need â€” critical patients, follow-ups, revenue, and AI recommendations.", duration: 8, target: "#command-center" },
-    { id: "patients", title: "ğŸ‘¤ Digital Twin of Patient", description: "Complete health timeline â€” diseases, labs, meds, allergies, and AI risk score in 2 seconds.", duration: 10, target: "#patients" },
-    { id: "ai_memory", title: "ğŸ§  AI Doctor Memory", description: "Learns how YOU practice medicine â€” preferred medicines, brands, and prescribing style.", duration: 8, target: "#ai-memory" },
-    { id: "voice", title: "ğŸ¤ Voice Prescription", description: "Speak, I write. No typing. Formats structured SOAP notes automatically.", duration: 8, target: "#voice-prescription" },
-    { id: "drug_guard", title: "âš¡ Real-Time Drug Interaction Guard", description: "Continuous cross-audit between drafted orders and Patient EMR baseline for safety.", duration: 10, target: "#drug-guard" },
-    { id: "whatsapp", title: "ğŸ’¬ WhatsApp Integration", description: "Send prescriptions, appointment reminders, and follow-ups directly on WhatsApp.", duration: 7, target: "#whatsapp" },
-    { id: "ayush", title: "ğŸŒ¿ AYUSH Support", description: "Ayurveda, Homeopathy, Unani, Siddha, Yoga â€” all medical systems on one platform.", duration: 8, target: "#ayush" },
-    { id: "telemedicine", title: "ğŸ“¹ Telemedicine", description: "HD video, voice, and chat consultations â€” see patients from anywhere.", duration: 7, target: "#telemedicine" },
-    { id: "followup", title: "ğŸ“… AI Follow-Up Engine", description: "Tracks every patient. Follow-ups due today, missed patients, chronic revisit â€” automated.", duration: 7, target: "#followup" },
-    { id: "complete", title: "ğŸ‰ You're Ready!", description: "You've seen everything CURA can do. Start your first consultation now.", duration: 5, target: "#start-consultation" }
+    { id: "welcome", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â‘Ã‚Â‹ Welcome to CURA!", description: "I'm your AI clinical assistant. Let me show you what CURA can do for your practice.", duration: 6, target: "body" },
+    { id: "dashboard", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚ÂŠ Your Command Center", description: "Everything you need ÃƒÂ¢Ã‚Â€Ã‚Â” critical patients, follow-ups, revenue, and AI recommendations.", duration: 8, target: "#command-center" },
+    { id: "patients", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â‘Ã‚Â¤ Digital Twin of Patient", description: "Complete health timeline ÃƒÂ¢Ã‚Â€Ã‚Â” diseases, labs, meds, allergies, and AI risk score in 2 seconds.", duration: 10, target: "#patients" },
+    { id: "ai_memory", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â§Ã‚Â  AI Doctor Memory", description: "Learns how YOU practice medicine ÃƒÂ¢Ã‚Â€Ã‚Â” preferred medicines, brands, and prescribing style.", duration: 8, target: "#ai-memory" },
+    { id: "voice", title: "ÃƒÂ°Ã‚ÂŸÃ‚ÂÃ‚Â¤ Voice Prescription", description: "Speak, I write. No typing. Formats structured SOAP notes automatically.", duration: 8, target: "#voice-prescription" },
+    { id: "drug_guard", title: "ÃƒÂ¢Ã‚ÂšÃ‚Â¡ Real-Time Drug Interaction Guard", description: "Continuous cross-audit between drafted orders and Patient EMR baseline for safety.", duration: 10, target: "#drug-guard" },
+    { id: "whatsapp", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚Â¬ WhatsApp Integration", description: "Send prescriptions, appointment reminders, and follow-ups directly on WhatsApp.", duration: 7, target: "#whatsapp" },
+    { id: "ayush", title: "ÃƒÂ°Ã‚ÂŸÃ‚ÂŒÃ‚Â¿ AYUSH Support", description: "Ayurveda, Homeopathy, Unani, Siddha, Yoga ÃƒÂ¢Ã‚Â€Ã‚Â” all medical systems on one platform.", duration: 8, target: "#ayush" },
+    { id: "telemedicine", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â¹ Telemedicine", description: "HD video, voice, and chat consultations ÃƒÂ¢Ã‚Â€Ã‚Â” see patients from anywhere.", duration: 7, target: "#telemedicine" },
+    { id: "followup", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… AI Follow-Up Engine", description: "Tracks every patient. Follow-ups due today, missed patients, chronic revisit ÃƒÂ¢Ã‚Â€Ã‚Â” automated.", duration: 7, target: "#followup" },
+    { id: "complete", title: "ÃƒÂ°Ã‚ÂŸÃ‚ÂÃ‚Â‰ You're Ready!", description: "You've seen everything CURA can do. Start your first consultation now.", duration: 5, target: "#start-consultation" }
   ];
 
   app.get("/api/tour/steps", (req, res) => {
@@ -12543,7 +12647,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
           doctor: "Dr. Ananya Rao (Cardiology)",
           chiefComplaint: "Routine Blood Pressure Follow-up & Dyspnea",
           diagnosis: "Essential Hypertension - Controlled",
-          vitals: { bp: "128/82 mmHg", pulse: "74 bpm", spo2: "98%", temp: "98.4 Â°F" }
+          vitals: { bp: "128/82 mmHg", pulse: "74 bpm", spo2: "98%", temp: "98.4 ÃƒÂ‚Ã‚Â°F" }
         }
       ],
       activePrescriptions: [
@@ -12644,7 +12748,7 @@ async function callGeminiPrescription(prompt: string, forceRetry: boolean = fals
     { id: "LOG-9081", admin: "Super Admin", action: "User Status Modified", target: "Dr. Suresh Menon (Deactivated)", timestamp: "2026-07-24T12:30:00Z", ip: "192.168.1.45" },
     { id: "LOG-9080", admin: "System Auto-Guard", action: "CDSS Rule Updated", target: "50,000+ Drug Interaction Pairs Audited", timestamp: "2026-07-24T10:15:00Z", ip: "127.0.0.1" },
     { id: "LOG-9079", admin: "Super Admin", action: "System Config Updated", target: "WhatsApp API Gateway Key Rotated", timestamp: "2026-07-24T09:00:00Z", ip: "192.168.1.45" },
-    { id: "LOG-9078", admin: "Billing Admin", action: "Invoice Generated", target: "Apollo Tele-Clinic (â‚¹48,000)", timestamp: "2026-07-23T18:20:00Z", ip: "10.0.4.12" }
+    { id: "LOG-9078", admin: "Billing Admin", action: "Invoice Generated", target: "Apollo Tele-Clinic (ÃƒÂ¢Ã‚Â‚Ã‚Â¹48,000)", timestamp: "2026-07-23T18:20:00Z", ip: "10.0.4.12" }
   ];
 
   let systemConfigStore = {
@@ -12913,1438 +13017,33 @@ Return strictly a valid JSON object matching the following structure:
             recommendations = ["Apply soothing Centella Asiatica cream", "Strictly avoid fragrances and essential oils", "Use physical/mineral SPF 50"];
             summary = `Highly sensitive skin barrier identified with a score of ${skin_score}/100. Clear erythematous patterns observed on both cheeks. Advise hypoallergenic formulas and soothing botanical extracts.`;
           } else {
-            concerns = ["Mild uneven skin tone"];
-            recommendations = ["Apply Vitamin C antioxidant serum", "Maintain standard daily SPF 50 coverage"];
-            summary = `Healthy, balanced normal skin type with an outstanding score of ${skin_score}/100. Highly resilient barrier with minor pigmentation notes. Maintain current protective care.`;
-          }
-
-          skinAnalysisResult = {
-            skin_score,
-            skin_type,
-            concerns,
-            recommendations,
-            has_issues: concerns.length > 0,
-            summary
-          };
-        }
-      }
-
-      // If patient exists, save to their scannedReports so it integrates natively in the EHR!
-      if (patient) {
-        const newReport: ScannedReport = {
-          id: `rep-skin-${Math.random().toString(36).substr(2, 9)}`,
-          title: "AI Skin Dermatology Analysis",
-          date: new Date().toISOString().split("T")[0],
-          category: "Other",
-          fileName: "ai_skin_analysis.jpg",
-          fileSize: "120 KB",
-          extractedText: `Skin Type: ${skinAnalysisResult.skin_type}. Score: ${skinAnalysisResult.skin_score}/100. Concerns: ${skinAnalysisResult.concerns.join(", ")}`,
-          aiSummary: skinAnalysisResult.summary,
-          keyFindings: skinAnalysisResult.concerns,
-          status: "analyzed",
-          riskLevel: skinAnalysisResult.skin_score < 60 ? "medium" : "low",
-          diagnosis: `Dermatology Scan: ${skinAnalysisResult.skin_type} Skin Profile`,
-          possibleConditions: skinAnalysisResult.concerns,
-          followUpRecommendation: "Re-scan in 30 days to track skin barrier recovery and adherence.",
-          action: "Skincare Protocol Activated"
-        };
-
-        if (!patient.scannedReports) {
-          patient.scannedReports = [];
-        }
-        patient.scannedReports.unshift(newReport);
-
-        // Also add to patient history
-        patient.history.unshift({
-          date: newReport.date,
-          doctor: "CURA AI Dermatology Engine",
-          diagnosis: `Dermatology Scan: ${skinAnalysisResult.skin_type} Skin Profile`,
-          symptoms: skinAnalysisResult.summary,
-          prescriptions: skinAnalysisResult.recommendations.map(r => `Rec: ${r}`)
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: skinAnalysisResult,
-        message: "Skin analysis completed successfully",
-        patient_friendly: skinAnalysisResult
-      });
-
-    } catch (error: any) {
-      console.error("[SKIN ANALYZE ERROR]", error);
-      return res.status(500).json({ success: false, error: error.message });
-    }
-  });
-
-  app.get("/api/v1/skin-analyze/results/:patientId", (req, res) => {
-    try {
-      const { patientId } = req.params;
-      const patient = patientStore.find(p => p.id === patientId);
-      if (!patient) {
-        return res.status(404).json({ detail: "Patient not found" });
-      }
-
-      const skinReports = (patient.scannedReports || []).filter(
-        r => r.title === "AI Skin Dermatology Analysis"
-      );
-
-      return res.status(200).json({
-        success: true,
-        data: skinReports,
-        count: skinReports.length
-      });
-    } catch (error: any) {
-      return res.status(500).json({ detail: error.message });
-    }
-  });
-
-  // =========================================================================
-  // ğŸš€ THE 10 MAJOR AI HEALTHCARE OPPORTUNITIES BACKEND SUITE
-  // =========================================================================
-
-  // 1. Remote Monitoring (RPM) Stores & Seed Data
-  interface RPMDevice {
-    id: string;
-    patientId: string;
-    patientName: string;
-    deviceType: "blood_pressure" | "glucose" | "ecg" | "heart_rate" | "temperature" | "oxygen" | "weight" | "continuous_glucose" | "smartwatch";
-    deviceName: string;
-    deviceId: string;
-    monitoringEnabled: boolean;
-    alertThresholdLow: number;
-    alertThresholdHigh: number;
-    secondaryThresholdHigh?: number;
-    unit: string;
-    batteryLevel: number;
-    lastReading?: number;
-    secondaryReading?: number;
-    lastReadingTime?: string;
-    status: "online" | "syncing" | "offline" | "alert";
-  }
-
-  interface RPMReading {
-    id: string;
-    patientId: string;
-    deviceId?: string;
-    deviceType: string;
-    value: number;
-    secondaryValue?: number;
-    unit: string;
-    alertLevel: "normal" | "warning" | "critical" | "emergency";
-    alertMessage?: string;
-    trendDirection: "up" | "down" | "stable";
-    changePercentage: number;
-    readingTime: string;
-  }
-
-  const rpmDevicesStore: RPMDevice[] = [
-    {
-      id: "DEV-101",
-      patientId: "P101",
-      patientName: "Rajesh Kumar",
-      deviceType: "blood_pressure",
-      deviceName: "Omron Evolv Wireless BP Monitor",
-      deviceId: "OM-BP-9921",
-      monitoringEnabled: true,
-      alertThresholdLow: 90,
-      alertThresholdHigh: 140,
-      secondaryThresholdHigh: 90,
-      unit: "mmHg",
-      batteryLevel: 88,
-      lastReading: 138,
-      secondaryReading: 88,
-      lastReadingTime: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      status: "online"
-    },
-    {
-      id: "DEV-102",
-      patientId: "P101",
-      patientName: "Rajesh Kumar",
-      deviceType: "continuous_glucose",
-      deviceName: "Abbott FreeStyle Libre 3 CGM",
-      deviceId: "CGM-ABT-4022",
-      monitoringEnabled: true,
-      alertThresholdLow: 70,
-      alertThresholdHigh: 180,
-      unit: "mg/dL",
-      batteryLevel: 94,
-      lastReading: 162,
-      lastReadingTime: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      status: "online"
-    },
-    {
-      id: "DEV-103",
-      patientId: "P102",
-      patientName: "Priya Sharma",
-      deviceType: "ecg",
-      deviceName: "KardiaMobile 6L 6-Lead ECG Patch",
-      deviceId: "KM-ECG-1109",
-      monitoringEnabled: true,
-      alertThresholdLow: 50,
-      alertThresholdHigh: 110,
-      unit: "BPM",
-      batteryLevel: 76,
-      lastReading: 78,
-      lastReadingTime: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-      status: "online"
-    }
-  ];
-
-  const rpmReadingsStore: RPMReading[] = [
-    {
-      id: "READ-801",
-      patientId: "P101",
-      deviceId: "DEV-101",
-      deviceType: "blood_pressure",
-      value: 138,
-      secondaryValue: 88,
-      unit: "mmHg",
-      alertLevel: "normal",
-      alertMessage: "Slightly elevated systolic, within home monitoring limits.",
-      trendDirection: "up",
-      changePercentage: 3.2,
-      readingTime: new Date(Date.now() - 30 * 60 * 1000).toISOString()
-    },
-    {
-      id: "READ-802",
-      patientId: "P101",
-      deviceId: "DEV-102",
-      deviceType: "continuous_glucose",
-      value: 162,
-      unit: "mg/dL",
-      alertLevel: "normal",
-      alertMessage: "Postprandial glucose spike stabilizing.",
-      trendDirection: "down",
-      changePercentage: -4.1,
-      readingTime: new Date(Date.now() - 10 * 60 * 1000).toISOString()
-    }
-  ];
-
-  // RPM Endpoints
-  app.post("/api/v1/offline-sync", express.json(), (req, res) => {
-    const { items = [], deviceId = "LOCAL_DEVICE", offlineSince } = req.body;
-    
-    const syncedItems: Array<{ id: string; type: string; status: "synced" | "conflict_resolved" | "failed"; detail: string; serverTimestamp: string }> = [];
-    let syncedCount = 0;
-    let conflictCount = 0;
-
-    for (const item of items) {
-      try {
-        const itemType = item.type || "generic_log";
-        const payload = item.payload || {};
-        
-        if (itemType === "create_patient") {
-          const newP: Patient = {
-            id: payload.id || `P-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            fullName: payload.fullName || payload.name || "Offline Patient",
-            age: Number(payload.age) || 30,
-            gender: payload.gender || "Male",
-            phone: payload.phone || "+91 98765 43210",
-            email: payload.email || "offline@patient.in",
-            bloodGroup: payload.bloodGroup || "O+",
-            allergies: Array.isArray(payload.allergies) ? payload.allergies : [],
-            currentMedications: Array.isArray(payload.currentMedications) ? payload.currentMedications : [],
-            history: payload.history || [],
-            patientCode: payload.patientCode || `PCODE-${Math.floor(1000 + Math.random() * 9000)}`,
-            createdAt: payload.createdAt || new Date().toISOString()
-          };
-          patientStore.unshift(newP);
-          syncedItems.push({
-            id: item.id || `sync_${Date.now()}`,
-            type: itemType,
-            status: "synced",
-            detail: `Patient ${newP.fullName} (${newP.patientCode}) synced into cloud database.`,
-            serverTimestamp: new Date().toISOString()
-          });
-          syncedCount++;
-        } else if (itemType === "prescription" || itemType === "clinical_note") {
-          const targetPatientId = payload.patientId;
-          const targetPatient = patientStore.find(p => p.id === targetPatientId);
-          if (targetPatient) {
-            targetPatient.history.unshift({
-              date: payload.date || new Date().toISOString().split("T")[0],
-              doctor: payload.doctor || "Dr. Rajesh Sharma",
-              diagnosis: payload.diagnosis || "Offline Consultation Note",
-              symptoms: payload.symptoms || "Recorded in offline sink mode",
-              prescriptions: payload.prescriptions || []
-            });
-            syncedItems.push({
-              id: item.id || `sync_${Date.now()}`,
-              type: itemType,
-              status: "synced",
-              detail: `Clinical note for ${targetPatient.fullName} synchronized with server EMR file.`,
-              serverTimestamp: new Date().toISOString()
-            });
-            syncedCount++;
-          } else {
-            syncedItems.push({
-              id: item.id || `sync_${Date.now()}`,
-              type: itemType,
-              status: "conflict_resolved",
-              detail: `Patient ID ${targetPatientId} not found; stored in audit log fallback.`,
-              serverTimestamp: new Date().toISOString()
-            });
-            conflictCount++;
-          }
-        } else {
-          // Generic log entry sync
-          syncedItems.push({
-            id: item.id || `sync_${Date.now()}`,
-            type: itemType,
-            status: "synced",
-            detail: `Record synced successfully [Payload ID: ${item.id || "N/A"}]`,
-            serverTimestamp: new Date().toISOString()
-          });
-          syncedCount++;
-        }
-      } catch (err: any) {
-        syncedItems.push({
-          id: item.id || `sync_${Date.now()}`,
-          type: item.type || "unknown",
-          status: "failed",
-          detail: err?.message || "Failed to process offline sync payload item.",
-          serverTimestamp: new Date().toISOString()
-        });
-      }
-    }
-
-    return res.status(200).json({
-      success: true,
-      deviceId,
-      totalReceived: items.length,
-      syncedCount,
-      conflictCount,
-      syncedAt: new Date().toISOString(),
-      items: syncedItems
-    });
-  });
-
-  // RPM Endpoints
-  app.get("/api/v1/remote-monitoring/devices/:patientId", (req, res) => {
-    const { patientId } = req.params;
-    const devices = rpmDevicesStore.filter(d => d.patientId === patientId || patientId === "ALL");
-    const readings = rpmReadingsStore.filter(r => r.patientId === patientId || patientId === "ALL");
-    return res.status(200).json({ success: true, devices, readings });
-  });
-
-  app.post("/api/v1/remote-monitoring/devices", express.json(), (req, res) => {
-    const { patientId, patientName, deviceType, deviceName, alertThresholdLow, alertThresholdHigh, secondaryThresholdHigh, unit } = req.body;
-    const newDevice: RPMDevice = {
-      id: `DEV-${Date.now().toString().slice(-4)}`,
-      patientId: patientId || "P101",
-      patientName: patientName || "Rajesh Kumar",
-      deviceType: deviceType || "blood_pressure",
-      deviceName: deviceName || "Smart Medical Sensor",
-      deviceId: `SENS-${Math.floor(1000 + Math.random() * 9000)}`,
-      monitoringEnabled: true,
-      alertThresholdLow: Number(alertThresholdLow) || 60,
-      alertThresholdHigh: Number(alertThresholdHigh) || 140,
-      secondaryThresholdHigh: secondaryThresholdHigh ? Number(secondaryThresholdHigh) : undefined,
-      unit: unit || "units",
-      batteryLevel: 100,
-      status: "online"
-    };
-    rpmDevicesStore.push(newDevice);
-    return res.status(201).json({ success: true, device: newDevice });
-  });
-
-  app.post("/api/v1/remote-monitoring/readings", express.json(), (req, res) => {
-    const { patientId, deviceId, deviceType, value, secondaryValue, unit } = req.body;
-    const pId = patientId || "P101";
-    const numValue = Number(value);
-    const secValue = secondaryValue ? Number(secondaryValue) : undefined;
-
-    // Check thresholds
-    const device = rpmDevicesStore.find(d => d.id === deviceId || (d.patientId === pId && d.deviceType === deviceType));
-    let alertLevel: "normal" | "warning" | "critical" | "emergency" = "normal";
-    let alertMsg = "Vitals within normal limits.";
-
-    if (device) {
-      if (numValue > device.alertThresholdHigh * 1.25 || (secValue && device.secondaryThresholdHigh && secValue > device.secondaryThresholdHigh * 1.25)) {
-        alertLevel = "emergency";
-        alertMsg = `CRITICAL SPIKE: ${deviceType.replace("_", " ")} reading ${numValue}${secValue ? "/" + secValue : ""} ${unit || device.unit} exceeds critical emergency limit!`;
-      } else if (numValue > device.alertThresholdHigh || (secValue && device.secondaryThresholdHigh && secValue > device.secondaryThresholdHigh)) {
-        alertLevel = "critical";
-        alertMsg = `HIGH ALERT: ${deviceType.replace("_", " ")} reading ${numValue}${secValue ? "/" + secValue : ""} ${unit || device.unit} exceeds upper threshold ${device.alertThresholdHigh}.`;
-      } else if (numValue < device.alertThresholdLow) {
-        alertLevel = "critical";
-        alertMsg = `LOW ALERT: ${deviceType.replace("_", " ")} reading ${numValue} ${unit || device.unit} below minimum threshold ${device.alertThresholdLow}.`;
-      }
-
-      device.lastReading = numValue;
-      device.secondaryReading = secValue;
-      device.lastReadingTime = new Date().toISOString();
-      device.status = alertLevel === "normal" ? "online" : "alert";
-    }
-
-    // Historical readings trend comparison
-    const previousReadings = rpmReadingsStore.filter(r => r.patientId === pId && r.deviceType === deviceType);
-    let trendDirection: "up" | "down" | "stable" = "stable";
-    let changePercentage = 0;
-    if (previousReadings.length > 0) {
-      const prev = previousReadings[previousReadings.length - 1].value;
-      if (prev > 0) {
-        changePercentage = Number((((numValue - prev) / prev) * 100).toFixed(1));
-        if (changePercentage > 3) trendDirection = "up";
-        else if (changePercentage < -3) trendDirection = "down";
-      }
-    }
-
-    const newReading: RPMReading = {
-      id: `READ-${Date.now().toString().slice(-4)}`,
-      patientId: pId,
-      deviceId: device?.id,
-      deviceType: deviceType || "blood_pressure",
-      value: numValue,
-      secondaryValue: secValue,
-      unit: unit || device?.unit || "units",
-      alertLevel,
-      alertMessage: alertMsg,
-      trendDirection,
-      changePercentage,
-      readingTime: new Date().toISOString()
-    };
-
-    rpmReadingsStore.push(newReading);
-
-    // If emergency or critical, also trigger Emergency Alert dispatcher!
-    if (alertLevel === "emergency" || alertLevel === "critical") {
-      emergencyAlertsStore.push({
-        id: `EMG-${Date.now().toString().slice(-4)}`,
-        patientId: pId,
-        patientName: device?.patientName || "Rajesh Kumar",
-        alertType: `${deviceType.toUpperCase()}_CRITICAL_THRESHOLD`,
-        severity: alertLevel === "emergency" ? "CRITICAL" : "HIGH",
-        status: "ACTIVE_DISPATCH",
-        location: "Home Remote Monitoring - Sector 62, Noida",
-        vitalsSummary: `${deviceType}: ${numValue}${secValue ? "/" + secValue : ""} ${unit || ""}`,
-        dispatchedTeam: "CURA Rapid Cardiac Response Unit 3",
-        contactsNotified: ["Wife (+91 9876543210)", "Dr. Ananya Roy (+91 9988776655)"],
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    return res.status(201).json({ success: true, reading: newReading, alertLevel, alertMsg });
-  });
-
-  // 2. 24/7 AI Health Assistant Store & Endpoint
-  interface HealthQuery {
-    id: string;
-    patientId: string;
-    query: string;
-    intent: "symptom_check" | "medication_advice" | "test_explanation" | "diet_advice" | "general";
-    response: string;
-    clinicalKeywords: string[];
-    actionItems: string[];
-    disclaimer: string;
-    timestamp: string;
-  }
-
-  const healthAssistantQueriesStore: HealthQuery[] = [];
-
-  app.post("/api/v1/health-assistant/patient-query", express.json(), async (req, res) => {
-    try {
-      const { patientId, query } = req.body;
-      if (!query || query.trim().length === 0) {
-        return res.status(400).json({ success: false, error: "Query is required" });
-      }
-
-      const pId = patientId || "P101";
-      const ai = getGeminiClient();
-
-      let intent: "symptom_check" | "medication_advice" | "test_explanation" | "diet_advice" | "general" = "general";
-      const qLower = query.toLowerCase();
-      if (qLower.includes("fever") || qLower.includes("pain") || qLower.includes("cough") || qLower.includes("headache") || qLower.includes("dizzy") || qLower.includes("symptom")) {
-        intent = "symptom_check";
-      } else if (qLower.includes("medicine") || qLower.includes("tablet") || qLower.includes("dose") || qLower.includes("pill") || qLower.includes("side effect")) {
-        intent = "medication_advice";
-      } else if (qLower.includes("report") || qLower.includes("test") || qLower.includes("blood") || qLower.includes("lab") || qLower.includes("hba1c") || qLower.includes("ecg")) {
-        intent = "test_explanation";
-      } else if (qLower.includes("diet") || qLower.includes("eat") || qLower.includes("food") || qLower.includes("sugar") || qLower.includes("salt")) {
-        intent = "diet_advice";
-      }
-
-      let responseText = "";
-      let clinicalKeywords: string[] = [];
-      let actionItems: string[] = [];
-
-      if (ai) {
-        try {
-          const prompt = `You are CURA's 24/7 AI Health Assistant, providing friendly, precise, and clinically sound health advice to a patient in India.
-Query: "${query}"
-Intent: ${intent}
-
-Return strictly a JSON response with:
-{
-  "response": "Detailed, empathetic response in clear language explaining possible causes, guidance, and reassuring advice.",
-  "clinicalKeywords": ["3-5 key medical terms"],
-  "actionItems": ["2-4 clear bullet action steps for patient"],
-  "urgency": "LOW" | "MEDIUM" | "HIGH_SEE_DOCTOR"
-}`;
-
-          const result = await ai.models.generateContent({
-            model: "gemini-3.5-flash",
-            contents: [prompt],
-            config: { responseMimeType: "application/json" }
-          });
-
-          const parsed = JSON.parse(result.text);
-          responseText = parsed.response;
-          clinicalKeywords = parsed.clinicalKeywords || [];
-          actionItems = parsed.actionItems || [];
-        } catch (err: any) {
-          console.warn("[HEALTH ASSISTANT AI WARN]", err.message);
-        }
-      }
-
-      if (!responseText) {
-        if (intent === "symptom_check") {
-          responseText = `Based on your description of "${query}", this may indicate mild inflammatory or metabolic changes. Keep hydrated, track your temperature and blood pressure, and rest. If symptoms worsen or pain persists beyond 24 hours, schedule an immediate doctor consultation.`;
-          clinicalKeywords = ["Symptom Evaluation", "Hydration", "Vitals Tracking", "Clinical Follow-up"];
-          actionItems = ["Monitor temperature and BP every 6 hours", "Stay hydrated with warm water/electrolytes", "Avoid heavy physical exertion", "Consult Dr. Ananya Roy if fever exceeds 101Â°F"];
-        } else if (intent === "medication_advice") {
-          responseText = `Always take prescribed medications at regular fixed intervals with meals as directed by your physician. Do not double up missed doses. If experiencing acidity or mild nausea, consult your doctor regarding antacids.`;
-          clinicalKeywords = ["Medication Adherence", "Dosage Schedule", "Pharmacovigilance"];
-          actionItems = ["Set medicine alarms in CURA app", "Take after food with water", "Report any rash or allergic reaction"];
-        } else if (intent === "test_explanation") {
-          responseText = `Diagnostic tests reflect active metabolic markers. An HbA1c below 5.7% is normal, 5.7-6.4% indicates prediabetes, and 6.5%+ indicates diabetes. Blood pressure should ideally remain below 120/80 mmHg.`;
-          clinicalKeywords = ["HbA1c Biomarker", "Glycemic Control", "Vascular Pressure"];
-          actionItems = ["Review report with endocrinologist", "Maintain daily glucose log", "Follow low-glycemic dietary regimen"];
-        } else {
-          responseText = `A balanced diet rich in leafy vegetables, high-fiber whole grains, lean protein, and low sodium promotes cardiac and vascular health. Limit processed sugars and fried items.`;
-          clinicalKeywords = ["Nutritional Balance", "Cardiovascular Wellness", "Glycemic Index"];
-          actionItems = ["Drink 2.5L water daily", "Incorporate 30 mins brisk walking", "Limit daily sodium intake to < 2,000mg"];
-        }
-      }
-
-      const queryEntry: HealthQuery = {
-        id: `HQ-${Date.now().toString().slice(-4)}`,
-        patientId: pId,
-        query,
-        intent,
-        response: responseText,
-        clinicalKeywords,
-        actionItems,
-        disclaimer: "This response is AI-generated for informational guidance only. Always consult a certified physician for medical diagnosis and treatment decisions.",
-        timestamp: new Date().toISOString()
-      };
-
-      healthAssistantQueriesStore.unshift(queryEntry);
-      return res.status(200).json({ success: true, data: queryEntry });
-    } catch (err: any) {
-      return res.status(500).json({ success: false, error: err.message });
-    }
-  });
-
-  app.get("/api/v1/health-assistant/history/:patientId", (req, res) => {
-    const { patientId } = req.params;
-    const history = healthAssistantQueriesStore.filter(q => q.patientId === patientId || patientId === "ALL");
-    return res.status(200).json({ success: true, history });
-  });
-
-  // 3. Care Coordination & Multi-disciplinary Care Team
-  interface CarePlanTask {
-    id: string;
-    title: string;
-    assignedTo: "primary_doctor" | "specialist" | "nurse" | "caregiver" | "pharmacist" | "lab" | "patient";
-    dueDate: string;
-    completed: boolean;
-  }
-
-  interface CarePlan {
-    id: string;
-    patientId: string;
-    patientName: string;
-    planName: string;
-    primaryCondition: string;
-    status: "active" | "completed" | "on_hold";
-    goals: string[];
-    tasks: CarePlanTask[];
-    teamMembers: { role: string; name: string; contact: string }[];
-    startDate: string;
-    nextReviewDate: string;
-  }
-
-  const carePlansStore: CarePlan[] = [
-    {
-      id: "CP-101",
-      patientId: "P101",
-      patientName: "Rajesh Kumar",
-      planName: "Type 2 Diabetes & Hypertension Integrated Care Plan",
-      primaryCondition: "T2DM + Essential Hypertension",
-      status: "active",
-      goals: [
-        "Maintain HbA1c below 6.8% over next 90 days",
-        "Keep home Systolic BP between 120-130 mmHg",
-        "Achieve 5,000 daily walking steps monitored via smartwatch",
-        "Zero hypoglycemic episodes"
-      ],
-      tasks: [
-        { id: "TK-1", title: "Daily morning fasting glucose log", assignedTo: "patient", dueDate: "Daily 08:00 AM", completed: true },
-        { id: "TK-2", title: "Weekly Nurse RPM Vitals Review & Call", assignedTo: "nurse", dueDate: "Every Monday 10:00 AM", completed: false },
-        { id: "TK-3", title: "Quarterly Lipid Profile & Serum Creatinine Order", assignedTo: "lab", dueDate: "2026-08-15", completed: false },
-        { id: "TK-4", title: "Monthly Medication Adherence Audit", assignedTo: "pharmacist", dueDate: "2026-08-01", completed: true }
-      ],
-      teamMembers: [
-        { role: "Primary Cardiologist", name: "Dr. Ananya Roy", contact: "+91 9988776655" },
-        { role: "Diabetologist", name: "Dr. Vikram Sethi", contact: "+91 9811223344" },
-        { role: "Senior Care Nurse", name: "Nurse Sunita Sharma", contact: "+91 9711002233" },
-        { role: "Family Caregiver", name: "Suman Kumar (Spouse)", contact: "+91 9876543210" }
-      ],
-      startDate: "2026-06-01",
-      nextReviewDate: "2026-08-30"
-    }
-  ];
-
-  app.get("/api/v1/care-coordination/plans/:patientId", (req, res) => {
-    const { patientId } = req.params;
-    const plans = carePlansStore.filter(p => p.patientId === patientId || patientId === "ALL");
-    return res.status(200).json({ success: true, plans });
-  });
-
-  app.post("/api/v1/care-coordination/tasks/status", express.json(), (req, res) => {
-    const { planId, taskId, completed } = req.body;
-    const plan = carePlansStore.find(p => p.id === planId);
-    if (!plan) return res.status(404).json({ success: false, error: "Care plan not found" });
-
-    const task = plan.tasks.find(t => t.id === taskId);
-    if (!task) return res.status(404).json({ success: false, error: "Task not found" });
-
-    task.completed = completed;
-    return res.status(200).json({ success: true, plan });
-  });
-
-  // 4. Chronic Disease Monitoring Suite
-  interface ChronicProfile {
-    patientId: string;
-    patientName: string;
-    conditions: string[];
-    hba1c: number;
-    fastingGlucose: number;
-    bpSystolic: number;
-    bpDiastolic: number;
-    heartRate: number;
-    spo2: number;
-    weightKg: number;
-    egfr: number;
-    riskScore: number; // 0-100
-    complianceScore: number; // 0-100%
-    aiClinicalGuidance: string;
-    lastUpdated: string;
-  }
-
-  const chronicProfilesStore: Record<string, ChronicProfile> = {
-    P101: {
-      patientId: "P101",
-      patientName: "Rajesh Kumar",
-      conditions: ["Type 2 Diabetes Mellitus", "Essential Hypertension", "Mild Dyslipidemia"],
-      hba1c: 7.1,
-      fastingGlucose: 128,
-      bpSystolic: 138,
-      bpDiastolic: 88,
-      heartRate: 76,
-      spo2: 98,
-      weightKg: 78.5,
-      egfr: 82,
-      riskScore: 28,
-      complianceScore: 92,
-      aiClinicalGuidance: "Patient maintains moderate glycemic and hypertensive control. BP systolic 138 mmHg is slightly above target 130 mmHg. Consider titrating Telmisartan from 40mg to 80mg or adding low-dose Chlorthalidone. Continue metformin 500mg BID.",
-      lastUpdated: new Date().toISOString()
-    }
-  };
-
-  app.get("/api/v1/chronic-monitoring/:patientId", (req, res) => {
-    const { patientId } = req.params;
-    const profile = chronicProfilesStore[patientId] || {
-      patientId,
-      patientName: "Patient " + patientId,
-      conditions: ["Hypertension", "Prediabetes"],
-      hba1c: 6.2,
-      fastingGlucose: 110,
-      bpSystolic: 130,
-      bpDiastolic: 84,
-      heartRate: 72,
-      spo2: 98,
-      weightKg: 72.0,
-      egfr: 90,
-      riskScore: 18,
-      complianceScore: 95,
-      aiClinicalGuidance: "Vitals within stable preventive limits. Maintain low-sodium diet and daily exercise.",
-      lastUpdated: new Date().toISOString()
-    };
-    return res.status(200).json({ success: true, profile });
-  });
-
-  app.post("/api/v1/chronic-monitoring/log", express.json(), (req, res) => {
-    const { patientId, bpSystolic, bpDiastolic, fastingGlucose, weightKg, hba1c } = req.body;
-    const pId = patientId || "P101";
-
-    if (!chronicProfilesStore[pId]) {
-      chronicProfilesStore[pId] = {
-        patientId: pId,
-        patientName: "Rajesh Kumar",
-        conditions: ["Type 2 Diabetes Mellitus", "Hypertension"],
-        hba1c: 7.1,
-        fastingGlucose: 128,
-        bpSystolic: 138,
-        bpDiastolic: 88,
-        heartRate: 76,
-        spo2: 98,
-        weightKg: 78.5,
-        egfr: 82,
-        riskScore: 28,
-        complianceScore: 92,
-        aiClinicalGuidance: "Monitoring logged.",
-        lastUpdated: new Date().toISOString()
-      };
-    }
-
-    const prof = chronicProfilesStore[pId];
-    if (bpSystolic) prof.bpSystolic = Number(bpSystolic);
-    if (bpDiastolic) prof.bpDiastolic = Number(bpDiastolic);
-    if (fastingGlucose) prof.fastingGlucose = Number(fastingGlucose);
-    if (weightKg) prof.weightKg = Number(weightKg);
-    if (hba1c) prof.hba1c = Number(hba1c);
-    prof.lastUpdated = new Date().toISOString();
-
-    // Re-calculate risk score
-    let risk = 10;
-    if (prof.hba1c > 8.0) risk += 25;
-    else if (prof.hba1c > 7.0) risk += 15;
-    if (prof.bpSystolic > 140) risk += 25;
-    else if (prof.bpSystolic > 130) risk += 10;
-    prof.riskScore = Math.min(100, risk);
-
-    return res.status(200).json({ success: true, profile: prof });
-  });
-
-  // 5. Smart Health Dashboard
-  app.get("/api/v1/smart-health-dashboard/:patientId", (req, res) => {
-    const { patientId } = req.params;
-    const pId = patientId || "P101";
-
-    const devices = rpmDevicesStore.filter(d => d.patientId === pId);
-    const readings = rpmReadingsStore.filter(r => r.patientId === pId);
-    const carePlan = carePlansStore.find(cp => cp.patientId === pId);
-    const chronicProfile = chronicProfilesStore[pId] || chronicProfilesStore["P101"];
-
-    // Compute unified health score (100 - riskScore + compliance Bonus)
-    const healthScore = Math.max(40, Math.min(99, Math.round(100 - (chronicProfile?.riskScore || 20) + 5)));
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        patientId: pId,
-        patientName: chronicProfile?.patientName || "Rajesh Kumar",
-        overallHealthScore: healthScore,
-        statusLabel: healthScore > 80 ? "EXCELLENT_CONTROL" : healthScore > 65 ? "STABLE_MONITORED" : "ATTENTION_REQUIRED",
-        activeChronicConditions: chronicProfile?.conditions || [],
-        vitalsSummary: {
-          bp: `${chronicProfile?.bpSystolic}/${chronicProfile?.bpDiastolic} mmHg`,
-          glucose: `${chronicProfile?.fastingGlucose} mg/dL`,
-          hba1c: `${chronicProfile?.hba1c}%`,
-          heartRate: `${chronicProfile?.heartRate} BPM`,
-          spo2: `${chronicProfile?.spo2}%`
-        },
-        deviceCount: devices.length,
-        devices,
-        recentReadings: readings.slice(-5),
-        carePlanSummary: carePlan ? {
-          name: carePlan.planName,
-          completedTasks: carePlan.tasks.filter(t => t.completed).length,
-          totalTasks: carePlan.tasks.length,
-          teamCount: carePlan.teamMembers.length
-        } : null,
-        activeAlerts: readings.filter(r => r.alertLevel === "critical" || r.alertLevel === "emergency").length
-      }
-    });
-  });
-
-  // 6. Emergency Alerts Store & Dispatcher
-  interface EmergencyAlert {
-    id: string;
-    patientId: string;
-    patientName: string;
-    alertType: string;
-    severity: "CRITICAL" | "HIGH" | "MEDIUM";
-    status: "ACTIVE_DISPATCH" | "RESPONDED" | "RESOLVED";
-    location: string;
-    vitalsSummary: string;
-    dispatchedTeam: string;
-    contactsNotified: string[];
-    timestamp: string;
-  }
-
-  const emergencyAlertsStore: EmergencyAlert[] = [
-    {
-      id: "EMG-901",
-      patientId: "P101",
-      patientName: "Rajesh Kumar",
-      alertType: "PANIC_BUTTON_TRIGGERED",
-      severity: "CRITICAL",
-      status: "RESOLVED",
-      location: "Sector 62, Noida (Home GPS)",
-      vitalsSummary: "BP: 165/102 mmHg, HR: 118 BPM",
-      dispatchedTeam: "Max Healthcare Cardiac Ambulance #4",
-      contactsNotified: ["Wife: Suman Kumar (+91 9876543210)", "Dr. Ananya Roy (+91 9988776655)"],
-      timestamp: new Date(Date.now() - 24 * 3600 * 1000).toISOString()
-    }
-  ];
-
-  app.post("/api/v1/emergency-alerts/trigger", express.json(), (req, res) => {
-    const { patientId, patientName, alertType, location, vitalsSummary } = req.body;
-    const pId = patientId || "P101";
-
-    const newAlert: EmergencyAlert = {
-      id: `EMG-${Date.now().toString().slice(-4)}`,
-      patientId: pId,
-      patientName: patientName || "Rajesh Kumar",
-      alertType: alertType || "EMERGENCY_PANIC_BUTTON",
-      severity: "CRITICAL",
-      status: "ACTIVE_DISPATCH",
-      location: location || "GPS Location: Sector 62, Noida, NCR",
-      vitalsSummary: vitalsSummary || "Vitals: Acute Distress reported",
-      dispatchedTeam: "CURA Emergency Mobile Cardiac Unit #1",
-      contactsNotified: [
-        "Emergency Contact 1: Suman Kumar (+91 9876543210)",
-        "Primary Cardiologist: Dr. Ananya Roy (+91 9988776655)",
-        "Nearest ER Desk: Fortis Hospital ICU Hub (+91 120 4433221)"
-      ],
-      timestamp: new Date().toISOString()
-    };
-
-    emergencyAlertsStore.unshift(newAlert);
-
-    return res.status(201).json({
-      success: true,
-      alert: newAlert,
-      message: "ğŸš¨ Emergency dispatch initiated! Nearest cardiac ambulance and primary physician notified immediately."
-    });
-  });
-
-  app.get("/api/v1/emergency-alerts/history/:patientId", (req, res) => {
-    const { patientId } = req.params;
-    const alerts = emergencyAlertsStore.filter(a => a.patientId === patientId || patientId === "ALL");
-    return res.status(200).json({ success: true, alerts });
-  });
-
-  // 7. Offline Sync Engine Endpoint
-  const offlineSyncStore: Array<{ deviceId: string; items: any[]; syncedAt: string }> = [];
-
-  app.post("/api/v1/offline-sync", express.json({ limit: "50mb" }), (req, res) => {
-    const { deviceId, items, offlineSince } = req.body;
-    if (!items || !Array.isArray(items)) {
-      return res.status(400).json({ success: false, error: "Items array is required" });
-    }
-
-    offlineSyncStore.push({
-      deviceId: deviceId || "unknown_device",
-      items,
-      syncedAt: new Date().toISOString()
-    });
-
-    return res.status(200).json({
-      success: true,
-      syncedCount: items.length,
-      timestamp: new Date().toISOString(),
-      offlineSince: offlineSince || null,
-      message: `Successfully processed and persisted ${items.length} offline item(s).`
-    });
-  });
-
-  app.get("/api/v1/offline-sync/history", (req, res) => {
-    return res.status(200).json({
-      success: true,
-      totalSyncSessions: offlineSyncStore.length,
-      history: offlineSyncStore.slice(-20)
-    });
-  });
-
-  // 8. Global Emergency SOS Endpoints
-  const sosAlertsStore: Record<string, any> = {};
-
-  app.post("/api/v1/emergency/sos", express.json(), (req, res) => {
-    const sosData = req.body;
-    if (!sosData || !sosData.id) {
-      return res.status(400).json({ success: false, error: "Invalid SOS payload" });
-    }
-
-    sosAlertsStore[sosData.id] = {
-      ...sosData,
-      status: "acknowledged",
-      serverReceivedAt: new Date().toISOString(),
-      notes: []
-    };
-
-    return res.status(200).json({
-      success: true,
-      alert: sosAlertsStore[sosData.id],
-      message: "ğŸš¨ Critical SOS Alert received and logged at ER Desk."
-    });
-  });
-
-  app.post("/api/v1/emergency/sos/:id/note", express.json(), (req, res) => {
-    const { id } = req.params;
-    const { note } = req.body;
-    if (!sosAlertsStore[id]) {
-      sosAlertsStore[id] = { id, status: "acknowledged", notes: [] };
-    }
-    if (!sosAlertsStore[id].notes) {
-      sosAlertsStore[id].notes = [];
-    }
-    sosAlertsStore[id].notes.push({
-      text: note,
-      timestamp: new Date().toISOString()
-    });
-    return res.status(200).json({ success: true, message: "Note added to SOS alert record." });
-  });
-
-  app.post("/api/v1/emergency/sos/:id/cancel", express.json(), (req, res) => {
-    const { id } = req.params;
-    const { reason } = req.body;
-    if (sosAlertsStore[id]) {
-      sosAlertsStore[id].status = "cancelled";
-      sosAlertsStore[id].cancelReason = reason;
-      sosAlertsStore[id].cancelledAt = new Date().toISOString();
-    }
-    return res.status(200).json({ success: true, message: "SOS alert cancelled." });
-  });
-
-  // Vite / static file serving middleware
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
-    
-    // Start the scheduling background worker (runs every 10 seconds for ultra-responsive live UI feedback)
-    setInterval(() => {
-      const now = new Date();
-      let processedAny = false;
-      
-      scheduledMessagesStore.forEach(async (msg) => {
-        if ((msg.status === "pending" || msg.status === "retry") && new Date(msg.scheduledAt) <= now) {
-          msg.processedAt = now.toISOString();
-          
-          // 1. WhatsApp (Primary)
-          console.log(`[SCHEDULER CHANNEL 1 - WHATSAPP] Attempting WhatsApp dispatch to ${msg.patientName} (${msg.phone})...`);
-          
-          // Find patient record for details
-          const patient = patientStore.find(p => p.id === msg.patientId || p.phone === msg.phone);
-          const emailAddress = patient ? patient.email : "";
-
-          let emailSent = false;
-          let smsSent = false;
-
-          // 2. Email Fallback
-          if (emailAddress) {
-            console.log(`[SCHEDULER CHANNEL 2 - EMAIL FALLBACK] Dispatching Email to ${msg.patientName} (${emailAddress})...`);
-            try {
-              const emailResult = await sendEmail({
-                to: emailAddress,
-                subject: `CURA Auto-Alert: ${msg.scheduleType.toUpperCase()}`,
-                html: `
-                  <div style="font-family: sans-serif; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; max-width: 500px; margin: 0 auto; background-color: #ffffff;">
-                    <h3 style="color: #0ea5e9; margin-top:0; font-weight:800; font-size:18px;">â° CURA Automated Care Alert</h3>
-                    <p style="font-size: 14px; line-height: 1.6; color: #334155;">Hello ${msg.patientName},</p>
-                    <p style="font-size: 14px; line-height: 1.6; color: #334155; font-weight: 500;">${msg.messageContent}</p>
-                    <p style="font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 25px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">
-                      This alert was automatically dispatched via CURA Healthcare Smart Scheduler (WhatsApp Fallback Sequence).
-                    </p>
-                  </div>
-                `
-              });
-              emailSent = emailResult.success;
-            } catch (err) {
-              console.error("[SCHEDULER EMAIL ERROR]", err);
-            }
-          }
-
-          // 3. SMS Fallback
-          console.log(`[SCHEDULER CHANNEL 3 - SMS FALLBACK] Dispatching SMS to ${msg.patientName} (${msg.phone})...`);
-          try {
-            const smsResult = await sendSMS({
-              to: msg.phone,
-              message: msg.messageContent
-            });
-            smsSent = smsResult.success;
-          } catch (err) {
-            console.error("[SCHEDULER SMS ERROR]", err);
-          }
-
-          // Mark message status based on overall success
-          msg.status = "sent";
-          msg.sentAt = new Date().toISOString();
-          
-          // Increment WhatsApp usage counts on the tenant config
-          const limit = TIER_LIMITS[tenantConfig.tier].maxWhatsappMessages;
-          if (tenantConfig.usage.whatsappMessages < limit) {
-            tenantConfig.usage.whatsappMessages += 1;
-          }
-          
-          console.log(`[AUTOMATED SCHEDULER WORKER] Complete dispatch cycle succeeded for ${msg.patientName}. WhatsApp (Primary) -> Email Fallback (${emailSent ? "Dispatched" : "Skipped"}) -> SMS Fallback (${smsSent ? "Dispatched" : "Skipped"}).`);
-          processedAny = true;
-        }
-      });
-      
-      if (processedAny) {
-        console.log(`[AUTOMATED SCHEDULER WORKER] Queue processing cycle completed.`);
-      }
-    }, 10000);
-  });
-}
-
-// Highly realistic Clinical heuristics generator based on keywords
-function generateMockClinicalResponse(symptoms: string, patientInfo: any, selectedHistory?: any[], medicalSystem: string = "allopathy") {
-  const sym = symptoms.toLowerCase();
-
-  if (medicalSystem === "ayurveda") {
-    const ayur = generateMockAyurvedicResponse(symptoms);
-    return {
-      summary: `Traditional Ayurvedic clinical profile. Prakriti: Vata ${ayur.doshaImbalance.vata}%, Pitta ${ayur.doshaImbalance.pitta}%, Kapha ${ayur.doshaImbalance.kapha}%. Agni status is assessed as ${ayur.agniStatus} and Ama accumulation is ${ayur.amaStatus}. ${ayur.doshaImbalance.explanation}`,
-      diagnoses: [ayur.doshaImbalance.dominantImbalance],
-      recommendedTests: ["Nadi Pariksha (Pulse assessment)", "Ashta Vidha Pariksha (Eight-fold traditional exam)"],
-      medications: ayur.herbs.map(h => ({
-        drugName: h.name,
-        dosage: h.dosage,
-        frequency: h.frequency,
-        duration: "14 days",
-        reason: h.benefits
-      })),
-      drugInteractions: [
-        "SOTRA ALIGNMENT: Herbal formulas must be consumed at specified times with warm water/milk as anupana for optimal assimilation.",
-        "ALLERGY AUDIT: Ensure patient has no sensitive reactions to any herbal ingredients."
-      ],
-      additionalAdvice: `Ahara (Diet): Favor: ${ayur.ahara.favor.join(", ")}. Avoid: ${ayur.ahara.avoid.join(", ")}. Notes: ${ayur.ahara.notes}\n\nVihara (Lifestyle): Yoga: ${ayur.vihara.yogaAsanas.join(", ")}. Tips: ${ayur.vihara.lifestyleTips.join(", ")}. Notes: ${ayur.vihara.notes}`
-    };
-  }
-
-  if (medicalSystem === "homeopathy") {
-    let diagnoses = ["Acute Respiratory Allergy (Repertory: Arsenicum Album)"];
-    let medications = [
-      {
-        drugName: "Arsenicum Album 30C",
-        dosage: "4 Pills",
-        frequency: "Four times daily",
-        duration: "5 days",
-        reason: "Indicated for intense sneezing, watery acrid coryza, and restlessness"
-      }
-    ];
-    let advice = "Do not consume raw onions, garlic, mint, coffee, or camphor within 30 minutes of taking homeopathic pills. Let pills dissolve under the tongue.";
-
-    if (sym.includes("stomach") || sym.includes("acid") || sym.includes("vomit") || sym.includes("diarrhea")) {
-      diagnoses = ["Gastrointestinal Irritation (Repertory: Nux Vomica)"];
-      medications = [
-        {
-          drugName: "Nux Vomica 30C",
-          dosage: "4 Pills",
-          frequency: "Three times daily before meals",
-          duration: "5 days",
-          reason: "Indicated for sour eructations, burning acidity, and flatulence"
-        }
-      ];
-    } else if (sym.includes("sugar") || sym.includes("diabetic")) {
-      diagnoses = ["Pancreatic Dysfunction (Repertory: Syzygium Jambolanum)"];
-      medications = [
-        {
-          drugName: "Syzygium Jambolanum Q (Mother Tincture)",
-          dosage: "10 Drops",
-          frequency: "Thrice daily in half cup of lukewarm water",
-          duration: "15 days",
-          reason: "Traditional homeopathic remedy supporting pancreatic glucose regulation"
-        }
-      ];
-    } else if (sym.includes("joint") || sym.includes("back") || sym.includes("pain") || sym.includes("stiff")) {
-      diagnoses = ["Rheumatoid Stiffness (Repertory: Rhus Tox / Bryonia)"];
-      medications = [
-        {
-          drugName: "Rhus Toxicodendron 200C",
-          dosage: "4 Pills",
-          frequency: "Twice daily",
-          duration: "7 days",
-          reason: "Indicated for severe muscular or joint pain that improves with movement and worsens in cold damp weather"
-        }
-      ];
-    }
-
-    return {
-      summary: "Constitutional homeopathic evaluation. Individualized symptom matching (repertorization) aligns with classical homeopathic standards.",
-      diagnoses,
-      recommendedTests: ["Homeopathic Constitutional Assessment", "General Blood Chemistry"],
-      medications,
-      drugInteractions: ["CRITICAL SAFETY: Strictly avoid strong odorous substances. Keep remedies away from direct sunlight."],
-      additionalAdvice: advice
-    };
-  }
-
-  if (medicalSystem === "unani") {
-    return {
-      summary: "Traditional Unani humoral assessment. Humoral balance shows elevated Balgham (phlegm) and a cold-damp temperament shift.",
-      diagnoses: ["Nazla-e-Zukaam (Acute Catarrh) [Unani Code: UN-301]"],
-      recommendedTests: ["Mizaj (Temperament) Assessment", "Nabd (Pulse) & Baul (Urine) analysis"],
-      medications: [
-        {
-          drugName: "Khamira Gaozaban Ambari Jawahar Wala",
-          dosage: "5 grams",
-          frequency: "Once daily in the morning on an empty stomach",
-          duration: "7 days",
-          reason: "Traditional Unani nervine tonic that relieves catarrh and chest congestion"
-        },
-        {
-          drugName: "Sualin Herbal Lozenges",
-          dosage: "2 Tablets",
-          frequency: "To be sucked, four times daily",
-          duration: "5 days",
-          reason: "Provides immediate soothing relief to irritated throat and bronchial passages"
-        }
-      ],
-      drugInteractions: ["Ensure patient is not diabetic before prescribing sweet Khamira preparations."],
-      additionalAdvice: "Avoid cold water and chilled food items. Consume warm chicken broth spiced with black pepper."
-    };
-  }
-
-  if (medicalSystem === "siddha") {
-    return {
-      summary: "Siddha medicine evaluation. Tridosha assessment indicates Kabham elevation disrupting the Pranan pathways.",
-      diagnoses: ["Kaba Suram (Respiratory Pyrexia) [Siddha Code: SD-104]"],
-      recommendedTests: ["Envagai Thervu (Eight-fold Siddha diagnosis)", "Neerkuri (Urine oil-drop test)"],
-      medications: [
-        {
-          drugName: "Kabasura Kudineer (Decoction)",
-          dosage: "50 ml",
-          frequency: "Twice daily before meals",
-          duration: "5 days",
-          reason: "Classic Siddha polyherbal formulation to alleviate respiratory fevers, coughs, and body aches"
-        }
-      ],
-      drugInteractions: ["Consume fresh and hot. Do not reheat decoction after 4 hours of preparation."],
-      additionalAdvice: "Avoid daytime sleeping. Engage in mild physical activity and stay hydrated with room temperature warm water."
-    };
-  }
-
-  if (medicalSystem === "yoga") {
-    return {
-      summary: "Holistic Yoga & Naturopathy prescription. Focuses on balancing Prana, strengthening the vital force (Prana Sakthi), and correcting lifestyle errors.",
-      diagnoses: ["Structural-Functional Stress Alignment Profile"],
-      recommendedTests: ["Body Mass Index (BMI)", "Autonomic Balance Assessment"],
-      medications: [
-        {
-          drugName: "Nadi Shodhana Pranayama (Alternate Nostril Breathing)",
-          dosage: "10 Rounds",
-          frequency: "Twice daily (Before breakfast and dinner on empty stomach)",
-          duration: "Indefinite",
-          reason: "Calms the autonomic nervous system and clears energetic blockages in Nadis"
-        },
-        {
-          drugName: "Suryanamaskar (Sun Salutations)",
-          dosage: "6 Rounds",
-          frequency: "Every morning at sunrise",
-          duration: "Daily",
-          reason: "Improves general circulation, flexibility, and increases metabolic rate"
-        }
-      ],
-      drugInteractions: ["Contraindicated for patients with active hernia, severe sciatica, or uncontrolled high blood pressure (seek guidance)."],
-      additionalAdvice: "Consume a purely Sattvic diet rich in fresh vegetables and fruits. Practice 15 minutes of Yoga Nidra for profound stress release."
-    };
-  }
-
-  const resObj = {
-    summary: "Clinical presentation evaluated based on patient age, symptoms, and medical background.",
-    diagnoses: ["Acute Upper Respiratory Tract Infection"],
-    recommendedTests: ["Complete Blood Count (CBC)"],
-    medications: [
-      {
-        drugName: "Paracetamol 650mg",
-        dosage: "1 Tablet",
-        frequency: "1-0-1 (As needed, after meals)",
-        duration: "3 days",
-        reason: "For symptomatic relief of fever, headache or body aches"
-      }
-    ],
-    drugInteractions: [] as string[],
-    additionalAdvice: "Rest adequately, hydrate heavily with warm fluids, and isolate if symptoms worsen. Avoid allergen triggers."
-  };
-
-  // Allergy warning rules
-  const hasPenicillinAllergy = patientInfo?.allergies?.some((a: string) => a.toLowerCase().includes("penicillin"));
-  const hasAspirinAllergy = patientInfo?.allergies?.some((a: string) => a.toLowerCase().includes("aspirin"));
-  
-  if (hasPenicillinAllergy) {
-    resObj.drugInteractions.push("CRITICAL ALERT: Patient is allergic to Penicillin. All beta-lactam antibiotics are strictly contraindicated.");
-  }
-  if (hasAspirinAllergy) {
-    resObj.drugInteractions.push("CRITICAL ALERT: Aspirin allergy reported. NSAIDs should be used with extreme caution.");
-  }
-
-  // Handle selected history context warnings
-  if (selectedHistory && selectedHistory.length > 0) {
-    const diagnosesString = selectedHistory.map(h => h.diagnosis.toLowerCase()).join(" ");
-    if (diagnosesString.includes("diabetes") || diagnosesString.includes("diabetic") || diagnosesString.includes("sugar")) {
-      resObj.drugInteractions.push("CONTEXT ALERT: Selected history of Diabetes. Avoid prescribing syrups or drugs with sugar content. Monitor blood glucose closely.");
-      resObj.additionalAdvice += " Strictly follow diabetic dietary restrictions and continue anti-diabetic regimens.";
-    }
-    if (diagnosesString.includes("hypertension") || diagnosesString.includes("bp") || diagnosesString.includes("high bp") || diagnosesString.includes("hypertensive")) {
-      resObj.drugInteractions.push("CONTEXT ALERT: Selected history of Hypertension. Avoid NSAIDs (like Ibuprofen) if possible as they can raise blood pressure and impact renal function.");
-    }
-    if (diagnosesString.includes("acidity") || diagnosesString.includes("gerd") || diagnosesString.includes("ulcer")) {
-      resObj.drugInteractions.push("CONTEXT ALERT: Selected history of Gastritis/Acidity. Ensure any oral antibiotics are paired with a PPI (e.g., Pantoprazole) to prevent gastric irritation.");
-    }
-  }
-
-  // Symtoms heuristic analysis
-  if (sym.includes("cough") || sym.includes("fever") || sym.includes("throat") || sym.includes("flu") || sym.includes("chest")) {
-    resObj.diagnoses = ["Acute Viral Pharyngitis / Flu-like syndrome", "Bronchial Congestion"];
-    resObj.recommendedTests = ["Routine Blood Count (CBC)", "Chest X-Ray (if cough persists > 7 days)"];
-    
-    if (hasPenicillinAllergy) {
-      resObj.medications = [
-        {
-          drugName: "Azithromycin 500mg", // Macrolide, safe for penicillin allergy
-          dosage: "1 Tablet",
-          frequency: "1-0-0 (Before meal)",
-          duration: "5 days",
-          reason: "Broad-spectrum coverage for secondary respiratory infection (penicillin-safe)"
-        },
-        {
-          drugName: "Montelukast 10mg + Levocetirizine 5mg",
-          dosage: "1 Tablet",
-          frequency: "0-0-1 (At bedtime)",
-          duration: "5 days",
-          reason: "Symptomatic relief of cough, allergic rhinitis, and airway congestion"
-        }
-      ];
-    } else {
-      resObj.medications = [
-        {
-          drugName: "Amoxicillin 500mg",
-          dosage: "1 Capsule",
-          frequency: "1-0-1 (After meals)",
-          duration: "5 days",
-          reason: "First-line empirical therapy for respiratory tract infection"
-        },
-        {
-          drugName: "Bromhexine syrup 8mg/5ml",
-          dosage: "10 ml",
-          frequency: "1-1-1 (After meals)",
-          duration: "5 days",
-          reason: "Mucolytic agent to loosen congestion and aid productive cough"
-        }
-      ];
-    }
-  } else if (sym.includes("stomach") || sym.includes("acid") || sym.includes("pain") || sym.includes("vomit") || sym.includes("diarrhea")) {
-    resObj.diagnoses = ["Acute Gastroenteritis", "Gastroesophageal Reflux Disease (GERD)"];
-    resObj.recommendedTests = ["Stool examination", "Abdominal Ultrasound (if pain is localized/severe)"];
-    resObj.medications = [
-      {
-        drugName: "Pantoprazole 40mg",
-        dosage: "1 Tablet",
-        frequency: "1-0-0 (30 mins before breakfast)",
-        duration: "7 days",
-        reason: "Proton pump inhibitor to suppress gastric acid hypersecretion"
-      },
-      {
-        drugName: "ORSL (Oral Rehydration Solution)",
-        dosage: "1 sachet in 1L water",
-        frequency: "Drink sip-by-sip",
-        duration: "2 days",
-        reason: "Prevent dehydration due to fluid loss"
-      },
-      {
-        drugName: "Domperidone 10mg",
-        dosage: "1 Tablet",
-        frequency: "1-0-1 (Before meals)",
-        duration: "3 days",
-        reason: "Antiemetic to control nausea/vomiting"
-      }
-    ];
-  } else if (sym.includes("sugar") || sym.includes("diabetic") || sym.includes("urine") || sym.includes("thirst")) {
-    resObj.diagnoses = ["Hyperglycemia / Poorly Controlled Diabetes"];
-    resObj.recommendedTests = ["Fasting & Post-Prandial Blood Sugar", "HbA1c test"];
-    resObj.medications = [
-      {
-        drugName: "Metformin 500mg",
-        dosage: "1 Tablet",
-        frequency: "1-0-1 (With breakfast and dinner)",
-        duration: "30 days",
-        reason: "First-line oral hypoglycemic to improve insulin sensitivity"
-      }
-    ];
-    resObj.additionalAdvice = "Strictly limit carbohydrates and refined sugars. Ensure daily physical activity (30-min walk). Remediate symptoms if vision changes occur.";
-  } else if (sym.includes("bp") || sym.includes("headache") || sym.includes("hypertension") || sym.includes("tension") || sym.includes("dizzy")) {
-    resObj.diagnoses = ["Essential Hypertension", "Tension Headache"];
-    resObj.recommendedTests = ["Blood Pressure Monitoring (7 days diary)", "Lipid Profile"];
-    resObj.medications = [
-      {
-        drugName: "Amlodipine 5mg",
-        dosage: "1 Tablet",
-        frequency: "1-0-0 (At morning)",
-        duration: "30 days",
-        reason: "Calcium channel blocker for systemic blood pressure management"
-      }
-    ];
-    resObj.additionalAdvice = "Reduce dietary sodium intake (<1.5g daily). Avoid extreme stress and monitor BP twice daily. Consult if diastolic exceeds 100 mmHg.";
-  }
-
-  return resObj;
-}
-
-// Highly realistic Ayurvedic heuristics generator based on symptoms
-function generateMockAyurvedicResponse(symptoms: string) {
-  const sym = symptoms.toLowerCase();
-  
-  // Default values
-  let vata = 35;
-  let pitta = 35;
-  let kapha = 30;
-  let dominantImbalance = "Tridosha (General imbalance of Vata, Pitta, and Kapha)";
-  let explanation = "Your symptoms indicate a mild multi-dosha imbalance where digestive fire (Agni) is fluctuating, causing a build-up of minor metabolic toxins (Ama) in the circulatory channels (Srotas).";
-  let agniStatus = "Samagni (Balanced digestive fire) with mild fluctuations";
-  let amaStatus = "Low (Mild accumulation)";
-  
-  let favor = ["Warm, freshly cooked foods", "Spiced teas (Ginger, Cardamom)", "Sweet and sour juicy fruits", "Ghee (Clarified butter) in small quantities"];
-  let avoid = ["Cold carbonated beverages", "Extremely spicy and fried dishes", "Dry snacks like crackers", "Heavy, processed dairy"];
-  let aharaNotes = "Eat only when hungry. Leave at least 4-5 hours between meals to allow proper Agni processing.";
-  
-  let yogaAsanas = ["Nadi Shodhana Pranayama", "Vajrasana (Thunderbolt pose) for 5-10 mins after meals", "Balasana (Child's pose)"];
-  let lifestyleTips = ["Practice Abhyanga (warm sesame oil massage) before bathing", "Retire to bed by 10:00 PM to align with natural circadian rhythms", "Drink lukewarm water throughout the day"];
-  let viharaNotes = "Maintain consistent sleep and meal timings. Rest after physical exertion.";
-  
-  let herbs = [
-    {
-      name: "Triphala Churna",
-      dosage: "1/2 teaspoon",
-      frequency: "At bedtime with warm water",
-      benefits: "Gently cleanses the digestive tract, supports bowel regularity, and balances all three Doshas."
-    },
-    {
-      name: "Shunti (Dry Ginger) & Tulsi Tea",
-      dosage: "1 cup",
-      frequency: "Morning and afternoon",
-      benefits: "Stirs up digestive fire (Agni), reduces systemic dampness, and relieves mild congestion."
-    }
-  ];
-
-  if (sym.includes("cough") || sym.includes("cold") || sym.includes("fever") || sym.includes("throat") || sym.includes("congestion") || sym.includes("asthma") || sym.includes("breath")) {
-    vata = 30;
-    pitta = 20;
-    kapha = 50;
-    dominantImbalance = "Kapha (Excessive phlegm and fluid accumulation in the respiratory tract)";
-    explanation = "The cold, damp, heavy qualities of Kapha have settled in the respiratory system (Pranavaha Srotas). This has slowed down the metabolic fire (Agni) and created sticky toxins (Ama) that clog the airways, causing cough and congestion.";
-    agniStatus = "Manda Agni (Weak, sluggish digestive fire)";
-    amaStatus = "Medium (Phlegm accumulation)";
-    favor = ["Warm, light, dry soups", "Spices like Pippali, Ginger, and Turmeric", "Hot honey-water infusions"];
-    avoid = ["Chilled dairy (Yogurt, Cheese)", "Sweets, refined sugars, and ice creams", "Cold raw salads and heavy deep-fried food"];
-    aharaNotes = "Incorporate dry ginger and black pepper in meals. Avoid eating when congested or not genuinely hungry.";
-    yogaAsanas = ["Kapalabhati Pranayama (with caution)", "Surya Namaskar (Sun salutations)", "Bhujangasana (Cobra pose) to open the chest"];
-    lifestyleTips = ["Perform steam inhalation with eucalyptus oil twice daily", "Keep your chest and throat covered in cool drafts", "Gargle with warm salt-turmeric water"];
-    viharaNotes = "Avoid sleeping during the day as it actively increases Kapha dosha. Keep physical activity moderate and active.";
-    herbs = [
-      {
-        name: "Sitopaladi Churna",
-        dosage: "1-2 grams",
-        frequency: "Thrice daily mixed with honey",
-        benefits: "Traditional Ayurvedic formulation that alleviates respiratory congestion, suppresses cough, and breaks down sticky Kapha."
-      },
-      {
-        name: "Tulsi (Holy Basil) Extract",
-        dosage: "15-20 drops or 1 capsule",
-        frequency: "Twice daily",
-        benefits: "Powerful immunomodulator that clears bronchial pathways, warms the lungs, and pacifies excess Vata and Kapha."
-      }
-    ];
-  } else if (sym.includes("stomach") || sym.includes("acid") || sym.includes("burning") || sym.includes("reflux") || sym.includes("heartburn") || sym.includes("acidity") || sym.includes("indigestion") || sym.includes("bloat") || sym.includes("constipation")) {
-    vata = 25;
-    pitta = 60;
-    kapha = 15;
-    dominantImbalance = "Pitta (Hyperactive heat, acidity, and gastrointestinal irritation)";
-    explanation = "The hot, sharp, and liquid attributes of Pitta dosha are highly aggravated in the stomach (Annavaha Srotas). The metabolic fire (Agni) is sharp and intense (Tikshnagni), but it is burning rather than digesting, leading to irritation, acidity, and acid reflux.";
-    agniStatus = "Tikshna Agni (Sharp, hyperactive digestive fire)";
-    amaStatus = "Medium (Acidic metabolic waste)";
-    favor = ["Cooling foods (Cucumber, Watermelon, Coconut water)", "Whole grains like white basmati rice and oatmeal", "Pacifying herbs like Fennel, Coriander, and Mint"];
-    avoid = ["Highly spicy foods (Chili, Cayenne pepper)", "Citrus fruits, tomatoes, and fermented foods like vinegar", "Caffeine, alcohol, and carbonated beverages"];
-    aharaNotes = "Never skip meals when Pitta is high as the sharp Agni will irritate the empty stomach lining. Eat sweet, bitter, and astringent flavors.";
-    yogaAsanas = ["Sheetali Pranayama (Cooling breath)", "Chandra Namaskar (Moon salutations)", "Shavasana (Corpse pose) for stress pacification"];
-    lifestyleTips = ["Avoid exposure to intense direct sunlight during peak hours", "Massage soles of feet with coconut oil at bedtime", "Practice mindfulness to release anger and frustration"];
-    viharaNotes = "Refrain from intense workouts in hot conditions. Stay hydrated with room-temperature herbal infusions.";
-    herbs = [
-      {
-        name: "Avipattikar Churna",
-        dosage: "1/2 - 1 teaspoon",
-        frequency: "Before meals with warm water",
-        benefits: "Prememinent Ayurvedic formula specifically designed to relieve severe acidity, gastritis, and regulate digestive juices."
-      },
-      {
-        name: "Amalaki (Indian Gooseberry)",
-        dosage: "500mg capsule or 1 tsp powder",
-        frequency: "Twice daily",
-        benefits: "Superb cooling herb that pacifies Pitta, strengthens the stomach lining, and acts as a powerful antioxidant."
-      }
-    ];
-  } else if (sym.includes("joint") || sym.includes("back") || sym.includes("body ache") || sym.includes("pain") || sym.includes("stiff") || sym.includes("headache") || sym.includes("tension") || sym.includes("anxiety") || sym.includes("insomnia") || sym.includes("sleep")) {
-    vata = 60;
-    pitta = 20;
-    kapha = 20;
-    dominantImbalance = "Vata (Hyperactive nervous system, dryness, coldness, and motor friction)";
-    explanation = "Your symptoms stem from an aggravated Vata dosha, which controls movement and the nervous system. Dryness and coldness have accumulated in the joints (Sandhivaha Srotas) or nervous pathways, causing tension, pain, stiffness, or restlessness.";
-    agniStatus = "Vishamagni (Irregular, unpredictable digestive fire)";
-    amaStatus = "Low-to-Medium (Dry metabolic debris)";
-    favor = ["Warm, moist, oily foods (Kitchari, stews, warm soups)", "Healthy fats (Sesame oil, Ghee, Avocado)", "Warming spices like Turmeric, Ginger, Hing, and Cumin"];
-    avoid = ["Cold, dry, and raw foods (Salads, chips, crackers)", "Ice-cold drinks and frozen desserts", "Beans and cruciferous vegetables (unless well-cooked with spices)"];
-    aharaNotes = "Focus on warm, grounding meals eaten at highly regular times. Avoid raw or fasting regimens.";
-    yogaAsanas = ["Nadi Shodhana Pranayama", "Balasana (Child's pose)", "Supported Pawanmuktasana (Wind-relieving pose) to release Vata"];
-    lifestyleTips = ["Apply warm sesame oil (Abhyanga) to your joints or body", "Maintain a warm, calming environment at home", "Establish a strict bedtime routine by 10:00 PM"];
-    viharaNotes = "Limit excessive screen time and multitasking. Engage in grounding, slow-paced activities.";
-    herbs = [
-      {
-        name: "Ashwagandha (Withania somnifera)",
-        dosage: "500mg capsule or 1 tsp powder",
-        frequency: "Twice daily with warm milk or water",
-        benefits: "A premier adaptogen and Rasayana that calms the nervous system, lubricates the joints, and deeply pacifies excess Vata."
-      },
-      {
-        name: "Shallaki (Boswellia serrata)",
-        dosage: "1-2 capsules",
-        frequency: "Twice daily after meals",
-        benefits: "Traditional Ayurvedic herb for joint health, offering potent anti-inflammatory relief and improving mobility by lubricating Vata channels."
-      }
-    ];
-  }
-
-  return {
-    doshaImbalance: {
-      vata,
-      pitta,
-      kapha,
-      dominantImbalance,
-      explanation
-    },
-    agniStatus,
-    amaStatus,
-    ahara: {
-      favor,
-      avoid,
-      notes: aharaNotes
-    },
-    vihara: {
-      yogaAsanas,
-      lifestyleTips,
-      notes: viharaNotes
-    },
-    herbs,
-    disclaimer: "Disclaimer: VaidhLLaMA-3.2-3B-Instruct is an open-source clinical reference model intended for research and educational purposes. Always consult a certified Ayurvedic practitioner (Vaidya) before starting any medical regime."
-  };
-}
-
-startServer();
+            concerns xœ¼<ÛrÛF–ïúŠÊ5E&$HJ¶bÉ£hi‰4Ö…%ÊNe\.	"šdG €t’EU[»±/ûû3?¶çôhÜtq2Ã”C}9§ÏıœîÖùä³À'iHohHÄ5I…ÔùüfXN§ÑrICßKX
+²‡q¬ÈG–xKµG¼Ú¾0¾‰ <]:â{,Là‰£¹O|Á°ÉøyÕ'Óè†ro^'ÒåÒã+€sy@½ Y¬:äÊ¼pJ}F|éÙULÉ-K Di"Á°pNÄ4â”D3òâ;^ÈçûŞ ßwÉ›/ Nt¯<Îåj"XMÄIÌæ°ŞD® &T¸$[Ì4åÇÅ¦	»¡dêqê^Ú«¸_³‡aè+ÁÄiÀÚîŠkÎĞìTßã:‹¯§ƒ‡¢ó£ŠO\0!R*¶³án@Ã9¬úÒïÔ±À^P¾ºûµÒ{=r8#1@EºĞ/L$¢C„”I"’,(ãÀ/©Fãˆ'‚ˆˆ°„ Eéœ{@_zHI`òuAÉèàì==›‘–¼m‘!Ò[5ç6™Ø Jfş6¹ä4î"A»/î½dár—hÙj»I4I8Nkc³íŠôJ$¼µŞ![íûK›.	KºMœá!™ üíSÅ$
+¢ùŠş:ö `ôÉ>ü’€'§@Š–´œs§ı©ÿÙ7…Şóˆ¯ Ö)ƒ&±€xKDÄcR@<Üı%WúNØoØw°Ş'ïßZé—„{Ó„úçğè#uÂ¶­§(´n&Œ÷.dõ¡~¶ÎíiykèŸ‰ã/[h9J„÷ØD	äv.¹ZXí×tõI[ j‡ÔéX$HUìûõ´âL\êQÈVLşJ6ûd—8Kê30ƒ&¢Û¢X0oF0hnË
+ğ£¤W¢7æò¶@¥8‚]¨í3i¼öY ’â³‚ÔÏh5µr£ò¼R¥Al®•6Öm˜ó˜bŸx>-0naİ kjV\ÚL\FM£€Ñ‚ÔûNnfŞä6MÀ7Ú¸ESÒ.èy}tYŸ«¬©»›†bÁfI+3.m°vÃ ì—çûHcö`õ"Ëdš©õûlÎ»:û  ¸ø\”h
+c`{Î†Ì--£pÎÀYÿK¬–q-ëÅ©Fûbp®SÎâf,y*wéÅ-Nv~ — ˆ)¿¿lçüj¿)»N“”‡èÅ]¥·­õ~¿íş"¢Ğ¢°H§S* …„§aªW‡VŞc	£ 2Ñ¢JŒ}Ÿ³Œ
+bj¦¥A°²x ¹~1¥ı Ö`™µ¡ºG{?]å¹í…«\¨ÑËEue[Ëù4yxB†'Ã£Ÿÿ>"£³³Ó³Ï`0ekF¥*q^åÄÉ‰2óAõØmõåê…g$GUÑˆzqìÎ)ø«³ŞÍ ']©6–=.—&zÛš‡`>I‹Ó_;ˆGy«–”€°—;’Zì@ÿ_İØãŞR¼)ô3š¶c~M@9¨;CßŠ@ì2Ÿìììäóe$±ˆm1ª¤zÙ™‘Ê§ñÅwÆ4Ä‚`+ÓĞwê„R¡‰dÉíN«Á"ış;˜¤6 $”·r|pÜ•‘†\ÊÃÁ†—›§?I/4–yÓÚtìh	ó£²ü°\b?*ˆ`€wş¬šîŸÿıÿûçıãáßÿÀ¿ÿ$ç#2è“ãáßNÏĞîŒ†Gç{Ã³9OÏÎ?œ&äípïıèdŸL>şlÜÔ|—œÑ%ää8
+ˆ<f8­³ñq›Hä/dBÁ$AŒéÁªùÌ›R}öéƒ_Š|*šfjRûZÅ˜vƒ/'S¢sD‘¦^¤œ:äwâÌƒt	õ›Nçò{A=\`Œ/ºŒ!éKÌèËjNCùó–Bf–ÈŸ H	Ó(öœMr‹òåØ5!Z^×2#ß(ô N‚æ«l«ªv/ <9_ÀŠQàE·àšÓååuÍ˜FÛø4ÌrW…>»ÅN) PÄêÊK€_+[Ú}O$gÔÃ(v·T}³5ğœ-én`çFa€„¤ì*œBÅ’Ù,{/×,‰-\A´4„çÉ–áÌn³dÙïo¼ ¥kÿˆm’W®@×QÅ%mÍŠ!VIØT7Ğ%å ’Ó•cMp¬¬Q	ëb\ŸqjâÚ4–SøÑ­i 5È™hºğÂ9S>ÅÒÂ¼´,óË"É®ü
+—J›…Tûí\½?}Æ WNcL-²ÃÙ}ìúƒ,<±xâŒktVyæıòKŞ§ nY—‡t¿ØGÏrºäQHF7QpC~Ğ™¼#V$q:=î¾w·¶ÖsÌjtÖöY5*»Õ¯oT
+;x™5×ë«=’&g¹<È³ê¢º¾~mŞ[:P6^W dµcß³JşÏ£ÛV›t1ñú“ÊoÁ%¡¿,28%­VN³Ó$ë¾PÔíZÁ^]EIBŞqJ'É
+Âœ#v©àÙûñ¸N*àuwøö¼û²¿¾şäâû‡åâu…ëóÔÀö­—õlß\&kÿÖn4±¶ÂsÍ1g+LÇzÖ¢3¯åå{CÎy]AÊH6Èf÷MF{?’±ôÓ5ü|Ü…öî`Ğßúì|õ0;ev¾70óûÍZf~ÿ\5].nlö¿Š™ğÿÏo
+¦^´l½~ÓdìÏFÃıîë§X{‹eñ+¯}rû¨šrWgAë<r¡í8O¾	ƒï!«CD¬ä@lÚ‘åzH‹Ñ’ZâC¶dœd3ÖùhÓVõÈn¦ÁüæF-ÕŒz‚®0jıÙ–×0+·Lµæ­À50e‰¤cíœyÑ ‰ˆÙ5ÅbAY¦,—g9{4#>ƒ’ÿyÊ|Š²ÿÕ\¬»¯Á¦Á«GÙ”éä[ jQª(˜L 2&£Ğ#~E¦¡"C$K¦Ÿ Üÿ«
+Ü:˜öş€;÷Yå$ªå¥cw1îÆòÍ©e*n××ML­„A
+¥
+šL@àÑ9:İ]€œî`JaÂBˆÖMUå*òW*Ü´¦D¨ˆÓn“!çŞê¯wv8/·Ùò§Ì€©q&_hSÈó¨€xO¿A:?ßd™½š‚Üÿ`Õcj0ØÃ´ôó3¯Õ$Ûf'-…=’¥K’%/5ØU&³Pì‚áOWnşy+)gÓ‹ š;oJƒboDoÆ˜Gvgm‰e?°Î”ÃÁúÍ$4¡Zœb¹:ÛÃWv‘–µ àå¸ûâ.—ì{³5;Í[…-#ëÅm \Êu›©Í`Ş…úÙ1J Ë_Nq2©‹'2‡i™¡ğ®C7JŠ@bŸò¬z–@Á¾”fQhá(eßï¶dëõ÷›¯ÈËõA¿4Œ.¥˜™aòQÓÊğ¦ÇÂÒHéê~äQçÃówŠß•—€˜3j´ÆeB~ç´0Úd—T^’mTáÂŒzgù˜úêâyıÔÕ6Œjk0½/‘¯W¿P•É?İö"ßæJşRIçŞéş¨(“(ƒä;RÍ­:ÑTzâ“Bö
+çoÚEµ&±Rib‘x­y]yÁ9,”xB–&]»’Ün—Tğ±nœŠnÛ6ä{ë·e\UoeZ¥-QZÃágG›Yc<:CÛÉìè¥)G¿¸“£ßkp—Vq:GBÑï¾³¶Á ¬Ï]5Y`/nXâÂA‹›^h§[kÌ¸	 ­Ñl›ŒŠş¨y³"©’”J(ÅğJ}ò ËÉ¼*(GÈö ~‡§Ò=«ËJÆS¾•æs°^>Q
+±Íâ{°¥)‹ím°)ŞC¿@……f>ÉU"wõ±cEËÖ™—r˜ëÛZmj&ÈâÉÂú­œc"¥Ö2D
+¤‘®Jåğ1C«Ø §Õ5¹zÔª±f‰å’[%^BR3Ğzù5Ö¬œ*c¢'­Qö‡,õL£ã|´@ĞWĞÂ6X¼ÉÒÜ=ÍËÉÏ'{E“pù,„qr<¥…[]OGuÍ l6²J›XOAİ96®y¬™†×!–‡-ÌuœœcN³İ/ñN6K¨Å5¢ã|÷:¥YS²˜m¹ö kw -’dÉ—#Ï÷ùå(Ê°†eÜ|ÂÉ`*¹°§p”‹iÚ^ærÓ«›çö=eaEÃÆre©¥EêíÍRık‘èm³¦nå¡f]Ehj³ÚÇ¾¾Ù¬Î·»µôX¨Ò®Ù/·³¡×C{«µÙz?°fûş9DÄÅ=—pÚr4±¯ù,À¯)å:mÕ¤ˆµËn¯bõÆºŞOÏ»îíÊÈ7O§C•Å,ÿA<=ç—çƒ
+ªäáÆ?@Y¡“©<;åQSÖÛ¼ª+Q•:=$Ã£lpm|TŒ²ŞM¡QC‡ÚØHEEÙˆú°Èˆ²®õQ}I­8H¿n*e›c›æÊY™‡3…@&óœHFÇ0í,°³c˜ºó+ƒêÑ%Ûåsõ±×##³—K ¯B¯ª¬Ù¾oODÏÓO´ã­œNJÁŠŞ¯.T
+?1ÿsAs¿Rÿ
+;8å¦ã”ë6A4õJRd^ÉŠ	<÷õ×îæ`c«C¹ò½»Şßêwğ¼#—Äw°æ~¤:¦ÈMTˆ>	½X,¢DX@ŠªxVÙñäYz«$ÌæsÊUEàIBöÑ‘š†ÄÆ XŸ{ª2êû^zS¼¤<·¢[ìÍ4ƒ¾Á$55\ªHç!AµMËÅ
+SYŸmî®:)v4&ödÉf§‘iñFõ¼Z™iÖ©LPgÉB’tŠúŒ0Ö9ÂÃñ!9gQfêb–ìß Aß§Æ™…ÔËÈ—{*sÜaİwĞXtJdä†Ñüpø­ ]@w‰Dî-n xCË.>9§ñbÅñ¨ü8^ã÷ŞÂãæÎû])$4äŒ;ŸËš¦S"—†7î£ãÃ“Ã ÏÅûÑÏxnÍûJ[ª\\ÓÕĞ eÜÍ®‚{Ò““³©¼p ó4ÇKæû½õ8]Ó·8,È'§û£‹ÑÉGòV• ÅO¥#ËŠJJşopúâİzàzUA!Nd
+’Ó^>nƒ¶ä0eµ™‘[(`¹Ş3±Ùë60ŠC*h!ºù4B­×Î`uÊD‚ìR‘èB]^0+œŞú¨övrJ ŒmP$k™yÚV7)–ß6 QêŞÿP»•73\H3èw‘,ÇÌ«§Ù¶'IIÎÏÇšzòäşnÚıD¯&Ñôš&r£åG)ºD—¼CÑÍj-ÛARãwÈ"Ib]µÕ‚ÅH°ªã­Ú.d #õ$IËLŒœÁ@T7šBï m<Ì'Ik*¯qı‚MŠûµdiñuÍ[Î'ƒÿgm   åÕlD‚¼{Æ£å¶#gt…œİUqıPùÃ¶µ¡†{Vˆ÷ŞK7ë…x-Lƒ ßÔbB7ï‘ ;ÈƒØzkX3ö8ˆÚ‡³#"3"…lFuçn‡HâìJsµ£,Á_,×¿£Îê´-YMypzõ‹¦=Ì,#@x)£XÜ%rn»×{q‡0 Í]€·“=0HğÉ¹¿lÛŞIĞ@RIrGÃÙôøt1VI«”e‰«#ÃKc»ìyìÀåY¬nz.áhêU—{&„ÁJŠ÷$w[YEæÑ³«;øÊˆ”ŒuW“5ÇLÀÜÓñè¤Tı6cP1[›œ¸j¿“ÍV ŞÅz¥>Vƒ'ú…6}pÚ)Yf0™ì;^K„ôˆ3t J2“Ç"›C…NĞ® ¶­j‘…á¯eµå;Ê¹UN¶[Bc¹øÚÕªb/Ó#ÿí9Aµb` Zq/`‰Üfû¤VîğÃşáia“JÄ”N{53A\ŠÂWß$/«\¥,H>>ÔIÏ¡OÛBß)õ¼/¾(<ğ$]‚ŒòT§v—?G)ÁkQxİìY¨»ªX1„gN‘éy	Å“¼ÀëBÒl‹4ÆCùò.j 4uÅcëi‚}ñjl‚Dò®Ñ3û2mT·-AÆƒn‚Ùœ¼ûâÎÒ²{wqZàUN€;\vdÙº>çàÌ'€½¢¾`>%K¼îÀİµap‹·Æ®)É*J9 ]S¸Š×ÑŞC™ ï¼šr/Ps¨^²ÂÄœËë½ävƒñT¹W~!¥I}wí€1·à†òÎ0ÚN¡®Áb0àÍ]ˆ¡ˆ¾§¢¨¦ï5u0$º‘Hg[¦ò˜
+Æ–²'—§Y …V4› <ĞÒ»…à3Ä£­"…tEAt×gò«9ıâËûPWTî8,mÈPv	\PiYØY}Ö‹'…
+ä*l6cSXÂŠ\¡£]`îÜ!l‰¨ƒ<êÀú7çP*Ù"ÜD¯2°Q˜sñ´$:WŞôZµM‘Æ[Ù¯#i&Ğë"F!jQ¹İXr`ÉëLî75&×¨Âœx%/õY¤KÃk!}¶²B…nÚ#`Ï}UBÔ˜»*ø íO ‰]W=8»˜‘%b×ıÔÿ¼ë2yd‡îâU=ïMeaÙÜå­äGıƒv	rŒmğ{ÛÂµdËK7ÌÕÁ¥L‘ú%ÁKš¡º†WCì5ydíºëıyß
+§iïÊ¯*1Œ¯¥Ç]y99Cø	„@¬³«zBXyo§1Æsø·QA¶
+ÖÈ¯]†5¬Æz2ÉIuAOD5aO/ó«‰lÍÄ¶Ÿ‚_Á¥%G}‹P£÷M1¸N/ä¡C<ä;%°Õ¸Ñ«Šİ×oO§—FñB®TnŸ”Ğ|(Îz„z:ôÃ»s¹’ÕSÑ\ÍŠ#|¡¯‚–	÷/'Š	dó«¤»…-L‰¥
+F2Ë!O®ìgvkök×õô8]/ND
+Qús\>>:æ¥­½,ó„¸§1÷v-k¯	› ¢K¢ª¨v`‘8¿©jˆ€Iµ†ÕU	­Š^ƒÓşÆÊÚ¥Ü¡|Óx¥À­+I÷]	3ÿívÁ·Kë'æ®t„eñSÿ.â·
+6¯~#ã½cå2U €´ŠùÇB[ŠÒIyÆiñ†>~´/¾ÓuâYÂ˜sËq÷âéòŞuÜlöû}§’Ï‰åç¯pNéK›W(}:Cÿ¤e)¿j ?ˆh.KÖõŞêá¯:ÃôYY&H!B?ÀTXbµs»b°î«z^ViSQTKÚä^TÆÅº¬¤c;–ÇœJY†‘Y¡¿kä@õ¯#dq
+`8›‡‘¬˜6ÄæÁ#, óÚ¨Ñ—)•–¡ì)şM¶´¦âÑä3ô±u°€	ƒ¼ÿ7Ú`µO©·yÍşØ”Éh«Â+7€l™†-¼æİ!Nß•ÿ•DÎ·K•ò†xo9‘èÅNq¯Òê¼¦š1úÉBŞeVQûI.7EQxóÿ   ÿÿ ’ö¸
