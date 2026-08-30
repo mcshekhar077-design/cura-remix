@@ -5,20 +5,133 @@
       "description": "Emergency SOS alerts triggered via the 3-second hold Global Emergency SOS button.",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "maxLength": 128 },
-        "ticketNumber": { "type": "string", "maxLength": 64 },
-        "patientName": { "type": "string", "maxLength": 128 },
-        "phone": { "type": "string", "maxLength": 32 },
-        "holdDurationMs": { "type": "number" },
-        "triggerSource": { "type": "string", "maxLength": 256 },
-        "priority": { "type": "string", "maxLength": 32 },
-        "status": { "type": "string", "maxLength": 32 },
-        "createdAt": { "type": "string", "maxLength": 64 },
-        "location": { "type": "object" },
-        "notes": { "type": "array" },
-        "cancellationReason": { "type": "string", "maxLength": 256 }
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Unique identifier for the alert (auto-generated)"
+        },
+        "ticketNumber": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Human-readable ticket number (e.g., SOS-ER-1234)"
+        },
+        "patientId": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Reference to the patient document"
+        },
+        "patientName": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Patient's full name (denormalized for quick access)"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Patient's contact phone number"
+        },
+        "holdDurationMs": {
+          "type": "number",
+          "description": "Duration the SOS button was held (in milliseconds)"
+        },
+        "triggerSource": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Source of the trigger (e.g., 'Global Floating Action SOS Button')"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["CRITICAL_RED", "HIGH_ORANGE", "MEDIUM_YELLOW", "LOW_GREEN"],
+          "description": "Emergency priority level"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "acknowledged", "dispatched", "resolved", "cancelled"],
+          "description": "Current status of the alert"
+        },
+        "location": {
+          "type": "object",
+          "description": "Captured GPS coordinates and address payload"
+        },
+        "vitals": {
+          "type": "object",
+          "description": "Patient telemetry vital signs at trigger time"
+        },
+        "notes": {
+          "type": "array",
+          "description": "Notes added by medical staff or the patient"
+        },
+        "emergencyContacts": {
+          "type": "array",
+          "description": "Emergency contacts notified during SOS alert"
+        },
+        "assignedDoctor": {
+          "type": "object",
+          "description": "Assigned triage doctor details"
+        },
+        "assignedTeam": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Emergency team assigned (e.g., 'ER Team Alpha')"
+        },
+        "cancellationReason": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Reason for cancellation if status is 'cancelled'"
+        },
+        "responseTime": {
+          "type": "number",
+          "description": "Time from alert creation to acknowledgment (in milliseconds)"
+        },
+        "resolutionTime": {
+          "type": "number",
+          "description": "Time from alert creation to resolution (in milliseconds)"
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Alert creation timestamp"
+        },
+        "acknowledgedAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "When the alert was acknowledged"
+        },
+        "dispatchedAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "When the team was dispatched"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "When the alert was resolved"
+        },
+        "updatedAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Last update timestamp"
+        },
+        "createdBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "User ID who created the alert"
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "User ID who last updated the alert"
+        }
       },
-      "required": ["ticketNumber", "patientName", "phone", "status", "createdAt"]
+      "required": [
+        "ticketNumber",
+        "patientName",
+        "phone",
+        "status",
+        "priority",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {

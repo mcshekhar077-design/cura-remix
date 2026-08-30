@@ -13729,6 +13729,88 @@ Return strictly a JSON response with:
     return res.status(200).json({ success: true, alerts });
   });
 
+  // 7. Offline Sync Engine Endpoint
+  const offlineSyncStore: Array<{ deviceId: string; items: any[]; syncedAt: string }> = [];
+
+  app.post("/api/v1/offline-sync", express.json({ limit: "50mb" }), (req, res) => {
+    const { deviceId, items, offlineSince } = req.body;
+    if (!items || !Array.isArray(items)) {
+      return res.status(400).json({ success: false, error: "Items array is required" });
+    }
+
+    offlineSyncStore.push({
+      deviceId: deviceId || "unknown_device",
+      items,
+      syncedAt: new Date().toISOString()
+    });
+
+    return res.status(200).json({
+      success: true,
+      syncedCount: items.length,
+      timestamp: new Date().toISOString(),
+      offlineSince: offlineSince || null,
+      message: `Successfully processed and persisted ${items.length} offline item(s).`
+    });
+  });
+
+  app.get("/api/v1/offline-sync/history", (req, res) => {
+    return res.status(200).json({
+      success: true,
+      totalSyncSessions: offlineSyncStore.length,
+      history: offlineSyncStore.slice(-20)
+    });
+  });
+
+  // 8. Global Emergency SOS Endpoints
+  const sosAlertsStore: Record<string, any> = {};
+
+  app.post("/api/v1/emergency/sos", express.json(), (req, res) => {
+    const sosData = req.body;
+    if (!sosData || !sosData.id) {
+      return res.status(400).json({ success: false, error: "Invalid SOS payload" });
+    }
+
+    sosAlertsStore[sosData.id] = {
+      ...sosData,
+      status: "acknowledged",
+      serverReceivedAt: new Date().toISOString(),
+      notes: []
+    };
+
+    return res.status(200).json({
+      success: true,
+      alert: sosAlertsStore[sosData.id],
+      message: "🚨 Critical SOS Alert received and logged at ER Desk."
+    });
+  });
+
+  app.post("/api/v1/emergency/sos/:id/note", express.json(), (req, res) => {
+    const { id } = req.params;
+    const { note } = req.body;
+    if (!sosAlertsStore[id]) {
+      sosAlertsStore[id] = { id, status: "acknowledged", notes: [] };
+    }
+    if (!sosAlertsStore[id].notes) {
+      sosAlertsStore[id].notes = [];
+    }
+    sosAlertsStore[id].notes.push({
+      text: note,
+      timestamp: new Date().toISOString()
+    });
+    return res.status(200).json({ success: true, message: "Note added to SOS alert record." });
+  });
+
+  app.post("/api/v1/emergency/sos/:id/cancel", express.json(), (req, res) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+    if (sosAlertsStore[id]) {
+      sosAlertsStore[id].status = "cancelled";
+      sosAlertsStore[id].cancelReason = reason;
+      sosAlertsStore[id].cancelledAt = new Date().toISOString();
+    }
+    return res.status(200).json({ success: true, message: "SOS alert cancelled." });
+  });
+
   // Vite / static file serving middleware
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

@@ -9,6 +9,7 @@ import {
   Sparkles, 
   Check, 
   X, 
+  Menu,
   Phone, 
   Clock, 
   Calendar, 
@@ -19,6 +20,10 @@ import {
   Heart,
   Briefcase,
   ChevronRight,
+  ChevronDown,
+  LayoutGrid,
+  SlidersHorizontal,
+  Stethoscope,
   Database,
   Globe,
   User,
@@ -68,6 +73,7 @@ import RheumatologySuite from "./RheumatologySuite";
 import CriticalCareSuite from "./CriticalCareSuite";
 import GastroenterologySuite from "./GastroenterologySuite";
 import AnalyticsSuite from "./AnalyticsSuite";
+import DentistrySuite from "./DentistrySuite";
 import { PmjaySuite } from "./PmjaySuite";
 
 interface DoctorDashboardProps {
@@ -103,7 +109,7 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
   const [selectedHistoryIndices, setSelectedHistoryIndices] = useState<number[]>([]);
 
   // === COMMERCIAL SAAS STATES ===
-  const [activeTab, setActiveTab] = useState<"clinical" | "saas" | "frontoffice" | "enterprise" | "telemedicine" | "hims" | "intelligence" | "mental_health" | "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ai_core" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "analytics">("clinical");
+  const [activeTab, setActiveTab] = useState<"clinical" | "saas" | "frontoffice" | "enterprise" | "telemedicine" | "hims" | "intelligence" | "mental_health" | "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ai_core" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "analytics" | "dentistry" | "pmjay_api">("clinical");
   const [tenantConfig, setTenantConfig] = useState<any>(null);
   const [limits, setLimits] = useState<any>(null);
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
@@ -132,6 +138,71 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
   const [pmjayFetchError, setPmjayFetchError] = useState("");
   const [pmjayCustomIdInput, setPmjayCustomIdInput] = useState("PMJAY0000");
   const [pmjayFormatChoice, setPmjayFormatChoice] = useState<"pdf" | "json" | "xml">("pdf");
+
+  // === CONSOLIDATED HEADER NAVIGATION STATES ===
+  const [isSpecialtiesOpen, setIsSpecialtiesOpen] = useState(false);
+  const [isManagementOpen, setIsManagementOpen] = useState(false);
+  const [specialtyFilter, setSpecialtyFilter] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+
+  interface SpecialtyItem {
+    id: "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "dentistry" | "mental_health";
+    label: string;
+    icon: string;
+    badge: string;
+    color: string;
+    desc: string;
+  }
+
+  interface SpecialtyCategory {
+    category: string;
+    items: SpecialtyItem[];
+  }
+
+  const SPECIALTIES_CONFIG: SpecialtyCategory[] = [
+    {
+      category: "Medicine & Organ Systems",
+      items: [
+        { id: "cardiology", label: "Cardiology AI", icon: "❤️", badge: "ECG/Echo", color: "bg-rose-700", desc: "ECG, Echo, STEMI & Arrhythmia Analysis" },
+        { id: "neurology", label: "Neurology AI", icon: "🧠", badge: "AAN Brain", color: "bg-purple-700", desc: "Stroke, NIHSS, Seizure & Neuro Exam" },
+        { id: "gastroenterology", label: "Gastroenterology AI", icon: "🩺", badge: "ACG 2026", color: "bg-emerald-700", desc: "GI Bleed, Endoscopy & Liver Staging" },
+        { id: "nephrology", label: "Nephrology AI", icon: "🧪", badge: "KDIGO 2026", color: "bg-purple-700", desc: "eGFR, AKI/CKD & Dialysis Tracking" },
+        { id: "hematology", label: "Hematology AI", icon: "🩸", badge: "ASH 2026", color: "bg-red-700", desc: "CBC Smear, Coagulation & Anemia Protocol" },
+        { id: "rheumatology", label: "Rheumatology AI", icon: "🦴", badge: "ACR 2026", color: "bg-pink-700", desc: "Autoimmune, DAS28 & Biologics Staging" },
+      ]
+    },
+    {
+      category: "Surgical, Trauma & Critical Care",
+      items: [
+        { id: "emergency", label: "Emergency & ICU AI", icon: "🚑", badge: "ESI 2026", color: "bg-red-700", desc: "Triage, Code Blue & Resuscitation" },
+        { id: "critical_care", label: "Critical Care AI", icon: "⚡", badge: "SCCM 2026", color: "bg-red-700", desc: "Ventilator, SOFA Score & Sepsis Bundles" },
+        { id: "orthopedics", label: "Orthopedics AI", icon: "🦴", badge: "AO Trauma", color: "bg-blue-700", desc: "Fractures, ROM & Joint Replacement" },
+        { id: "ent", label: "ENT & Audiology AI", icon: "👂", badge: "AAO-HNS", color: "bg-purple-700", desc: "Audiogram, Endoscopy & Otoscopy" },
+        { id: "ophthalmology", label: "Ophthalmology AI", icon: "👁️", badge: "AAO 2026", color: "bg-blue-700", desc: "Fundus, Tonometry & Refraction AI" },
+      ]
+    },
+    {
+      category: "Specialized & Primary Care",
+      items: [
+        { id: "dentistry", label: "Dentistry & Odontogram", icon: "🦷", badge: "PERIO/3D", color: "bg-cyan-700", desc: "32-Tooth Chart, 6-Pt Perio & Radiographs" },
+        { id: "mental_health", label: "Psychiatry & Mind", icon: "🧠", badge: "DSM-5", color: "bg-purple-700", desc: "PHQ-9, GAD-7 & DSM-5 Diagnostic Criteria" },
+        { id: "pediatrics", label: "Pediatrics AI", icon: "👶", badge: "WHO/IAP", color: "bg-pink-700", desc: "Growth Charts, Immunization & Milestones" },
+        { id: "womens_health", label: "Women's Health AI", icon: "👩", badge: "OB-GYN", color: "bg-fuchsia-700", desc: "Antenatal, EDD, G/P Staging & Menstrual" },
+        { id: "dermatology", label: "Dermatology AI", icon: "☀️", badge: "AAD Dermpath", color: "bg-rose-700", desc: "Skin Lesions, ABCDE & Dermoscopy AI" },
+        { id: "oncology", label: "Oncology AI", icon: "🧬", badge: "NCCN Cancer", color: "bg-rose-700", desc: "TNM Staging, Chemotherapy & Genetics" },
+      ]
+    }
+  ];
+
+  const MANAGEMENT_ITEMS = [
+    { id: "intelligence" as const, label: "CURA Intelligence", icon: "🧠", badge: "ROI", desc: "AI Practice Yield, Diagnostics ROI & Efficiency" },
+    { id: "analytics" as const, label: "Analytics & Reporting Hub", icon: "📊", badge: "REAL-TIME", desc: "Turnaround times, clinical audit charts & census" },
+    { id: "ai_core" as const, label: "Universal AI Core", icon: "🧠", badge: "Router v3", desc: "Multimodal Gemini 2.5 routing & clinical KB" },
+    { id: "saas" as const, label: "SaaS Control Center", icon: "⚙️", badge: "ADMIN", desc: "Tenancy quotas, tier upgrades & clinic billing" },
+    { id: "enterprise" as const, label: "Enterprise & Security", icon: "🛡️", badge: "COMPLIANCE", desc: "DPDP compliance, immutable audit trails & ABDM" },
+    { id: "pmjay_api" as const, label: "PM-JAY API Setu", icon: "🇮🇳", badge: "AYUSHMAN", desc: "Ayushman Bharat National Health Claims Registry" },
+  ];
 
   const fetchPatientPmjayDetails = async (patientId: string, pmjayIdToFetch?: string) => {
     const idToUse = (pmjayIdToFetch || pmjayCustomIdInput || "PMJAY0000").trim().toUpperCase();
@@ -2303,7 +2374,8 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
       )}
 
       {/* HEADER BAR */}
-      <header className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row gap-4 justify-between items-center shrink-0 z-10 shadow-sm shadow-slate-100">
+      <header className="bg-white border-b border-slate-100 px-4 sm:px-6 py-3 sm:py-3.5 flex justify-between items-center shrink-0 z-30 shadow-sm shadow-slate-100 sticky top-0">
+        {/* Left Branding */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 cursor-pointer" onClick={onBackToLanding}>
             {tenantConfig?.branding?.logoUrl ? (
@@ -2324,13 +2396,13 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
               {tenantConfig?.branding?.clinicName ? tenantConfig.branding.clinicName.split(" ")[0] : "CURA"}<span className="text-red-600">.</span>
             </span>
           </div>
-          <span className="h-4 w-[1px] bg-slate-200 mx-2"></span>
-          <span className="text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5">
+          <span className="h-4 w-[1px] bg-slate-200 mx-1 hidden sm:inline-block"></span>
+          <span className="text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wider hidden md:flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block pulse-dot"></span> 
             {tenantConfig?.branding?.clinicName || "CURA Healthcare"} EMR Terminal
           </span>
           {tenantConfig?.tier && (
-            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border hidden md:inline-block ${
+            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border hidden lg:inline-block ${
               tenantConfig.tier === "trial" 
                 ? "bg-amber-50 border-amber-200 text-amber-700" 
                 : tenantConfig.tier === "solo-clinic"
@@ -2344,371 +2416,361 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
           )}
         </div>
 
-        {/* WORKSPACE & SAAS CONTROLS TAB SWITCHER */}
-        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+        {/* Current Active Workspace Tag on Mobile/Tablet */}
+        <div className="flex xl:hidden items-center gap-1.5">
+          {(() => {
+            let activeIcon = "🩺";
+            let activeName = "Clinical Practice";
+            if (activeTab === "frontoffice") { activeIcon = "🛎️"; activeName = "Front Office"; }
+            else if (activeTab === "telemedicine") { activeIcon = "📹"; activeName = "Telemedicine"; }
+            else if (activeTab === "hims") { activeIcon = "🏥"; activeName = "Hospital IMS"; }
+            else {
+              const spec = SPECIALTIES_CONFIG.flatMap(c => c.items).find(i => i.id === activeTab);
+              if (spec) { activeIcon = spec.icon; activeName = spec.label; }
+              else {
+                const mgmt = MANAGEMENT_ITEMS.find(i => i.id === activeTab);
+                if (mgmt) { activeIcon = mgmt.icon; activeName = mgmt.label; }
+              }
+            }
+            return (
+              <div 
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2.5 py-1 rounded-xl cursor-pointer text-xs font-bold text-slate-800 transition-colors"
+                title="Tap to switch module"
+              >
+                <span>{activeIcon}</span>
+                <span className="truncate max-w-[110px] sm:max-w-[180px]">{activeName}</span>
+                <ChevronDown className="h-3 w-3 text-slate-400" />
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* DESKTOP CONSOLIDATED WORKSPACE & SAAS CONTROLS TAB SWITCHER */}
+        <div className="hidden xl:flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 relative">
+          {/* Core Primary Clinical Tabs */}
           <button
             onClick={() => {
               setActiveTab("clinical");
               setErrorAlert(null);
+              setIsSpecialtiesOpen(false);
+              setIsManagementOpen(false);
             }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${
+            className={`text-xs font-bold px-3.5 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === "clinical" 
-                ? "bg-white text-slate-800 shadow-sm" 
-                : "text-slate-500 hover:text-slate-800"
+                ? "bg-white text-slate-800 shadow-sm font-black" 
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            🩺 Clinical Practice
+            🩺 <span>Clinical Practice</span>
           </button>
+          
           <button
             onClick={() => {
               setActiveTab("frontoffice");
               setErrorAlert(null);
               fetchAppointments();
+              setIsSpecialtiesOpen(false);
+              setIsManagementOpen(false);
             }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${
+            className={`text-xs font-bold px-3.5 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === "frontoffice" 
-                ? "bg-white text-slate-800 shadow-sm" 
-                : "text-slate-500 hover:text-slate-800"
+                ? "bg-white text-slate-800 shadow-sm font-black" 
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            🛎️ Front Office Terminal
+            🛎️ <span>Front Office</span>
           </button>
+          
           <button
             onClick={() => {
               setActiveTab("telemedicine");
               setErrorAlert(null);
               fetchAppointments();
+              setIsSpecialtiesOpen(false);
+              setIsManagementOpen(false);
             }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
+            className={`text-xs font-bold px-3.5 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === "telemedicine" 
-                ? "bg-white text-slate-800 shadow-sm" 
-                : "text-slate-500 hover:text-slate-800"
+                ? "bg-white text-slate-800 shadow-sm font-black" 
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            📹 Telemedicine Center
+            📹 <span>Telemedicine</span>
           </button>
-          <button
-            onClick={() => {
-              setActiveTab("saas");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "saas" 
-                ? "bg-white text-slate-800 shadow-sm" 
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            ⚙️ SaaS Control Center
-            {tenantConfig?.tier === "trial" && (
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 inline-block animate-pulse"></span>
-            )}
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("enterprise");
-              setErrorAlert(null);
-              fetchEnterpriseStates();
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "enterprise" 
-                ? "bg-white text-slate-800 shadow-sm" 
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            🛡️ Enterprise & Security
-          </button>
+          
           <button
             onClick={() => {
               setActiveTab("hims");
               setErrorAlert(null);
               fetchHimsStates();
+              setIsSpecialtiesOpen(false);
+              setIsManagementOpen(false);
             }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
+            className={`text-xs font-bold px-3.5 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === "hims" 
-                ? "bg-white text-slate-800 shadow-sm" 
-                : "text-slate-500 hover:text-slate-800"
+                ? "bg-white text-slate-800 shadow-sm font-black" 
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            🏥 Hospital IMS Suite
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("intelligence");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "intelligence" 
-                ? "bg-indigo-600 text-white shadow-sm" 
-                : "text-indigo-600 hover:text-indigo-800"
-            }`}
-          >
-            🧠 CURA Intelligence
-            <span className="bg-amber-400 text-slate-900 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">ROI</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("mental_health");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "mental_health" 
-                ? "bg-purple-700 text-white shadow-sm" 
-                : "text-purple-700 hover:text-purple-900"
-            }`}
-          >
-            🧠 Psychiatry & Mind
-            <span className="bg-purple-300 text-purple-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">DSM-5</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("cardiology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "cardiology" 
-                ? "bg-rose-700 text-white shadow-sm" 
-                : "text-rose-700 hover:text-rose-900"
-            }`}
-          >
-            ❤️ Cardiology AI
-            <span className="bg-rose-300 text-rose-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">ECG/Echo</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("pediatrics");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "pediatrics" 
-                ? "bg-pink-700 text-white shadow-sm" 
-                : "text-pink-700 hover:text-pink-900"
-            }`}
-          >
-            👶 Pediatrics AI
-            <span className="bg-pink-300 text-pink-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">WHO/IAP</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("womens_health");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "womens_health" 
-                ? "bg-fuchsia-700 text-white shadow-sm" 
-                : "text-fuchsia-700 hover:text-fuchsia-900"
-            }`}
-          >
-            👩 Women&apos;s Health AI
-            <span className="bg-fuchsia-300 text-fuchsia-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">OB-GYN</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("orthopedics");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "orthopedics" 
-                ? "bg-blue-700 text-white shadow-sm" 
-                : "text-blue-700 hover:text-blue-900"
-            }`}
-          >
-            🦴 Orthopedics AI
-            <span className="bg-blue-300 text-blue-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">AO Trauma</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("dermatology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "dermatology" 
-                ? "bg-rose-700 text-white shadow-sm" 
-                : "text-rose-700 hover:text-rose-900"
-            }`}
-          >
-            ☀️ Dermatology AI
-            <span className="bg-rose-300 text-rose-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">AAD Dermpath</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("neurology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "neurology" 
-                ? "bg-purple-700 text-white shadow-sm" 
-                : "text-purple-700 hover:text-purple-900"
-            }`}
-          >
-            🧠 Neurology AI
-            <span className="bg-purple-300 text-purple-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">AAN Brain</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("oncology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "oncology" 
-                ? "bg-rose-700 text-white shadow-sm" 
-                : "text-rose-700 hover:text-rose-900"
-            }`}
-          >
-            🧬 Oncology AI
-            <span className="bg-rose-300 text-rose-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">NCCN Cancer</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("emergency");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "emergency" 
-                ? "bg-red-700 text-white shadow-sm" 
-                : "text-red-700 hover:text-red-900"
-            }`}
-          >
-            🚑 Emergency & ICU AI
-            <span className="bg-red-300 text-red-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">ESI 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("ent");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "ent" 
-                ? "bg-purple-700 text-white shadow-sm" 
-                : "text-purple-700 hover:text-purple-900"
-            }`}
-          >
-            👂 ENT & Audiology AI
-            <span className="bg-purple-300 text-purple-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">AAO-HNS</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("ophthalmology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "ophthalmology" 
-                ? "bg-blue-700 text-white shadow-sm" 
-                : "text-blue-700 hover:text-blue-900"
-            }`}
-          >
-            👁️ Ophthalmology AI
-            <span className="bg-blue-300 text-blue-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">AAO 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("hematology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "hematology" 
-                ? "bg-red-700 text-white shadow-sm" 
-                : "text-red-700 hover:text-red-900"
-            }`}
-          >
-            🩸 Hematology AI
-            <span className="bg-red-300 text-red-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">ASH 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("nephrology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "nephrology" 
-                ? "bg-purple-700 text-white shadow-sm" 
-                : "text-purple-700 hover:text-purple-900"
-            }`}
-          >
-            🧪 Nephrology AI
-            <span className="bg-purple-300 text-purple-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">KDIGO 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("rheumatology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "rheumatology" 
-                ? "bg-pink-700 text-white shadow-sm" 
-                : "text-pink-700 hover:text-pink-900"
-            }`}
-          >
-            🦴 Rheumatology AI
-            <span className="bg-pink-300 text-pink-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">ACR 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("critical_care");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "critical_care" 
-                ? "bg-red-700 text-white shadow-sm" 
-                : "text-red-700 hover:text-red-900"
-            }`}
-          >
-            ⚡ Critical Care AI
-            <span className="bg-red-300 text-red-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">SCCM 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("gastroenterology");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "gastroenterology" 
-                ? "bg-emerald-700 text-white shadow-sm" 
-                : "text-emerald-700 hover:text-emerald-900"
-            }`}
-          >
-            🩺 Gastroenterology AI
-            <span className="bg-emerald-300 text-emerald-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">ACG 2026</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("analytics");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "analytics" 
-                ? "bg-blue-700 text-white shadow-sm" 
-                : "text-blue-700 hover:text-blue-900"
-            }`}
-          >
-            📊 Analytics & Reporting Hub
-            <span className="bg-blue-300 text-blue-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">REAL-TIME</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("ai_core");
-              setErrorAlert(null);
-            }}
-            className={`text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === "ai_core" 
-                ? "bg-cyan-700 text-white shadow-sm" 
-                : "text-cyan-700 hover:text-cyan-900"
-            }`}
-          >
-            🧠 Universal AI Core
-            <span className="bg-cyan-300 text-cyan-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">Router v3</span>
+            🏥 <span>Hospital IMS</span>
           </button>
 
-          <button
-            onClick={() => setIsTourOpen(true)}
-            className="text-xs font-black px-3.5 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-indigo-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white shadow-md shadow-purple-500/20 transition-all cursor-pointer flex items-center gap-1.5 border border-purple-400/30"
-            title="Launch CURA Autonomous Self-Demo Product Tour"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
-            <span>🎥 Self-Demo Video</span>
-          </button>
+          <span className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+          {/* 17 SPECIALTY AI SUITES DROPDOWN */}
+          <div className="relative">
+            {(() => {
+              const activeSpec = SPECIALTIES_CONFIG.flatMap(c => c.items).find(item => item.id === activeTab);
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSpecialtiesOpen(!isSpecialtiesOpen);
+                    setIsManagementOpen(false);
+                  }}
+                  className={`text-xs font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeSpec
+                      ? "bg-slate-900 text-white shadow-sm font-black border border-slate-700"
+                      : isSpecialtiesOpen
+                      ? "bg-slate-200 text-slate-900"
+                      : "text-slate-700 hover:text-slate-950 hover:bg-slate-200/70"
+                  }`}
+                >
+                  {activeSpec ? (
+                    <>
+                      <span>{activeSpec.icon}</span>
+                      <span className="max-w-[140px] truncate">{activeSpec.label}</span>
+                      <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase">
+                        {activeSpec.badge}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <LayoutGrid className="h-3.5 w-3.5 text-cyan-600" />
+                      <span>Specialty AI Suites</span>
+                      <span className="bg-slate-200 text-slate-700 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full">
+                        17
+                      </span>
+                    </>
+                  )}
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isSpecialtiesOpen ? 'rotate-180 text-cyan-400' : 'text-slate-400'}`} />
+                </button>
+              );
+            })()}
+
+            {/* Specialties Popover Modal / Flyout Menu */}
+            {isSpecialtiesOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40 bg-slate-950/20 backdrop-blur-[1px]" 
+                  onClick={() => setIsSpecialtiesOpen(false)} 
+                />
+                <div className="absolute top-full left-0 mt-2 z-50 w-[740px] max-w-[90vw] bg-slate-950/98 backdrop-blur-2xl border border-slate-800 text-slate-100 rounded-3xl shadow-2xl p-5 space-y-4 animate-scale-up">
+                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-gradient-to-tr from-cyan-600 to-sky-500 rounded-xl text-white shadow-md">
+                        <LayoutGrid className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black text-white flex items-center gap-2">
+                          Specialty AI Clinical Suites
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-full">
+                            17 Clinical Modules
+                          </span>
+                        </h3>
+                        <p className="text-[11px] text-slate-400">
+                          Select an anatomical or diagnostic specialty to activate calibrated EMR tools & AI models
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Search filter */}
+                    <div className="relative w-56">
+                      <Search className="h-3.5 w-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={specialtyFilter}
+                        onChange={(e) => setSpecialtyFilter(e.target.value)}
+                        placeholder="Search specialty..."
+                        className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  {/* Grouped Specialties Grid */}
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                    {SPECIALTIES_CONFIG.map((group) => {
+                      const filteredItems = group.items.filter(item => 
+                        item.label.toLowerCase().includes(specialtyFilter.toLowerCase()) ||
+                        item.desc.toLowerCase().includes(specialtyFilter.toLowerCase()) ||
+                        item.badge.toLowerCase().includes(specialtyFilter.toLowerCase())
+                      );
+                      if (filteredItems.length === 0) return null;
+
+                      return (
+                        <div key={group.category} className="space-y-2">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono">
+                            {group.category} ({filteredItems.length})
+                          </span>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+                            {filteredItems.map((item) => {
+                              const isSelected = activeTab === item.id;
+                              return (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveTab(item.id);
+                                    setErrorAlert(null);
+                                    setIsSpecialtiesOpen(false);
+                                    setSpecialtyFilter("");
+                                  }}
+                                  className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between group ${
+                                    isSelected
+                                      ? "bg-cyan-950/80 border-cyan-500/70 shadow-lg shadow-cyan-950/50"
+                                      : "bg-slate-900/90 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700"
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-base">{item.icon}</span>
+                                      <span className={`text-xs font-bold leading-tight ${isSelected ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>
+                                        {item.label}
+                                      </span>
+                                    </div>
+                                    <span className={`text-[8px] font-mono font-black px-1.5 py-0.5 rounded-full uppercase shrink-0 ${
+                                      isSelected
+                                        ? "bg-cyan-500 text-slate-950"
+                                        : "bg-slate-800 text-cyan-300 border border-slate-700"
+                                    }`}>
+                                      {item.badge}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-400 line-clamp-1 leading-normal">
+                                    {item.desc}
+                                  </p>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <span className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+          {/* 6 OPERATIONS & INTELLIGENCE SUITES DROPDOWN */}
+          <div className="relative">
+            {(() => {
+              const activeMgmt = MANAGEMENT_ITEMS.find(item => item.id === activeTab);
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsManagementOpen(!isManagementOpen);
+                    setIsSpecialtiesOpen(false);
+                  }}
+                  className={`text-xs font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeMgmt
+                      ? "bg-indigo-900 text-white shadow-sm font-black border border-indigo-700"
+                      : isManagementOpen
+                      ? "bg-slate-200 text-slate-900"
+                      : "text-indigo-700 hover:text-indigo-900 hover:bg-slate-200/70"
+                  }`}
+                >
+                  {activeMgmt ? (
+                    <>
+                      <span>{activeMgmt.icon}</span>
+                      <span className="max-w-[130px] truncate">{activeMgmt.label}</span>
+                      <span className="bg-amber-400 text-slate-950 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase">
+                        {activeMgmt.badge}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <SlidersHorizontal className="h-3.5 w-3.5 text-indigo-600" />
+                      <span>Intelligence & Ops</span>
+                      <span className="bg-slate-200 text-slate-700 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full">
+                        6
+                      </span>
+                    </>
+                  )}
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isManagementOpen ? 'rotate-180 text-indigo-400' : 'text-slate-400'}`} />
+                </button>
+              );
+            })()}
+
+            {/* Management Popover Menu */}
+            {isManagementOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40 bg-slate-950/20 backdrop-blur-[1px]" 
+                  onClick={() => setIsManagementOpen(false)} 
+                />
+                <div className="absolute top-full right-0 md:left-0 mt-2 z-50 w-[380px] max-w-[90vw] bg-slate-950/98 backdrop-blur-2xl border border-slate-800 text-slate-100 rounded-3xl shadow-2xl p-4 space-y-2.5 animate-scale-up">
+                  <div className="border-b border-slate-800/80 pb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
+                      <SlidersHorizontal className="h-3.5 w-3.5 text-indigo-400" /> Operations, AI & Security
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono">6 Modules</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {MANAGEMENT_ITEMS.map((item) => {
+                      const isSelected = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setErrorAlert(null);
+                            if (item.id === "enterprise") fetchEnterpriseStates();
+                            setIsManagementOpen(false);
+                          }}
+                          className={`w-full p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 group ${
+                            isSelected
+                              ? "bg-indigo-950/80 border-indigo-500/70 shadow-md shadow-indigo-950/50"
+                              : "bg-slate-900/80 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700"
+                          }`}
+                        >
+                          <span className="text-xl mt-0.5">{item.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-1 mb-0.5">
+                              <span className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>
+                                {item.label}
+                              </span>
+                              <span className={`text-[8px] font-mono font-black px-1.5 py-0.5 rounded-full uppercase ${
+                                isSelected
+                                  ? "bg-amber-400 text-slate-950"
+                                  : "bg-slate-800 text-indigo-300 border border-slate-700"
+                              }`}>
+                                {item.badge}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 line-clamp-1">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* DESKTOP CONTROLS */}
+        <div className="hidden xl:flex items-center gap-3">
           {/* 🛡️ DPDP RBAC Active Role Switcher */}
           <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 p-1.5 rounded-full shadow-sm">
             <span className="text-[9px] font-black text-slate-700 uppercase px-2 tracking-wider">Active Role:</span>
@@ -2752,6 +2814,15 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
             </select>
           </div>
 
+          <button
+            onClick={() => setIsTourOpen(true)}
+            className="text-xs font-black px-3.5 py-2 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white shadow-md shadow-purple-500/20 transition-all cursor-pointer flex items-center gap-1.5 border border-purple-400/30"
+            title="Launch CURA Autonomous Self-Demo Product Tour"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
+            <span>Tour Video</span>
+          </button>
+
           <button 
             onClick={onBackToLanding}
             className="text-xs font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 px-4 py-2.5 rounded-full transition-all"
@@ -2759,7 +2830,331 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
             ← Exit Terminal
           </button>
         </div>
+
+        {/* MOBILE UNIFIED HAMBURGER MENU BUTTON & QUICK ACTIONS */}
+        <div className="flex xl:hidden items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsTourOpen(true)}
+            className="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors"
+            title="Launch Product Tour"
+          >
+            <Sparkles className="h-4 w-4 text-purple-600" />
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer border border-slate-800"
+            aria-label="Open Unified Navigation Menu"
+          >
+            <Menu className="h-5 w-5 text-cyan-400" />
+            <span className="text-xs font-bold font-sans">Menu</span>
+          </button>
+        </div>
       </header>
+
+      {/* UNIFIED MOBILE HAMBURGER NAVIGATION DRAWER */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 z-50 flex justify-end">
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm"
+            />
+
+            {/* Sliding Drawer Container */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 26, stiffness: 280 }}
+              className="relative z-50 w-full max-w-md bg-slate-950 text-slate-100 h-full flex flex-col shadow-2xl border-l border-slate-800 overflow-hidden"
+            >
+              {/* Drawer Top Header */}
+              <div className="p-4 border-b border-slate-800/90 flex items-center justify-between bg-slate-900/95 backdrop-blur shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-gradient-to-tr from-cyan-600 to-sky-500 rounded-xl text-white shadow-md">
+                    <Heart className="h-4 w-4 fill-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black text-white flex items-center gap-1.5">
+                      {tenantConfig?.branding?.clinicName || "CURA Healthcare"}
+                    </h2>
+                    <p className="text-[10px] text-slate-400 font-mono">
+                      Unified Navigation & Specialty AI Suites
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Close Menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Drawer Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-5">
+                {/* Instant Search Across All Modules */}
+                <div className="relative">
+                  <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={mobileSearchQuery}
+                    onChange={(e) => setMobileSearchQuery(e.target.value)}
+                    placeholder="Search 23+ clinical & operational modules..."
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
+                  />
+                  {mobileSearchQuery && (
+                    <button 
+                      onClick={() => setMobileSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Practitioner Role & Specialization Mode Controls */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 space-y-2.5">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono flex items-center justify-between">
+                    <span>Practitioner Profile & System</span>
+                    <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                      Online EMR
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[9px] font-bold text-slate-400 block mb-1">Active Role</label>
+                      <select
+                        value={activeUserRole}
+                        onChange={(e) => updateRbacRole(e.target.value as any)}
+                        className="w-full text-xs font-bold bg-slate-950 border border-slate-700 rounded-xl py-1.5 px-2.5 text-white focus:outline-none focus:border-cyan-500 cursor-pointer"
+                      >
+                        <option value="doctor">🩺 Doctor</option>
+                        <option value="receptionist">🛎️ Receptionist</option>
+                        <option value="compliance">🛡️ Compliance (DPO)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-bold text-slate-400 block mb-1">Medical Mode</label>
+                      <select
+                        value={medicalSystem}
+                        onChange={(e) => {
+                          const sys = e.target.value as any;
+                          setMedicalSystem(sys);
+                          setSuccessMsg(`Switched terminal mode to ${sys.toUpperCase()}.`);
+                          setTimeout(() => setSuccessMsg(null), 4000);
+                        }}
+                        className="w-full text-xs font-bold bg-slate-950 border border-slate-700 rounded-xl py-1.5 px-2.5 text-white focus:outline-none focus:border-cyan-500 cursor-pointer"
+                      >
+                        <option value="allopathy">🩺 Allopathy</option>
+                        <option value="ayurveda">🌿 Ayurveda</option>
+                        <option value="homeopathy">🌸 Homeopathy</option>
+                        <option value="unani">🧪 Unani</option>
+                        <option value="siddha">🧬 Siddha</option>
+                        <option value="yoga">🧘 Naturopathy</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 1: Core Primary Workstations (4) */}
+                <div className="space-y-2">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono flex items-center justify-between">
+                    <span>Core Workstations</span>
+                    <span className="text-slate-500">4 Modules</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: "clinical" as const, label: "Clinical Practice", icon: "🩺", desc: "Patient chart & consult" },
+                      { id: "frontoffice" as const, label: "Front Office", icon: "🛎️", desc: "Appointments & billing" },
+                      { id: "telemedicine" as const, label: "Telemedicine", icon: "📹", desc: "Remote video consults" },
+                      { id: "hims" as const, label: "Hospital IMS", icon: "🏥", desc: "Wards, IPD & pharmacy" },
+                    ].filter(item => 
+                      !mobileSearchQuery || 
+                      item.label.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+                      item.desc.toLowerCase().includes(mobileSearchQuery.toLowerCase())
+                    ).map(item => {
+                      const isSelected = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setErrorAlert(null);
+                            if (item.id === "frontoffice" || item.id === "telemedicine") fetchAppointments();
+                            if (item.id === "hims") fetchHimsStates();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                            isSelected
+                              ? "bg-cyan-950 border-cyan-500 text-white shadow-lg shadow-cyan-950/60"
+                              : "bg-slate-900/90 border-slate-800 hover:bg-slate-850 hover:border-slate-700 text-slate-300"
+                          }`}
+                        >
+                          <div className="text-xl mb-1">{item.icon}</div>
+                          <div className="text-xs font-black text-white">{item.label}</div>
+                          <div className="text-[10px] text-slate-400 leading-tight">{item.desc}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section 2: 17 Specialty AI Clinical Suites */}
+                <div className="space-y-3">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono flex items-center justify-between">
+                    <span>Specialty AI Clinical Suites</span>
+                    <span className="text-cyan-400 font-bold">17 Modules</span>
+                  </div>
+
+                  {SPECIALTIES_CONFIG.map((group) => {
+                    const filteredItems = group.items.filter(item =>
+                      item.label.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+                      item.desc.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+                      item.badge.toLowerCase().includes(mobileSearchQuery.toLowerCase())
+                    );
+                    if (filteredItems.length === 0) return null;
+
+                    return (
+                      <div key={group.category} className="space-y-1.5">
+                        <div className="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                          {group.category}
+                        </div>
+                        <div className="space-y-1">
+                          {filteredItems.map(item => {
+                            const isSelected = activeTab === item.id;
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => {
+                                  setActiveTab(item.id);
+                                  setErrorAlert(null);
+                                  setIsMobileMenuOpen(false);
+                                }}
+                                className={`w-full p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                                  isSelected
+                                    ? "bg-cyan-950/80 border-cyan-500/80 shadow-md text-white"
+                                    : "bg-slate-900/60 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700 text-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className="text-lg shrink-0">{item.icon}</span>
+                                  <div className="min-w-0">
+                                    <div className="text-xs font-bold text-white truncate">{item.label}</div>
+                                    <div className="text-[10px] text-slate-400 truncate">{item.desc}</div>
+                                  </div>
+                                </div>
+                                <span className={`text-[8px] font-mono font-black px-1.5 py-0.5 rounded-full uppercase shrink-0 ${
+                                  isSelected 
+                                    ? "bg-cyan-500 text-slate-950" 
+                                    : "bg-slate-800 text-cyan-300 border border-slate-700"
+                                }`}>
+                                  {item.badge}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Section 3: Operations & Intelligence (6) */}
+                <div className="space-y-2">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono flex items-center justify-between">
+                    <span>Operations, Intelligence & Security</span>
+                    <span className="text-indigo-400 font-bold">6 Modules</span>
+                  </div>
+
+                  <div className="space-y-1">
+                    {MANAGEMENT_ITEMS.filter(item =>
+                      item.label.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+                      item.desc.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+                      item.badge.toLowerCase().includes(mobileSearchQuery.toLowerCase())
+                    ).map(item => {
+                      const isSelected = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setErrorAlert(null);
+                            if (item.id === "enterprise") fetchEnterpriseStates();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className={`w-full p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                            isSelected
+                              ? "bg-indigo-950/80 border-indigo-500/80 shadow-md text-white"
+                              : "bg-slate-900/60 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700 text-slate-300"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="text-lg shrink-0">{item.icon}</span>
+                            <div className="min-w-0">
+                              <div className="text-xs font-bold text-white truncate">{item.label}</div>
+                              <div className="text-[10px] text-slate-400 truncate">{item.desc}</div>
+                            </div>
+                          </div>
+                          <span className={`text-[8px] font-mono font-black px-1.5 py-0.5 rounded-full uppercase shrink-0 ${
+                            isSelected 
+                              ? "bg-amber-400 text-slate-950" 
+                              : "bg-slate-800 text-indigo-300 border border-slate-700"
+                          }`}>
+                            {item.badge}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Drawer Bottom Actions */}
+              <div className="p-4 border-t border-slate-800/90 bg-slate-900/95 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsTourOpen(true);
+                  }}
+                  className="flex-1 py-2.5 px-3 bg-purple-900/50 hover:bg-purple-900/80 border border-purple-700/60 text-purple-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+                  <span>Tour Video</span>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onBackToLanding();
+                  }}
+                  className="flex-1 py-2.5 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <span>← Exit Terminal</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* DASHBOARD CONTENT AREA */}
       <div className="flex-1 flex overflow-hidden">
@@ -6620,6 +7015,13 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
         ) : activeTab === "analytics" ? (
           <div className="flex-1 overflow-y-auto">
             <AnalyticsSuite />
+          </div>
+        ) : activeTab === "dentistry" ? (
+          <div className="flex-1 overflow-y-auto">
+            <DentistrySuite 
+              patientName={selectedPatient ? selectedPatient.name : "Rahul Saxena"}
+              onBackToLanding={() => setActiveTab("clinical")}
+            />
           </div>
         ) : activeTab === "ai_core" ? (
           <div className="flex-1 overflow-y-auto">
