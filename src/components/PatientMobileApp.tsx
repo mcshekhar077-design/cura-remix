@@ -9888,15 +9888,120 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                      "р░Чр▒Лр░кр▒Нр░пр░др░╛ р░ир▒Лр░Яр▒Ар░╕р▒Б (р░╕р▒Жр░Хр▒Нр░╖р░ир▒Н 5, DPDP р░Ър░Яр▒Нр░Яр░В)"}
                   </span>
                 </h5>
-                <p className="text-slate-350 font-medium">
+                <p className="text-slate-300 font-medium">
                   {consentLang === "en" ? "Under the Digital Personal Data Protection (DPDP) Act, 2023, we collect your vital telemetries, clinical scan uploads, and medical history solely to provide telemedicine, RMP diagnosis support, and automated emergency alerts. Your data is stored securely in row-level isolated sandboxes encrypted with AES-256 and is not shared with third parties without your explicit opt-in." :
-                   consentLang === "hi" ? "рдбрд┐рдЬрд┐рдЯрд▓ рд╡реНрдпрдХреНрддрд┐рдЧрдд рдбреЗрдЯрд╛ рд╕рдВрд░рдХреНрд╖рдг (DPDP) рдЕрдзрд┐рдирд┐рдпрдо, 2023 рдХреЗ рддрд╣рдд, рд╣рдо рдЖрдкрдХреА рдЯреЗрд▓реАрдореЗрдбрд┐рд╕рд┐рди, рдбреЙрдХреНрдЯрд░ рдирд┐рджрд╛рди рд╕рд╣рд╛рдпрддрд╛ рдФрд░ рдЖрдкрд╛рддрдХрд╛рд▓реАрди рдЕрд▓рд░реНрдЯ рдкреНрд░рджрд╛рди рдХрд░рдиреЗ рдХреЗ рд▓рд┐рдП рдЖрдкрдХреЗ рдорд╣рддреНрд╡рдкреВрд░реНрдг рдЯреЗрд▓реАрдореЗрдЯреНрд░реА, рдиреИрджрд╛рдирд┐рдХ рд╕реНрдХреИрди рдФрд░ рдЪрд┐рдХрд┐рддреНрд╕рд╛ рдЗрддрд┐рд╣рд╛рд╕ рдХреЛ рдПрдХрддреНрд░ рдХрд░рддреЗ рд╣реИрдВреxЬмX_o█╚ўзШ
-E`BIЦгыЭk∙р8iz@юb╪N_В ╖&╫kК$╕K╦В╧@ртE·fjХЛ42}=уr/ЎWсGщь,)╤"i%EЇ@.wfw;~;л─Гёр]<8ОЧ°ё&>=Кп╒╟╩¤г╤№ФьЇ_я▒7ЬRыЇ0D$y~НWё` кыЇ9NзUТ1╪ё#йб■oёщ3нЙнЧёщаЛ3Р ЩЮ+╕+2╖нV*ТUр+и─├╫ёЁ*■D╧╫ё┘+ъ∙ёЁ?$xGВw#-ЛтсE|v$╣T]gЗёЁШ┌щ╧▐[╗╖6ЗZ'ЩЖ╪╕НzcGjZё8>{!!i┐P`Д!╡5┌z&CЖёЁЬf=зхЗг▐И╛$╙╨.PЁГнfИЁукеф'┤Ы+ЁКЮ/i' ┼╨И_тс?╡L╧Юю$Y}3№█HЕ▐c@Z┌╘┘е╧}_╟г┌╕┴┐ыVK▄\Йг7qtG?╤єu¤Я#Ош_qtG╟╘Р°GlАq~D║пQФк№G ╣.:Q
-к╒Юз~Л▐QЙ.йБ2╥|бVVkйнA╜зч[НhH·W
-╘∙бF°2О■нqтў
-e·В╞в├в▀h║Ьд3╙boї<8ю╣ЪG	ЮУ╥ў6U╜╥Л_жєGЄЇЛЮЗ·уYмўщрУt╦ЧzKz╥P│зр▐з┐╘SW+9╧-╒№хЩ╔.╦▐]ЮЩш▌п}цЖ`-р█<ро╔a╙k╖.р│┌ффK8Шт[╓хнКЁЩ╔Н╛▒ ╛4Х╔eq@зЩ╒Ч|OOцы■▐S╪Ў\il9╠▄ъУ▄╕SпCш√<0Щр █n█ш┘▓▓ЬБыЩ\Ф┴кf#▒Tы4єr√O
-b}vx*[H/шotXАSWnГ├╢╕ГВ√^З[Ё╖lУ9░╬M/░МїЮЙj+ОуїьЄ└▐╢╣Цgт|д╗6яБ╧Д$·╔дН`оеVA#)0n▀АП┘лЦу═gо|лОэ╛{▄┤╬hK/Р0╗zoccnМє╛╦╢ФЛY(╜.┌▌╤я·╪aЬ╗╩о
-Шш2э8*░}╠7wж▌f]█)░уЯиVY└█6Ъ	Vэ└t8мШjGcАk<ш┌R юh╤щща╦╗[\Ы│ы╣6ЪLЬ	|З%Цx╫v-╘Щp╫Ц╠┘фяrЇ3╫y╫У■вф0R@чпп}У╟З╛Ф╢zбА╗N╚еч╔Nэkoh~2рмлб┘оР╠Х└Lў4.┤1√wqЖЭ*З▓сШJБ─╔URH╧ЇЬ╝ЯM\RGф¤їlPzшВ s┘═ЗИmSGжэbwИ╢H▒╪Ь`чP?нvЩ?;kK▐ЭГ╓2╠ьЛи╖╓┌WjUldЩa█с{а$┬01Щ10■
-Д▄7╢╕ьaDВП,x!:╫2Ў╪j'Мёe│^√в[ШР8J┐╤H&mЖШiДйА╬ъ╒&(@╞|╔@ъчxmOф8н╫┴-UЦїЦ╔wь|├ЬO╛м6YN0$н╙E2
-╗щь╩схУ'@бh+Ф╥sK0╔╛ПX┤JеD╟sСx╠Э╓■,y┐DM╫НHaАчМTОАRв┤ё3aёj;a°ёy$р√яoШр:i/тйЄв╘JУ$:}─56Ыо~Э[жыф║T:црПSМ·╤zыF╦Uл╒м7n┬°$M█зЛЁ╗ьаС ШP	юmS╨р+лїЇ ┘К▐─┌╡ Щ═\>nз█Ь+Ыу OV·7N┤¤яz╞№<tМ╧!OB)сlЗОГ4пЎ$╝└Ё=ЫфXа╕┬Vti я*R¤}╣╜g? ╘Щ:+·s_U╟ЎV7+d;$╠▒М&ц╩Н▄╡░v'ёШёR!Ю6Б,╦┘ГяК-S╩Mx(т.лH#хС7&/D▄=уЪЎ╬uCК│╝Ю╤╡╩╨t}/Фет▒▌[√√ohс'┼Ж┌ ╢╦U¤б^╟├Рu}J▄ЕzyD╘╩ШSУ_С┤ДUчцrusi¤╜Bg-▄е5я:▀їv8`a│┴v∙Фр│ъРkФ╓ре?Н▄'И}z:NЁЬi╘ob;Шf~▀hр!<ЎUо,f:╒YШ9▒╚┴x*Ч▄'Вl9СIdЖ:СцгА-аИ4▌ТOхК∙j3o╬┬ ZU┼tv *W0g*┼с╕ДК╗№Ш№Р▐{Цj╘Yp,▄OЕщїPШтY╧X@ЧО=xВ+╖╓цЫc╧О:═ЙТn$YH|Nгjh╦sмOшёOьчЗ▐╟╗9б╝R~мЛKш&IUE,боўo▌*(╓')╞'П]п╜3iYЫЯм╛│┬Fтнl╩цЦ77QZa∙нУF▀k╘$V╒Хvtц
-mu4їAаu,})ў┌mlт-I¤oЕWe╦ЦаонxEъW╦}Rp&L░^С╘aЁЁ╤ГGП7сюу══G▀ц╕?чЦ"║/╦эЫ3{Ф╫▄╕УцїCпНgp>н3zIeд■▀╚▓T=╬ЄЄ;Zв\ТчуkП╓+J■Пу√╞зI ╞д!вm°(Фе:FqиAXB'ЮА5/└+Eq╠│@.':░dN┌▀fб#╟\ЖБxt;║оV!p0s0є?      з■XН
+                   consentLang === "hi" ? "рдбрд┐рдЬрд┐рдЯрд▓ рд╡реНрдпрдХреНрддрд┐рдЧрдд рдбреЗрдЯрд╛ рд╕рдВрд░рдХреНрд╖рдг (DPDP) рдЕрдзрд┐рдирд┐рдпрдо, 2023 рдХреЗ рддрд╣рдд, рд╣рдо рдЖрдкрдХреА рдЯреЗрд▓реАрдореЗрдбрд┐рд╕рд┐рди, рдбреЙрдХреНрдЯрд░ рдирд┐рджрд╛рди рд╕рд╣рд╛рдпрддрд╛ рдФрд░ рдЖрдкрд╛рддрдХрд╛рд▓реАрди рдЕрд▓рд░реНрдЯ рдкреНрд░рджрд╛рди рдХрд░рдиреЗ рдХреЗ рд▓рд┐рдП рдЖрдкрдХреЗ рдорд╣рддреНрд╡рдкреВрд░реНрдг рдЯреЗрд▓реАрдореЗрдЯреНрд░реА, рдиреИрджрд╛рдирд┐рдХ рд╕реНрдХреИрди рдФрд░ рдЪрд┐рдХрд┐рддреНрд╕рд╛ рдЗрддрд┐рд╣рд╛рд╕ рдХреЛ рдПрдХрддреНрд░ рдХрд░рддреЗ рд╣реИрдВред" :
+                   consentLang === "ta" ? "роЯро┐роЬро┐роЯрпНроЯро▓рпН родройро┐роирокро░рпН родро░ро╡рпБ рокро╛родрпБроХро╛рокрпНрокрпБ (DPDP) роЪроЯрпНроЯроорпН 2023-ройрпН роХрпАро┤рпН, роЙроЩрпНроХро│рпН рооро░рпБродрпНродрпБро╡ роЪрпЗро╡рпИ рооро▒рпНро▒рпБроорпН роЕро╡роЪро░ роЪро┐роХро┐роЪрпНроЪрпИроХрпНроХро╛роХ роороЯрпНроЯрпБроорпЗ роЙроЩрпНроХро│рпН родро░ро╡рпБ роЪрпЗроХро░ро┐роХрпНроХрокрпНрокроЯрпБроХро┐ро▒родрпБ." :
+                   "р░бр░┐р░Ьр░┐р░Яр░▓р▒Н р░╡р▒Нр░пр░Хр▒Нр░др░┐р░Чр░д р░бр▒Зр░Яр░╛ р░░р░Хр▒Нр░╖р░г (DPDP) р░Ър░Яр▒Нр░Яр░В 2023 р░кр▒Нр░░р░Хр░╛р░░р░В, р░ор▒А р░╡р▒Ир░жр▒Нр░п р░╕р▒Зр░╡р░▓ р░Хр▒Кр░░р░Хр▒Б р░ор░╛р░др▒Нр░░р░ор▒З р░ор▒А р░╕р░ор░╛р░Ър░╛р░░р░В р░╕р▒Зр░Хр░░р░┐р░Вр░Ър░мр░бр▒Бр░др▒Бр░Вр░жр░┐."}
+                </p>
+              </div>
+
+              {/* Granular Consent Controls */}
+              <div className="space-y-2.5 pt-2">
+                <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest font-mono">
+                  Granular Purpose Permissions
+                </h5>
+                
+                <div className="space-y-2">
+                  <label className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs cursor-pointer">
+                    <span className="text-slate-300 text-[11px] font-medium">EMR History Sharing across Hospitals</span>
+                    <input 
+                      type="checkbox"
+                      checked={patientConsent.granularPreferences.historySharing}
+                      onChange={(e) => {
+                        const updated = { ...patientConsent.granularPreferences, historySharing: e.target.checked };
+                        updatePatientConsent(consentLang, updated);
+                      }}
+                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 h-4 w-4"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs cursor-pointer">
+                    <span className="text-slate-300 text-[11px] font-medium">AI Clinical Decision Support (CDSS) Processing</span>
+                    <input 
+                      type="checkbox"
+                      checked={patientConsent.granularPreferences.aiCdssProcessing}
+                      onChange={(e) => {
+                        const updated = { ...patientConsent.granularPreferences, aiCdssProcessing: e.target.checked };
+                        updatePatientConsent(consentLang, updated);
+                      }}
+                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 h-4 w-4"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs cursor-pointer">
+                    <span className="text-slate-300 text-[11px] font-medium">Family Caregiver Portal Access</span>
+                    <input 
+                      type="checkbox"
+                      checked={patientConsent.granularPreferences.familySharing}
+                      onChange={(e) => {
+                        const updated = { ...patientConsent.granularPreferences, familySharing: e.target.checked };
+                        updatePatientConsent(consentLang, updated);
+                      }}
+                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 h-4 w-4"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs cursor-pointer">
+                    <span className="text-slate-300 text-[11px] font-medium">Live Vital Telemetry Sync</span>
+                    <input 
+                      type="checkbox"
+                      checked={patientConsent.granularPreferences.vitalTelemetry}
+                      onChange={(e) => {
+                        const updated = { ...patientConsent.granularPreferences, vitalTelemetry: e.target.checked };
+                        updatePatientConsent(consentLang, updated);
+                      }}
+                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 h-4 w-4"
+                    />
+                  </label>
+
+                  <label className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs cursor-pointer">
+                    <span className="text-slate-300 text-[11px] font-medium">Emergency Break-Glass Override</span>
+                    <input 
+                      type="checkbox"
+                      checked={patientConsent.granularPreferences.emergencyBreakGlass}
+                      onChange={(e) => {
+                        const updated = { ...patientConsent.granularPreferences, emergencyBreakGlass: e.target.checked };
+                        updatePatientConsent(consentLang, updated);
+                      }}
+                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 h-4 w-4"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center gap-2">
+                {patientConsent.accepted ? (
+                  <button
+                    type="button"
+                    onClick={revokePatientConsent}
+                    className="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer"
+                  >
+                    Revoke DPDP Consent
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => updatePatientConsent(consentLang, {
+                      historySharing: true,
+                      aiCdssProcessing: true,
+                      familySharing: true,
+                      vitalTelemetry: true,
+                      emergencyBreakGlass: true
+                    })}
+                    className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md shadow-emerald-500/20"
+                  >
+                    Re-authorize Active Consent
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  }
+}

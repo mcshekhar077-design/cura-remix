@@ -13045,5 +13045,27 @@ function generateMockAyurvedicResponse(symptoms: string) {
   app.get("/api/admin/logs", (req, res) => {
     return res.status(200).json({ success: true, data: adminLogsStore });
   });
-  // Vite middleware for developmentxœ\‘AOÃ0…ïý&â¢*ã\TNŒÛÓ®,jÌ”%!q·¡©ÿt]Ù •RÙ~zŸ_›èà>¸chwb6š¾Og+¸©*`i¢Úš´³,‡céÔÎF‚&„
-ä^j‚: $\¥Ö†>(â©,á[­”Á½øâ–@¡EèŠ³Nz¿üö©Í¢—lèvùCvž‰6"ï‰âbOãÐDü³™Ò‘’š´O/ñé´ýMXïÏ`½ˆýàÁ‡^I’®ùè“_É6HœÝ±xÀ¯ú- z„1nªED«žµA~N‰«­ÂƒhhkØè;äì²l@˜$FËó×eÒß‹ÓÓ¯H}PgP·áëá“Ch­ÕvÎBCäËÉÄ¸ZšÆE*o½]·HéN´”2Ðùw¥Î   ÿÿ ¡Ÿ©
+
+  // Vite middleware for development
+  if (process.env.NODE_ENV !== "production") {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on http://0.0.0.0:${PORT}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+});
