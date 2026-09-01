@@ -31,20 +31,67 @@ import AICareNavigation from "./components/AICareNavigation";
 import ThemeSelectorWidget, { ThemeProvider } from "./components/ThemeSelector";
 import OfflineSyncEngine from "./components/OfflineSyncEngine";
 import GlobalEmergencySOS from "./components/GlobalEmergencySOS";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import CuraAuthModal from "./components/CuraAuthModal";
 
-type ViewState = "landing" | "dashboard" | "admin" | "patient" | "pharmacy" | "ayush" | "mr" | "mental_health" | "cardiology" | "pediatrics" | "womens_health" | "orthopedics" | "dermatology" | "neurology" | "oncology" | "emergency" | "ent" | "ai_core" | "ophthalmology" | "hematology" | "nephrology" | "rheumatology" | "critical_care" | "gastroenterology" | "analytics" | "dentistry" | "physiology" | "video_consultation" | "care_navigation";
+type ViewState = 
+  | "landing" 
+  | "dashboard" 
+  | "admin" 
+  | "patient" 
+  | "pharmacy" 
+  | "ayush" 
+  | "mr" 
+  | "mental_health" 
+  | "cardiology" 
+  | "pediatrics" 
+  | "womens_health" 
+  | "orthopedics" 
+  | "dermatology" 
+  | "neurology" 
+  | "oncology" 
+  | "emergency" 
+  | "ent" 
+  | "ai_core" 
+  | "ophthalmology" 
+  | "hematology" 
+  | "nephrology" 
+  | "rheumatology" 
+  | "critical_care" 
+  | "gastroenterology" 
+  | "analytics" 
+  | "dentistry" 
+  | "physiology" 
+  | "video_consultation" 
+  | "care_navigation";
 
-export default function App() {
+function MainRouter() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
   const [dashboardMedicalSystem, setDashboardMedicalSystem] = useState<"allopathy" | "ayurveda" | "homeopathy" | "unani" | "siddha" | "yoga">("allopathy");
+  
+  const { isAuthenticated, isAuthModalOpen, intendedView, closeAuthModal } = useAuth();
 
   const navigateTo = (view: ViewState) => {
     setCurrentView(view);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleAuthSuccess = () => {
+    if (intendedView) {
+      navigateTo(intendedView as ViewState);
+    }
+  };
+
   return (
-    <ThemeProvider>
+    <>
+      {/* Global Auth Modal Triggered by AuthContext */}
+      <CuraAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        intendedModuleTitle={intendedView ? intendedView.toUpperCase().replace(/_/g, " ") : undefined}
+        onSuccess={handleAuthSuccess}
+      />
+
       {currentView === "landing" && (
         <LandingPage 
           onNavigateToDashboard={() => {
@@ -80,6 +127,7 @@ export default function App() {
           onNavigateToCareNavigation={() => navigateTo("care_navigation")}
         />
       )}
+
       {currentView === "dashboard" && (
         <DoctorDashboard 
           initialMedicalSystem={dashboardMedicalSystem}
@@ -105,7 +153,7 @@ export default function App() {
         <AyushWellness 
           onBackToLanding={() => navigateTo("landing")}
           onNavigateToAllopathic={() => {
-            setDashboardMedicalSystem("ayurveda"); // Open dashboard in AYUSH mode!
+            setDashboardMedicalSystem("ayurveda");
             navigateTo("dashboard");
           }}
         />
@@ -236,6 +284,16 @@ export default function App() {
       <GlobalEmergencySOS 
         onNavigateToEmergency={() => navigateTo("emergency")}
       />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <MainRouter />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

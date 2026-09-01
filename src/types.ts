@@ -179,4 +179,21 @@ export interface Referral {
   createdAt: string;
 }
 
+export type UserRole = "doctor" | "patient" | "pharmacist" | "admin" | "specialist" | "staff" | "ayush_practitioner" | "mr_representative";
+
+export interface AuthUser {
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+  phone?: string;
+  clinicName?: string;
+  doctorCount?: string;
+  specialty?: string;
+  abhaId?: string;
+  token?: string;
+  subdomain?: string;
+  createdAt?: string;
+}
+
 

@@ -1126,7 +1126,7 @@ const operationTheatresStore: OperationTheatre[] = [
 ];
 
 const otEquipmentStore: OTEquipment[] = [
-  { id: "EQ-101", name: "High-End Ventilator (DrÃƒÂƒÃ‚Â¤ger)", equipmentType: "ventilator", serialNumber: "DRG-88712", model: "Evita V800", manufacturer: "DrÃƒÂƒÃ‚Â¤ger", status: "available", location: "OT-01", lastMaintenanceDate: "2026-06-15", nextMaintenanceDate: "2026-12-15" },
+  { id: "EQ-101", name: "High-End Ventilator (DrÃƒÂƒÃ‚ÂƒÃƒÂ‚Ã‚Â¤ger)", equipmentType: "ventilator", serialNumber: "DRG-88712", model: "Evita V800", manufacturer: "DrÃƒÂƒÃ‚ÂƒÃƒÂ‚Ã‚Â¤ger", status: "available", location: "OT-01", lastMaintenanceDate: "2026-06-15", nextMaintenanceDate: "2026-12-15" },
   { id: "EQ-102", name: "C-Arm Fluoroscopy (Siemens)", equipmentType: "c_arm", serialNumber: "SI-33928", model: "Cios Spin", manufacturer: "Siemens Healthineers", status: "available", location: "OT-01", lastMaintenanceDate: "2026-05-10", nextMaintenanceDate: "2026-11-10" },
   { id: "EQ-103", name: "Laparoscopic Stack (Storz)", equipmentType: "laparoscopy", serialNumber: "SZ-55610", model: "IMAGE1 S", manufacturer: "Karl Storz", status: "available", location: "OT-02", lastMaintenanceDate: "2026-05-20", nextMaintenanceDate: "2026-11-20" },
   { id: "EQ-104", name: "Surgical Microscope (Zeiss)", equipmentType: "microscope", serialNumber: "ZE-22104", model: "OPMI PENTERO 800", manufacturer: "Zeiss", status: "available", location: "OT-02", lastMaintenanceDate: "2026-04-12", nextMaintenanceDate: "2026-10-12" },
@@ -1599,7 +1599,7 @@ const crmLeads: CrmLead[] = [
     source: "website",
     status: "qualified",
     interests: ["ipd", "opd", "pharmacy"],
-    budgetRange: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹2,00,000 - ÃƒÂ¢Ã‚Â‚Ã‚Â¹5,00,000",
+    budgetRange: "ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹2,00,000 - ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹5,00,000",
     lastContact: "2026-07-10T11:00:00Z",
     nextFollowUp: "2026-07-14T10:00:00Z",
     notes: "Very interested in the integrated IPD Bed management & Ward tracker. Wants a detailed custom price quote.",
@@ -1620,7 +1620,7 @@ const crmLeads: CrmLead[] = [
     source: "referral",
     status: "contacted",
     interests: ["ayush"],
-    budgetRange: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹50,005 - ÃƒÂ¢Ã‚Â‚Ã‚Â¹1,00,000",
+    budgetRange: "ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹50,005 - ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹1,00,000",
     lastContact: "2026-07-11T14:30:00Z",
     nextFollowUp: "2026-07-15T16:00:00Z",
     notes: "Referred by Dr. Rajesh. Extremely interested in AYUSH modules (Ayurveda Panchakarma calendar and Prakriti logging). Needs some assistance with local language support.",
@@ -2221,7 +2221,7 @@ const radiologyRequestsStore: RadiologyRequest[] = [
     performedDate: "2026-07-08T12:15:00Z",
     contrastUsed: true,
     contrastType: "Gadobutrol (Gadovist)",
-    allergyNotes: "No known contrast allergy. GFR is 88 ml/min/1.73mÃƒÂ‚Ã‚Â² (Normal).",
+    allergyNotes: "No known contrast allergy. GFR is 88 ml/min/1.73mÃƒÂƒÃ‚Â‚ÃƒÂ‚Ã‚Â² (Normal).",
     pregnancyStatus: false,
     radiationSafetyNotes: "MRI safety screening checklist completed. No metallic implants.",
     createdAt: "2026-07-08T10:05:00Z"
@@ -3508,7 +3508,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "sent",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Paracetamol 500mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 09:00 AM. Instructions: After meals.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Paracetamol 500mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 09:00 AM. Instructions: After meals.",
     scheduledAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     processedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     sentAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -3528,7 +3528,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Amlodipine 5mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 08:00 AM. Instructions: For Hypertension.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Amlodipine 5mg for Rajesh Kumar. Dosage: 1 Tab. Scheduled: Daily at 08:00 AM. Instructions: For Hypertension.",
     scheduledAt: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(), // 1 hour from now
     retryCount: 0,
     maxRetries: 3,
@@ -3546,7 +3546,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Multivitamin for Rajesh Kumar. Dosage: 1 Cap. Scheduled: Daily at 01:00 PM. Instructions: After lunch.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Multivitamin for Rajesh Kumar. Dosage: 1 Cap. Scheduled: Daily at 01:00 PM. Instructions: After lunch.",
     scheduledAt: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours from now
     retryCount: 0,
     maxRetries: 3,
@@ -3564,7 +3564,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Ferrous Ascorbate for Anjali Gupta. Dosage: 1 Tab. Scheduled: Daily at 09:00 PM. Instructions: Before sleep.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Ferrous Ascorbate for Anjali Gupta. Dosage: 1 Tab. Scheduled: Daily at 09:00 PM. Instructions: Before sleep.",
     scheduledAt: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
     retryCount: 0,
     maxRetries: 3,
@@ -3582,7 +3582,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 AM. Instructions: Take with breakfast.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 AM. Instructions: Take with breakfast.",
     scheduledAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
     retryCount: 0,
     maxRetries: 3,
@@ -3600,7 +3600,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "medication",
     status: "pending",
     templateName: "MEDICATION_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 PM. Instructions: Take with dinner.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Metformin 1000mg for Srinivas Rao. Dosage: 1 Tab. Scheduled: Daily at 08:30 PM. Instructions: Take with dinner.",
     scheduledAt: new Date(Date.now() + 10 * 60 * 60 * 1000).toISOString(),
     retryCount: 0,
     maxRetries: 3,
@@ -3618,7 +3618,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "follow_up",
     status: "pending",
     templateName: "FOLLOW_UP_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… Follow-Up Reminder: Hello Anjali Gupta, Dr. Rajesh Sharma has scheduled a follow-up review on your Hemoglobin tests. Reason: Severe Fatigue & Anemia check.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚Â… Follow-Up Reminder: Hello Anjali Gupta, Dr. Rajesh Sharma has scheduled a follow-up review on your Hemoglobin tests. Reason: Severe Fatigue & Anemia check.",
     scheduledAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 mins from now
     retryCount: 0,
     maxRetries: 3,
@@ -3632,7 +3632,7 @@ const scheduledMessagesStore: ScheduledMessage[] = [
     scheduleType: "reminder",
     status: "pending",
     templateName: "APPOINTMENT_REMINDER",
-    messageContent: "ÃƒÂ°Ã‚ÂŸÃ‚Â”Ã‚Â” Appointment Reminder: Hello Srinivas Rao, you have a Diabetes review with Dr. Rajesh Sharma tomorrow at 04:00 PM. Type: IN_PERSON.",
+    messageContent: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â”ÃƒÂ‚Ã‚Â” Appointment Reminder: Hello Srinivas Rao, you have a Diabetes review with Dr. Rajesh Sharma tomorrow at 04:00 PM. Type: IN_PERSON.",
     scheduledAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 mins from now
     retryCount: 0,
     maxRetries: 3,
@@ -3698,7 +3698,7 @@ export const TIER_LIMITS = {
     maxPatients: 500,
     maxAiCalls: 200,
     maxWhatsappMessages: 300,
-    price: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹1,499 / month",
+    price: "ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹1,499 / month",
     label: "Solo Clinic Plan",
     features: ["1 Doctor, 2 Staff", "Full voice AI clinical companion", "Up to 500 patients", "WhatsApp broadcasting"]
   },
@@ -3706,7 +3706,7 @@ export const TIER_LIMITS = {
     maxPatients: 10000,
     maxAiCalls: 2000,
     maxWhatsappMessages: 3000,
-    price: "ÃƒÂ¢Ã‚Â‚Ã‚Â¹4,999 / month",
+    price: "ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹4,999 / month",
     label: "Nursing Home Plan",
     features: ["Up to 10 Doctors, 5 Staff", "All AI engines & Context timeline", "Standard video calls integration", "Diagnostic timeline tracker"]
   },
@@ -3863,7 +3863,7 @@ let whitelabelConfig: WhiteLabelConfig = {
   companyTagline: "The Operating System for Smarter Healthcare",
   emailFromName: "CURA Support",
   emailFromAddress: "support@cura.in",
-  emailFooterText: "ÃƒÂ‚Ã‚Â© 2026 CURA Healthcare Technologies. All rights reserved.",
+  emailFooterText: "ÃƒÂƒÃ‚Â‚ÃƒÂ‚Ã‚Â© 2026 CURA Healthcare Technologies. All rights reserved.",
   sidebarConfig: {
     modules: [
       { id: "dashboard", label: "Dashboard", icon: "LayoutDashboard", visible: true },
@@ -4288,7 +4288,7 @@ async function startServer() {
           mr.successfulReferrals += 1;
           mr.totalEarnings += commission;
 
-          console.log(`[MR REFERRAL] Recorded conversion of ${clinicName} for MR ${mr.fullName} (${mr.referralCode}). Commission: ÃƒÂ¢Ã‚Â‚Ã‚Â¹${commission}`);
+          console.log(`[MR REFERRAL] Recorded conversion of ${clinicName} for MR ${mr.fullName} (${mr.referralCode}). Commission: ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹${commission}`);
         } else {
           console.warn(`[MR REFERRAL] Invalid referral code used during signup: ${referralCode}`);
         }
@@ -4781,6 +4781,141 @@ async function startServer() {
     }
   });
 
+  // === UNIVERSAL CURA AUTHENTICATION & SIGNUP APIS ===
+  const universalUsersStore: any[] = [
+    {
+      id: "doc-sharma",
+      fullName: "Dr. Rajesh Sharma",
+      email: "dr.sharma@cura.in",
+      role: "doctor",
+      clinicName: "Sharma Multispecialty Care",
+      phone: "+91 98765 43210",
+      specialty: "Allopathy & Internal Medicine",
+      subdomain: "sharma-clinic",
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: "pat-rajesh",
+      fullName: "Rajesh Kumar",
+      email: "rajesh.kumar@gmail.com",
+      role: "patient",
+      clinicName: "Apollo Clinic Patient",
+      phone: "+91 98765 00001",
+      specialty: "Patient Portal",
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: "doc-priya",
+      fullName: "Dr. Priya Nair",
+      email: "dr.priya@ayush.cura.in",
+      role: "ayush_practitioner",
+      clinicName: "Vaidya Ayurveda & Wellness",
+      phone: "+91 98765 43211",
+      specialty: "Ayurveda & Holistic Medicine",
+      subdomain: "vaidya-wellness",
+      createdAt: new Date().toISOString()
+    }
+  ];
+
+  app.post("/api/v1/auth/universal-signup", (req, res) => {
+    try {
+      const { fullName, email, phone, role, clinicName, doctorCount, abhaId, password } = req.body;
+      if (!fullName || !email || !phone) {
+        return res.status(400).json({ detail: "Missing required registration parameters." });
+      }
+
+      const cleanEmail = String(email).trim().toLowerCase();
+      const existingUser = universalUsersStore.find(u => u.email.toLowerCase() === cleanEmail);
+      if (existingUser) {
+        return res.status(200).json({
+          success: true,
+          message: "User already exists. Session established.",
+          user: existingUser,
+          token: `AUTH_${Date.now()}_${existingUser.id}`
+        });
+      }
+
+      const newUser = {
+        id: `usr_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`,
+        fullName: String(fullName).trim(),
+        email: cleanEmail,
+        phone: String(phone).trim(),
+        role: role || "doctor",
+        clinicName: clinicName || `${fullName}'s Clinic`,
+        doctorCount: doctorCount || "1",
+        abhaId: abhaId || "",
+        subdomain: clinicName ? clinicName.toLowerCase().replace(/[^a-z0-9]/g, "-") : "clinic",
+        createdAt: new Date().toISOString()
+      };
+
+      universalUsersStore.unshift(newUser);
+      logAudit("AUTH", "user_account", newUser.id, `User registered: ${newUser.fullName} (${newUser.email}), Role: ${newUser.role}`, req);
+
+      return res.status(201).json({
+        success: true,
+        message: "Account registered successfully",
+        user: newUser,
+        token: `AUTH_${Date.now()}_${newUser.id}`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ detail: err.message });
+    }
+  });
+
+  app.post("/api/v1/auth/universal-login", (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email) {
+        return res.status(400).json({ detail: "Email is required." });
+      }
+
+      const cleanEmail = String(email).trim().toLowerCase();
+      let match = universalUsersStore.find(u => u.email.toLowerCase() === cleanEmail);
+      
+      if (!match) {
+        // Create an account on the fly for demo convenience if entered
+        match = {
+          id: `usr_${Date.now().toString(36)}`,
+          fullName: cleanEmail.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+          email: cleanEmail,
+          role: "doctor",
+          clinicName: "Smart Healthcare Clinic",
+          phone: "+91 98765 43210",
+          createdAt: new Date().toISOString()
+        };
+        universalUsersStore.unshift(match);
+      }
+
+      logAudit("AUTH", "user_account", match.id, `User logged in: ${match.fullName} (${match.email})`, req);
+
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        user: match,
+        token: `AUTH_${Date.now()}_${match.id}`
+      });
+    } catch (err: any) {
+      return res.status(500).json({ detail: err.message });
+    }
+  });
+
+  app.get("/api/v1/auth/universal-me", (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer AUTH_")) {
+        const parts = authHeader.split("_");
+        const userId = parts[parts.length - 1];
+        const match = universalUsersStore.find(u => u.id === userId);
+        if (match) {
+          return res.status(200).json({ authenticated: true, user: match });
+        }
+      }
+      return res.status(200).json({ authenticated: false, user: null });
+    } catch (err: any) {
+      return res.status(500).json({ detail: err.message });
+    }
+  });
+
   // API 3: Pre-seeded / Custom Patients Search (with extended support for Patient Code)
   app.get("/api/v1/patients", (req, res) => {
     // Generate audit log for general patient directory access
@@ -5224,7 +5359,7 @@ async function startServer() {
         "UPDATE",
         "patient_consent",
         id,
-        `ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â CRITICAL SEC_NOTICE: Patient explicitly REVOKED all DPDP consent processing authorizations. Data processing frozen.`,
+        `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ‚Â¯ÃƒÂ‚Ã‚Â¸ÃƒÂ‚Ã‚Â CRITICAL SEC_NOTICE: Patient explicitly REVOKED all DPDP consent processing authorizations. Data processing frozen.`,
         req
       );
 
@@ -5625,7 +5760,7 @@ async function startServer() {
           title: manualTitle || "Complete Blood Count (EHR Scan)",
           date: manualDate || new Date().toISOString().split("T")[0],
           category: manualCategory || "Lab Report",
-          aiSummary: "Your overall blood health looks wonderful! All your essential markersÃƒÂ¢Ã‚Â€Ã‚Â”like your red blood cells, infection-fighting white blood cells, and clotting plateletsÃƒÂ¢Ã‚Â€Ã‚Â”are safely within the standard healthy limits.",
+          aiSummary: "Your overall blood health looks wonderful! All your essential markersÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â”like your red blood cells, infection-fighting white blood cells, and clotting plateletsÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â”are safely within the standard healthy limits.",
           keyFindings: [
             "Hemoglobin is 14.2 g/dL: This is right in the healthy sweet spot (13.5 - 17.5), meaning your body has plenty of oxygen-carrying capacity and energy.",
             "White Blood Cell Count is 6,800: A perfectly healthy level showing your immune system is quiet and there is no active infection.",
@@ -7008,7 +7143,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
                   );
                   if (apt) {
                     apt.status = "confirmed";
-                    replyMessage = `ÃƒÂ¢Ã‚ÂœÃ‚Â… Thank you, ${patient.fullName}. Your appointment with ${apt.doctorName} is confirmed for ${new Date(apt.scheduledAt).toLocaleString()}. See you there!`;
+                    replyMessage = `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂœÃƒÂ‚Ã‚Â… Thank you, ${patient.fullName}. Your appointment with ${apt.doctorName} is confirmed for ${new Date(apt.scheduledAt).toLocaleString()}. See you there!`;
                     actionLogged = `Appointment ${apt.id} auto-confirmed via WhatsApp Webhook.`;
                   } else {
                     replyMessage = `Hi ${patient.fullName}, we couldn't find an upcoming scheduled appointment. To book a new one, please reply 'Book'.`;
@@ -7023,7 +7158,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
                   );
                   if (apt) {
                     apt.status = "cancelled";
-                    replyMessage = `ÃƒÂ¢Ã‚ÂÃ‚ÂŒ Your appointment with ${apt.doctorName} has been cancelled as requested. Reply 'Book' or visit our portal if you'd like to reschedule.`;
+                    replyMessage = `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂÃƒÂ‚Ã‚ÂŒ Your appointment with ${apt.doctorName} has been cancelled as requested. Reply 'Book' or visit our portal if you'd like to reschedule.`;
                     actionLogged = `Appointment ${apt.id} auto-cancelled via WhatsApp Webhook.`;
                   } else {
                     replyMessage = `Hi ${patient.fullName}, no active scheduled appointment was found to cancel.`;
@@ -7032,22 +7167,22 @@ function generateMockAyurvedicResponse(symptoms: string) {
                 }
                 // 3. RESCHEDULE REQUEST
                 else if (textLower.includes("reschedule") || textLower.includes("change")) {
-                  replyMessage = `ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… No problem, ${patient.fullName}. Please click here to select a new slot on our live scheduler portal: https://app.cura.in/reschedule`;
+                  replyMessage = `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚Â… No problem, ${patient.fullName}. Please click here to select a new slot on our live scheduler portal: https://app.cura.in/reschedule`;
                   actionLogged = `Sent self-reschedule link.`;
                 }
                 // 4. REFILL REQUEST
                 else if (textLower.includes("refill") || textLower.includes("repeat") || textLower.includes("medicine")) {
-                  replyMessage = `ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Your prescription refill request has been logged into CURA. Dr. Siddharth is reviewing it, and we will ping you with the digital Rx once approved!`;
+                  replyMessage = `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Your prescription refill request has been logged into CURA. Dr. Siddharth is reviewing it, and we will ping you with the digital Rx once approved!`;
                   actionLogged = `Logged RX refill request for doctor review.`;
                 }
                 // 5. DEFAULT / HELP
                 else {
-                  replyMessage = `ÃƒÂ°Ã‚ÂŸÃ‚Â¤Ã‚Â– Hi ${patient.fullName}! I am your CURA virtual health assistant. I can handle immediate requests:\n\n` +
-                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Yes" or "Confirm" to confirm your visit\n` +
-                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Cancel" to abort an appointment\n` +
-                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Reschedule" to move your slot\n` +
-                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Refill" to request Rx refills\n` +
-                    `ÃƒÂ¢Ã‚Â€Ã‚Â¢ Reply "Address" to get clinic directions`;
+                  replyMessage = `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â¤ÃƒÂ‚Ã‚Â– Hi ${patient.fullName}! I am your CURA virtual health assistant. I can handle immediate requests:\n\n` +
+                    `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â¢ Reply "Yes" or "Confirm" to confirm your visit\n` +
+                    `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â¢ Reply "Cancel" to abort an appointment\n` +
+                    `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â¢ Reply "Reschedule" to move your slot\n` +
+                    `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â¢ Reply "Refill" to request Rx refills\n` +
+                    `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â¢ Reply "Address" to get clinic directions`;
                   actionLogged = `Dispatched automated interactive chatbot helper text.`;
                 }
               } else if (msgType === "interactive") {
@@ -7056,14 +7191,14 @@ function generateMockAyurvedicResponse(symptoms: string) {
                   const apt = appointmentStore.find(a => a.patientId === patient.id && (a.status === "scheduled" || a.status === "confirmed"));
                   if (apt) {
                     apt.status = "confirmed";
-                    replyMessage = `ÃƒÂ¢Ã‚ÂœÃ‚Â… Confirmed via button click. Thank you!`;
+                    replyMessage = `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂœÃƒÂ‚Ã‚Â… Confirmed via button click. Thank you!`;
                     actionLogged = `Appointment ${apt.id} auto-confirmed via WhatsApp Interactive Button click.`;
                   }
                 } else if (buttonId === "cancel_appointment") {
                   const apt = appointmentStore.find(a => a.patientId === patient.id && (a.status === "scheduled" || a.status === "confirmed"));
                   if (apt) {
                     apt.status = "cancelled";
-                    replyMessage = `ÃƒÂ¢Ã‚ÂÃ‚ÂŒ Cancelled via button click.`;
+                    replyMessage = `ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂÃƒÂ‚Ã‚ÂŒ Cancelled via button click.`;
                     actionLogged = `Appointment ${apt.id} auto-cancelled via WhatsApp Interactive Button click.`;
                   }
                 }
@@ -7280,7 +7415,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
         scheduleType: "reminder",
         status: "pending",
         templateName: "APPOINTMENT_REMINDER",
-        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚Â”Ã‚Â” Appointment Reminder: Hello ${newAppointment.patientName}, you have a ${newAppointment.type.toUpperCase()} appointment with ${newAppointment.doctorName} scheduled on ${new Date(scheduledAt).toLocaleString("en-IN")}. Reason: ${newAppointment.reason}.`,
+        messageContent: `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â”ÃƒÂ‚Ã‚Â” Appointment Reminder: Hello ${newAppointment.patientName}, you have a ${newAppointment.type.toUpperCase()} appointment with ${newAppointment.doctorName} scheduled on ${new Date(scheduledAt).toLocaleString("en-IN")}. Reason: ${newAppointment.reason}.`,
         scheduledAt: reminderTime.toISOString(),
         appointmentId: newAppointment.id,
         retryCount: 0,
@@ -7398,7 +7533,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
         scheduleType: "follow_up",
         status: "pending",
         templateName: "FOLLOW_UP_REMINDER",
-        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… Follow-Up Reminder: Hello ${patient.fullName}, Dr. ${doctorName} has scheduled a follow-up review on your diagnostic reports. Reason: ${reason || "Routine review"}. Date: ${new Date(followUpDate).toLocaleDateString("en-IN")}.`,
+        messageContent: `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚Â… Follow-Up Reminder: Hello ${patient.fullName}, Dr. ${doctorName} has scheduled a follow-up review on your diagnostic reports. Reason: ${reason || "Routine review"}. Date: ${new Date(followUpDate).toLocaleDateString("en-IN")}.`,
         scheduledAt: scheduledAt.toISOString(),
         retryCount: 0,
         maxRetries: 3,
@@ -7447,7 +7582,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
         scheduleType: "medication",
         status: "pending",
         templateName: "MEDICATION_REMINDER",
-        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚ÂŠ Medication Reminder: Paracetamol ${dosage} for ${patient.fullName}. Name: ${medicineName}. Timing: Daily at ${time}. Instructions: ${instructions || "Take as directed by doctor"}.`,
+        messageContent: `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚ÂŠ Medication Reminder: Paracetamol ${dosage} for ${patient.fullName}. Name: ${medicineName}. Timing: Daily at ${time}. Instructions: ${instructions || "Take as directed by doctor"}.`,
         scheduledAt: scheduledAt.toISOString(),
         retryCount: 0,
         maxRetries: 3,
@@ -7488,7 +7623,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
         scheduleType: "refill",
         status: "pending",
         templateName: "REFILL_REQUEST",
-        messageContent: `ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Refill Request Alert: Patient ${patient.fullName} requests a prescription renewal refill for medication "${medicineName}" (${dosage || "As prescribed"}). Assigned doctor review: ${doctorName || "Dr. Rajesh Sharma"}.`,
+        messageContent: `ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ Refill Request Alert: Patient ${patient.fullName} requests a prescription renewal refill for medication "${medicineName}" (${dosage || "As prescribed"}). Assigned doctor review: ${doctorName || "Dr. Rajesh Sharma"}.`,
         scheduledAt: new Date().toISOString(),
         retryCount: 0,
         maxRetries: 3,
@@ -10294,7 +10429,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
     report.deliveryMethod = deliveryMethod || "whatsapp";
     report.deliveredDate = new Date().toISOString();
 
-    console.log(`\n=========================================\nÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â² [SIMULATED RADIOLOGY REPORT DELIVERY]\nTo Patient: ${report.patientName}\nMethod: ${report.deliveryMethod.toUpperCase()}\nReport ID: ${report.id}\nFindings Summary:\n"${report.impression.slice(0, 100)}..."\n=========================================\n`);
+    console.log(`\n=========================================\nÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚Â² [SIMULATED RADIOLOGY REPORT DELIVERY]\nTo Patient: ${report.patientName}\nMethod: ${report.deliveryMethod.toUpperCase()}\nReport ID: ${report.id}\nFindings Summary:\n"${report.impression.slice(0, 100)}..."\n=========================================\n`);
 
     return res.status(200).json({ success: true, report, mode: "simulated" });
   });
@@ -10886,7 +11021,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
 
     // Double entry check: Round to 2 decimal places to avoid floating point issues
     if (Math.abs(totalDebits - totalCredits) > 0.01) {
-      return res.status(400).json({ detail: `Unbalanced Entry! Total debits (ÃƒÂ¢Ã‚Â‚Ã‚Â¹${totalDebits}) must equal total credits (ÃƒÂ¢Ã‚Â‚Ã‚Â¹${totalCredits}).` });
+      return res.status(400).json({ detail: `Unbalanced Entry! Total debits (ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹${totalDebits}) must equal total credits (ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹${totalCredits}).` });
     }
 
     // Verify all accounts exist
@@ -11018,7 +11153,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
 
     const newAmountPaid = inv.amountPaid + payAmt;
     if (newAmountPaid > inv.totalAmount) {
-      return res.status(400).json({ detail: `Payment exceeds total outstanding invoice liability (Remaining: ÃƒÂ¢Ã‚Â‚Ã‚Â¹${inv.totalAmount - inv.amountPaid}).` });
+      return res.status(400).json({ detail: `Payment exceeds total outstanding invoice liability (Remaining: ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹${inv.totalAmount - inv.amountPaid}).` });
     }
 
     inv.amountPaid = newAmountPaid;
@@ -11126,7 +11261,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
 
     const newAmountPaid = bill.amountPaid + payAmt;
     if (newAmountPaid > bill.totalAmount) {
-      return res.status(400).json({ detail: `Payment exceeds total outstanding bill liability (Remaining: ÃƒÂ¢Ã‚Â‚Ã‚Â¹${bill.totalAmount - bill.amountPaid}).` });
+      return res.status(400).json({ detail: `Payment exceeds total outstanding bill liability (Remaining: ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹${bill.totalAmount - bill.amountPaid}).` });
     }
 
     bill.amountPaid = newAmountPaid;
@@ -11628,7 +11763,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
       priceMonthly: 2500,
       revenueSharePercent: 20,
       status: "Active",
-      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â«Ã‚Â€",
+      logoUrl: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â«ÃƒÂ‚Ã‚Â€",
       installsCount: 14
     },
     {
@@ -11640,7 +11775,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
       priceMonthly: 1500,
       revenueSharePercent: 25,
       status: "Active",
-      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â‘Ã‚Â¶",
+      logoUrl: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â‘ÃƒÂ‚Ã‚Â¶",
       installsCount: 22
     },
     {
@@ -11652,7 +11787,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
       priceMonthly: 4000,
       revenueSharePercent: 20,
       status: "Active",
-      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â©Ã‚Â»",
+      logoUrl: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â©ÃƒÂ‚Ã‚Â»",
       installsCount: 9
     },
     {
@@ -11664,7 +11799,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
       priceMonthly: 3000,
       revenueSharePercent: 20,
       status: "Needs Authorization",
-      logoUrl: "ÃƒÂ°Ã‚ÂŸÃ‚Â”Ã‚Â¬",
+      logoUrl: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â”ÃƒÂ‚Ã‚Â¬",
       installsCount: 0
     }
   ];
@@ -11891,15 +12026,15 @@ function generateMockAyurvedicResponse(symptoms: string) {
         referral_study: "ALLHAT Trial (2002) - Confirmed equivalence of Amlodipine to Chlorthalidone in reducing major coronary events.",
         drug_interactions: ["Simvastatin (increased risk of myopathy, limit Simvastatin to 20mg daily)", "Grapefruit juice (increases bioavailability)"],
         contraindications: ["Severe aortic stenosis", "Cardiogenic shock"],
-        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("amlodipine") || a.toLowerCase().includes("calcium channel")) ? "ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to calcium channel blockers!" : "No active drug allergies detected."
+        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("amlodipine") || a.toLowerCase().includes("calcium channel")) ? "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to calcium channel blockers!" : "No active drug allergies detected."
       },
       "metformin": {
         rationale: "Biguanide. Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity.",
         guideline: "ADA (American Diabetes Association) Standards of Medical Care in Diabetes (2026) recommends Metformin as the preferred first-line pharmacological agent for the treatment of Type 2 Diabetes.",
         referral_study: "UKPDS Study (1998) - Showed significant reduction in diabetes-related deaths and myocardial infarction in patients treated with Metformin.",
         drug_interactions: ["Contrast dye (stop Metformin 48 hours before contrast imaging to prevent lactic acidosis)", "Cimetidine (increases metformin levels)"],
-        contraindications: ["eGFR < 30 mL/min/1.73mÃƒÂ‚Ã‚Â² (severe renal impairment)", "Acute or chronic metabolic acidosis"],
-        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("metformin")) ? "ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to Metformin!" : "No active drug allergies detected."
+        contraindications: ["eGFR < 30 mL/min/1.73mÃƒÂƒÃ‚Â‚ÃƒÂ‚Ã‚Â² (severe renal impairment)", "Acute or chronic metabolic acidosis"],
+        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("metformin")) ? "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to Metformin!" : "No active drug allergies detected."
       },
       "azithromycin": {
         rationale: "Macrolide antibiotic. Binds to 50S ribosomal subunit of susceptible microorganisms, interfering with microbial protein synthesis.",
@@ -11907,7 +12042,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
         referral_study: "CATALYST trial (2018) - Evaluated effectiveness in atypical respiratory infections.",
         drug_interactions: ["Amiodarone / QT-prolonging drugs (increased risk of QT prolongation and torsades de pointes)", "Warfarin (increases bleeding risk)"],
         contraindications: ["History of cholestatic jaundice/hepatic dysfunction associated with prior azithromycin use", "QT prolongation history"],
-        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("azithromycin") || a.toLowerCase().includes("macrolide")) ? "ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to Macrolide antibiotics!" : "No active drug allergies detected."
+        allergy_alert: patient?.allergies?.some(a => a.toLowerCase().includes("azithromycin") || a.toLowerCase().includes("macrolide")) ? "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ ALLERGY WARNING: Patient has documented hypersensitivity to Macrolide antibiotics!" : "No active drug allergies detected."
       }
     };
     
@@ -11953,7 +12088,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("amitriptyline") || lower.includes("diazepam") || lower.includes("zolpidem")) {
-          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Geriatric Alert (Beer's Criteria): ${med} is on the high-risk medication list for patients over 65 (increased risk of falls, sedation, cognitive impairment).`);
+          alerts.push(`ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ‚Â¯ÃƒÂ‚Ã‚Â¸ÃƒÂ‚Ã‚Â Geriatric Alert (Beer's Criteria): ${med} is on the high-risk medication list for patients over 65 (increased risk of falls, sedation, cognitive impairment).`);
           riskScore = "High";
         }
       });
@@ -11961,7 +12096,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("aspirin")) {
-          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Pediatric Alert: Aspirin is strictly contraindicated in children under 12 due to high risk of Reye's Syndrome (severe encephalopathy and liver fatty infiltration).`);
+          alerts.push(`ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ Pediatric Alert: Aspirin is strictly contraindicated in children under 12 due to high risk of Reye's Syndrome (severe encephalopathy and liver fatty infiltration).`);
           riskScore = "Emergency";
         }
       });
@@ -11972,10 +12107,10 @@ function generateMockAyurvedicResponse(symptoms: string) {
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("telmisartan") || lower.includes("losartan") || lower.includes("enalapril") || lower.includes("lisinopril")) {
-          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Pregnancy Alert (FDA Category D/X): ARBs/ACE inhibitors like ${med} cause direct fetal renal toxicity and skull anomalies. DISCONTINUE immediately!`);
+          alerts.push(`ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ Pregnancy Alert (FDA Category D/X): ARBs/ACE inhibitors like ${med} cause direct fetal renal toxicity and skull anomalies. DISCONTINUE immediately!`);
           riskScore = "Emergency";
         } else if (lower.includes("atorvastatin") || lower.includes("simvastatin")) {
-          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Pregnancy Alert (FDA Category X): Statins like ${med} are strictly contraindicated due to disruption of fetal cholesterol synthesis critical for membrane development.`);
+          alerts.push(`ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ Pregnancy Alert (FDA Category X): Statins like ${med} are strictly contraindicated due to disruption of fetal cholesterol synthesis critical for membrane development.`);
           riskScore = "Emergency";
         }
       });
@@ -11986,10 +12121,10 @@ function generateMockAyurvedicResponse(symptoms: string) {
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("metformin")) {
-          alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ Renal Safety Alert: Metformin is contraindicated or requires drastic dosage restriction in renal impairment (eGFR < 30) due to severe risk of lactic acidosis.`);
+          alerts.push(`ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ Renal Safety Alert: Metformin is contraindicated or requires drastic dosage restriction in renal impairment (eGFR < 30) due to severe risk of lactic acidosis.`);
           riskScore = "High";
         } else if (lower.includes("ibuprofen") || lower.includes("diclofenac") || lower.includes("naproxen")) {
-          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Renal Safety Alert: NSAIDs like ${med} cause acute vasoconstriction of afferent renal arterioles, risking acute kidney injury.`);
+          alerts.push(`ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ‚Â¯ÃƒÂ‚Ã‚Â¸ÃƒÂ‚Ã‚Â Renal Safety Alert: NSAIDs like ${med} cause acute vasoconstriction of afferent renal arterioles, risking acute kidney injury.`);
           riskScore = "High";
         }
       });
@@ -12000,10 +12135,10 @@ function generateMockAyurvedicResponse(symptoms: string) {
       medications?.forEach((med: string) => {
         const lower = med.toLowerCase();
         if (lower.includes("paracetamol") || lower.includes("acetaminophen")) {
-          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Hepatic Safety Alert: Acetaminophen/Paracetamol clearance is reduced in active liver disease. Strict limit of <2g per 24 hours to avoid hepatotoxicity.`);
+          alerts.push(`ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ‚Â¯ÃƒÂ‚Ã‚Â¸ÃƒÂ‚Ã‚Â Hepatic Safety Alert: Acetaminophen/Paracetamol clearance is reduced in active liver disease. Strict limit of <2g per 24 hours to avoid hepatotoxicity.`);
           riskScore = "High";
         } else if (lower.includes("atorvastatin") || lower.includes("statins")) {
-          alerts.push(`ÃƒÂ¢Ã‚ÂšÃ‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Hepatic Safety Alert: Statins can cause active transaminase elevations. Monitor liver enzymes closely.`);
+          alerts.push(`ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ‚Â¯ÃƒÂ‚Ã‚Â¸ÃƒÂ‚Ã‚Â Hepatic Safety Alert: Statins can cause active transaminase elevations. Monitor liver enzymes closely.`);
           riskScore = "Medium";
         }
       });
@@ -12016,7 +12151,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
         patient.allergies.forEach((allergy: string) => {
           const lowerAllergy = allergy.toLowerCase();
           if (lowerMed.includes(lowerAllergy) || lowerAllergy.includes(lowerMed)) {
-            alerts.push(`ÃƒÂ°Ã‚ÂŸÃ‚ÂšÃ‚Â¨ DRUG ALLERGY MATCH: Documented patient allergy to "${allergy}" matches proposed prescription containing "${med}".`);
+            alerts.push(`ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¨ DRUG ALLERGY MATCH: Documented patient allergy to "${allergy}" matches proposed prescription containing "${med}".`);
             riskScore = "Emergency";
           }
         });
@@ -12024,7 +12159,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
     }
     
     if (alerts.length === 0) {
-      alerts.push("ÃƒÂ¢Ã‚ÂœÃ‚Â… Safe: No active clinical safety flags triggered for this patient profile and medicine combo.");
+      alerts.push("ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂœÃƒÂ‚Ã‚Â… Safe: No active clinical safety flags triggered for this patient profile and medicine combo.");
     }
     
     return res.status(200).json({
@@ -12309,17 +12444,17 @@ function generateMockAyurvedicResponse(symptoms: string) {
   };
 
   const TOUR_STEPS_DEFINITION = [
-    { id: "welcome", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â‘Ã‚Â‹ Welcome to CURA!", description: "I'm your AI clinical assistant. Let me show you what CURA can do for your practice.", duration: 6, target: "body" },
-    { id: "dashboard", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚ÂŠ Your Command Center", description: "Everything you need ÃƒÂ¢Ã‚Â€Ã‚Â” critical patients, follow-ups, revenue, and AI recommendations.", duration: 8, target: "#command-center" },
-    { id: "patients", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â‘Ã‚Â¤ Digital Twin of Patient", description: "Complete health timeline ÃƒÂ¢Ã‚Â€Ã‚Â” diseases, labs, meds, allergies, and AI risk score in 2 seconds.", duration: 10, target: "#patients" },
-    { id: "ai_memory", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â§Ã‚Â  AI Doctor Memory", description: "Learns how YOU practice medicine ÃƒÂ¢Ã‚Â€Ã‚Â” preferred medicines, brands, and prescribing style.", duration: 8, target: "#ai-memory" },
-    { id: "voice", title: "ÃƒÂ°Ã‚ÂŸÃ‚ÂÃ‚Â¤ Voice Prescription", description: "Speak, I write. No typing. Formats structured SOAP notes automatically.", duration: 8, target: "#voice-prescription" },
-    { id: "drug_guard", title: "ÃƒÂ¢Ã‚ÂšÃ‚Â¡ Real-Time Drug Interaction Guard", description: "Continuous cross-audit between drafted orders and Patient EMR baseline for safety.", duration: 10, target: "#drug-guard" },
-    { id: "whatsapp", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â’Ã‚Â¬ WhatsApp Integration", description: "Send prescriptions, appointment reminders, and follow-ups directly on WhatsApp.", duration: 7, target: "#whatsapp" },
-    { id: "ayush", title: "ÃƒÂ°Ã‚ÂŸÃ‚ÂŒÃ‚Â¿ AYUSH Support", description: "Ayurveda, Homeopathy, Unani, Siddha, Yoga ÃƒÂ¢Ã‚Â€Ã‚Â” all medical systems on one platform.", duration: 8, target: "#ayush" },
-    { id: "telemedicine", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â¹ Telemedicine", description: "HD video, voice, and chat consultations ÃƒÂ¢Ã‚Â€Ã‚Â” see patients from anywhere.", duration: 7, target: "#telemedicine" },
-    { id: "followup", title: "ÃƒÂ°Ã‚ÂŸÃ‚Â“Ã‚Â… AI Follow-Up Engine", description: "Tracks every patient. Follow-ups due today, missed patients, chronic revisit ÃƒÂ¢Ã‚Â€Ã‚Â” automated.", duration: 7, target: "#followup" },
-    { id: "complete", title: "ÃƒÂ°Ã‚ÂŸÃ‚ÂÃ‚Â‰ You're Ready!", description: "You've seen everything CURA can do. Start your first consultation now.", duration: 5, target: "#start-consultation" }
+    { id: "welcome", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â‘ÃƒÂ‚Ã‚Â‹ Welcome to CURA!", description: "I'm your AI clinical assistant. Let me show you what CURA can do for your practice.", duration: 6, target: "body" },
+    { id: "dashboard", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚ÂŠ Your Command Center", description: "Everything you need ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â” critical patients, follow-ups, revenue, and AI recommendations.", duration: 8, target: "#command-center" },
+    { id: "patients", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â‘ÃƒÂ‚Ã‚Â¤ Digital Twin of Patient", description: "Complete health timeline ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â” diseases, labs, meds, allergies, and AI risk score in 2 seconds.", duration: 10, target: "#patients" },
+    { id: "ai_memory", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â§ÃƒÂ‚Ã‚Â  AI Doctor Memory", description: "Learns how YOU practice medicine ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â” preferred medicines, brands, and prescribing style.", duration: 8, target: "#ai-memory" },
+    { id: "voice", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂÃƒÂ‚Ã‚Â¤ Voice Prescription", description: "Speak, I write. No typing. Formats structured SOAP notes automatically.", duration: 8, target: "#voice-prescription" },
+    { id: "drug_guard", title: "ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚ÂšÃƒÂ‚Ã‚Â¡ Real-Time Drug Interaction Guard", description: "Continuous cross-audit between drafted orders and Patient EMR baseline for safety.", duration: 10, target: "#drug-guard" },
+    { id: "whatsapp", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â’ÃƒÂ‚Ã‚Â¬ WhatsApp Integration", description: "Send prescriptions, appointment reminders, and follow-ups directly on WhatsApp.", duration: 7, target: "#whatsapp" },
+    { id: "ayush", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂŒÃƒÂ‚Ã‚Â¿ AYUSH Support", description: "Ayurveda, Homeopathy, Unani, Siddha, Yoga ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â” all medical systems on one platform.", duration: 8, target: "#ayush" },
+    { id: "telemedicine", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚Â¹ Telemedicine", description: "HD video, voice, and chat consultations ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â” see patients from anywhere.", duration: 7, target: "#telemedicine" },
+    { id: "followup", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚Â“ÃƒÂ‚Ã‚Â… AI Follow-Up Engine", description: "Tracks every patient. Follow-ups due today, missed patients, chronic revisit ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â€ÃƒÂ‚Ã‚Â” automated.", duration: 7, target: "#followup" },
+    { id: "complete", title: "ÃƒÂƒÃ‚Â°ÃƒÂ‚Ã‚ÂŸÃƒÂ‚Ã‚ÂÃƒÂ‚Ã‚Â‰ You're Ready!", description: "You've seen everything CURA can do. Start your first consultation now.", duration: 5, target: "#start-consultation" }
   ];
 
   app.get("/api/tour/steps", (req, res) => {
@@ -12647,7 +12782,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
           doctor: "Dr. Ananya Rao (Cardiology)",
           chiefComplaint: "Routine Blood Pressure Follow-up & Dyspnea",
           diagnosis: "Essential Hypertension - Controlled",
-          vitals: { bp: "128/82 mmHg", pulse: "74 bpm", spo2: "98%", temp: "98.4 ÃƒÂ‚Ã‚Â°F" }
+          vitals: { bp: "128/82 mmHg", pulse: "74 bpm", spo2: "98%", temp: "98.4 ÃƒÂƒÃ‚Â‚ÃƒÂ‚Ã‚Â°F" }
         }
       ],
       activePrescriptions: [
@@ -12748,7 +12883,7 @@ function generateMockAyurvedicResponse(symptoms: string) {
     { id: "LOG-9081", admin: "Super Admin", action: "User Status Modified", target: "Dr. Suresh Menon (Deactivated)", timestamp: "2026-07-24T12:30:00Z", ip: "192.168.1.45" },
     { id: "LOG-9080", admin: "System Auto-Guard", action: "CDSS Rule Updated", target: "50,000+ Drug Interaction Pairs Audited", timestamp: "2026-07-24T10:15:00Z", ip: "127.0.0.1" },
     { id: "LOG-9079", admin: "Super Admin", action: "System Config Updated", target: "WhatsApp API Gateway Key Rotated", timestamp: "2026-07-24T09:00:00Z", ip: "192.168.1.45" },
-    { id: "LOG-9078", admin: "Billing Admin", action: "Invoice Generated", target: "Apollo Tele-Clinic (ÃƒÂ¢Ã‚Â‚Ã‚Â¹48,000)", timestamp: "2026-07-23T18:20:00Z", ip: "10.0.4.12" }
+    { id: "LOG-9078", admin: "Billing Admin", action: "Invoice Generated", target: "Apollo Tele-Clinic (ÃƒÂƒÃ‚Â¢ÃƒÂ‚Ã‚Â‚ÃƒÂ‚Ã‚Â¹48,000)", timestamp: "2026-07-23T18:20:00Z", ip: "10.0.4.12" }
   ];
 
   let systemConfigStore = {
@@ -12910,140 +13045,5 @@ function generateMockAyurvedicResponse(symptoms: string) {
   app.get("/api/admin/logs", (req, res) => {
     return res.status(200).json({ success: true, data: adminLogsStore });
   });
-
-  // --- SKIN ANALYZE PRO INTEGRATION ---
-  app.post("/api/v1/skin-analyze/analyze", express.json({ limit: "50mb" }), async (req, res) => {
-    try {
-      const { patient_id, patientId, image_base64, imageBase64, left_side_image, right_side_image } = req.body;
-      const targetPatientId = patient_id || patientId;
-      const base64Data = image_base64 || imageBase64;
-
-      // Find patient if provided
-      const patient = targetPatientId ? patientStore.find(p => p.id === String(targetPatientId)) : null;
-
-      let skinAnalysisResult = {
-        skin_score: 82,
-        skin_type: "Combination",
-        concerns: ["Mild acne on forehead", "Slight dehydration around cheeks"],
-        recommendations: [
-          "Use a gentle salicylic acid cleanser daily",
-          "Apply light, oil-free hyaluronic acid moisturizer",
-          "Apply non-comedogenic SPF 50+ sunscreen every morning"
-        ],
-        has_issues: true,
-        summary: "Skin analysis indicates a combination skin type with good overall elasticity (score 82/100). Mild congestion observed in the T-zone area, with light dehydration on the cheeks. Recommend hydration and mild salicylic care."
-      };
-
-      // Try using Gemini if API key is active
-      const ai = getGeminiClient();
-      if (ai && base64Data) {
-        try {
-          const geminiPrompt = `
-You are a professional clinical dermatology AI assistant integrated into the CURA Healthcare platform.
-Analyze this front-face facial image and perform a detailed skin analysis.
-Return strictly a valid JSON object matching the following structure:
-{
-  "skin_score": number (between 30 and 100),
-  "skin_type": "Dry" | "Oily" | "Combination" | "Normal" | "Sensitive",
-  "concerns": string[] (list of 2-4 concrete skin issues found),
-  "recommendations": string[] (list of 2-4 targeted clinical skin-care actions),
-  "has_issues": boolean,
-  "summary": string (a precise, patient-friendly clinical summary of findings and type)
-}
-`;
-          const contents: any[] = [geminiPrompt];
-          if (base64Data.includes(",")) {
-            const parts = base64Data.split(",");
-            const mime = parts[0].match(/:(.*?);/)?.[1] || "image/jpeg";
-            const data = parts[1];
-            contents.push({
-              inlineData: {
-                mimeType: mime,
-                data: data
-              }
-            });
-          } else {
-            contents.push({
-              inlineData: {
-                mimeType: "image/jpeg",
-                data: base64Data
-              }
-            });
-          }
-
-          const response = await ai.models.generateContent({
-            model: "gemini-3.5-flash",
-            contents: contents,
-            config: {
-              responseMimeType: "application/json"
-            }
-          });
-
-          if (response && response.text) {
-            const parsed = JSON.parse(response.text.trim());
-            if (parsed && typeof parsed.skin_score === "number") {
-              skinAnalysisResult = parsed;
-            }
-          }
-        } catch (geminiError) {
-          console.error("[SKIN ANALYZE GEMINI ERROR] falling back to clinical generator", geminiError);
-        }
-      } else {
-        // Deterministic but realistic clinical generation based on patient properties if patient is provided
-        if (patient) {
-          const patientSeed = patient.fullName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-          const types: Array<"Dry" | "Oily" | "Combination" | "Normal" | "Sensitive"> = ["Dry", "Oily", "Combination", "Normal", "Sensitive"];
-          const skin_type = types[patientSeed % types.length];
-          const skin_score = 65 + (patientSeed % 31); // 65 to 95
-          
-          let concerns: string[] = [];
-          let recommendations: string[] = [];
-          let summary = "";
-
-          if (skin_type === "Dry") {
-            concerns = ["Slight flakiness around nasolabial folds", "Fine dry lines on cheeks"];
-            recommendations = ["Apply ceramide-rich barrier repair cream", "Avoid harsh foaming face washes", "Use gentle hydrating serums"];
-            summary = `Dry, moisture-depleted skin barrier identified with an overall score of ${skin_score}/100. Minor flakiness detected in the cheek area. Recommend deep lipid hydration and non-foaming cleansers.`;
-          } else if (skin_type === "Oily") {
-            concerns = ["Active acne lesions on forehead", "Enlarged pores on nose/T-zone"];
-            recommendations = ["Wash with 2% Salicylic Acid cleanser", "Apply lightweight niacinamide gel", "Use oil-free SPF 50 sunscreen"];
-            summary = `Oily, sebum-rich skin type identified with an overall score of ${skin_score}/100. Moderate congestion and sebaceous activity noted on the forehead and nose. Recommend gentle chemical exfoliation.`;
-          } else if (skin_type === "Combination") {
-            concerns = ["Mild blackheads on nose", "Mild dehydration around cheeks"];
-            recommendations = ["Use mild balancing pH cleanser", "Apply light gel-moisturizer on T-zone", "Use nourishing facial oil on cheeks"];
-            summary = `Combination skin profile identified with an overall score of ${skin_score}/100. Excess sebum on the nose with dry cheek zones. Suggest double-cleansing and region-specific moisture application.`;
-          } else if (skin_type === "Sensitive") {
-            concerns = ["Persistent erythema (redness) on cheeks", "Impaired outer skin barrier"];
-            recommendations = ["Apply soothing Centella Asiatica cream", "Strictly avoid fragrances and essential oils", "Use physical/mineral SPF 50"];
-            summary = `Highly sensitive skin barrier identified with a score of ${skin_score}/100. Clear erythematous patterns observed on both cheeks. Advise hypoallergenic formulas and soothing botanical extracts.`;
-          } else {
-            concerns xœ¼<ÛrÛF–ïúŠÊ5E&$HJ¶bÉ£hi‰4Ö…%ÊNe\.	"šdG €t’EU[»±/ûû3?¶çôhÜtq2Ã”C}9§ÏıœîÖùä³À'iHohHÄ5I…ÔùüfXN§ÑrICßKX
-²‡q¬ÈG–xKµG¼Ú¾0¾‰ <]:â{,Là‰£¹O|Á°ÉøyÕ'Óè†ro^'ÒåÒã+€sy@½ Y¬:äÊ¼pJ}F|éÙULÉ-K Di"Á°pNÄ4â”D3òâ;^ÈçûŞ ßwÉ›/ Nt¯<Îåj"XMÄIÌæ°ŞD® &T¸$[Ì4åÇÅ¦	»¡dêqê^Ú«¸_³‡aè+ÁÄiÀÚîŠkÎĞìTßã:‹¯§ƒ‡¢ó£ŠO\0!R*¶³án@Ã9¬úÒïÔ±À^P¾ºûµÒ{=r8#1@EºĞ/L$¢C„”I"’,(ãÀ/©Fãˆ'‚ˆˆ°„ Eéœ{@_zHI`òuAÉèàì==›‘–¼m‘!Ò[5ç6™Ø Jfş6¹ä4î"A»/î½dár—hÙj»I4I8Nkc³íŠôJ$¼µŞ![íûK›.	KºMœá!™ üíSÅ$
-¢ùŠş:ö `ôÉ>ü’€'§@Š–´œs§ı©ÿÙ7…Şóˆ¯ Ö)ƒ&±€xKDÄcR@<Üı%WúNØoØw°Ş'ïßZé—„{Ó„úçğè#uÂ¶­§(´n&Œ÷.dõ¡~¶ÎíiykèŸ‰ã/[h9J„÷ØD	äv.¹ZXí×tõI[ j‡ÔéX$HUìûõ´âL\êQÈVLşJ6ûd—8Kê30ƒ&¢Û¢X0oF0hnË
-ğ£¤W¢7æò¶@¥8‚]¨í3i¼öY ’â³‚ÔÏh5µr£ò¼R¥Al®•6Öm˜ó˜bŸx>-0naİ kjV\ÚL\FM£€Ñ‚ÔûNnfŞä6MÀ7Ú¸ESÒ.èy}tYŸ«¬©»›†bÁfI+3.m°vÃ ì—çûHcö`õ"Ëdš©õûlÎ»:û  ¸ø\”h
-c`{Î†Ì--£pÎÀYÿK¬–q-ëÅ©Fûbp®SÎâf,y*wéÅ-Nv~ — ˆ)¿¿lçüj¿)»N“”‡èÅ]¥·­õ~¿íş"¢Ğ¢°H§S* …„§aªW‡VŞc	£ 2Ñ¢JŒ}Ÿ³Œ
-bj¦¥A°²x ¹~1¥ı Ö`™µ¡ºG{?]å¹í…«\¨ÑËEue[Ëù4yxB†'Ã£Ÿÿ>"£³³Ó³Ï`0ekF¥*q^åÄÉ‰2óAõØmõåê…g$GUÑˆzqìÎ)ø«³ŞÍ ']©6–=.—&zÛš‡`>I‹Ó_;ˆGy«–”€°—;’Zì@ÿ_İØãŞR¼)ô3š¶c~M@9¨;CßŠ@ì2Ÿìììäóe$±ˆm1ª¤zÙ™‘Ê§ñÅwÆ4Ä‚`+ÓĞwê„R¡‰dÉíN«Á"ış;˜¤6 $”·r|pÜ•‘†\ÊÃÁ†—›§?I/4–yÓÚtìh	ó£²ü°\b?*ˆ`€wş¬šîŸÿıÿûçıãáßÿÀ¿ÿ$ç#2è“ãáßNÏĞîŒ†Gç{Ã³9OÏÎ?œ&äípïıèdŸL>şlÜÔ|—œÑ%ää8
-ˆ<f8­³ñq›Hä/dBÁ$AŒéÁªùÌ›R}öéƒ_Š|*šfjRûZÅ˜vƒ/'S¢sD‘¦^¤œ:äwâÌƒt	õ›Nçò{A=\`Œ/ºŒ!éKÌèËjNCùó–Bf–ÈŸ H	Ó(öœMr‹òåØ5!Z^×2#ß(ô N‚æ«l«ªv/ <9_ÀŠQàE·àšÓååuÍ˜FÛø4ÌrW…>»ÅN) PÄêÊK€_+[Ú}O$gÔÃ(v·T}³5ğœ-én`çFa€„¤ì*œBÅ’Ù,{/×,‰-\A´4„çÉ–áÌn³dÙïo¼ ¥kÿˆm’W®@×QÅ%mÍŠ!VIØT7Ğ%å ’Ó•cMp¬¬Q	ëb\ŸqjâÚ4–SøÑ­i 5È™hºğÂ9S>ÅÒÂ¼´,óË"É®ü
-—J›…Tûí\½?}Æ WNcL-²ÃÙ}ìúƒ,<±xâŒktVyæıòKŞ§ nY—‡t¿ØGÏrºäQHF7QpC~Ğ™¼#V$q:=î¾w·¶ÖsÌjtÖöY5*»Õ¯oT
-;x™5×ë«=’&g¹<È³ê¢º¾~mŞ[:P6^W dµcß³JşÏ£ÛV›t1ñú“ÊoÁ%¡¿,28%­VN³Ó$ë¾PÔíZÁ^]EIBŞqJ'É
-Âœ#v©àÙûñ¸N*àuwøö¼û²¿¾şäâû‡åâu…ëóÔÀö­—õlß\&kÿÖn4±¶ÂsÍ1g+LÇzÖ¢3¯åå{CÎy]AÊH6Èf÷MF{?’±ôÓ5ü|Ü…öî`Ğßúì|õ0;ev¾70óûÍZf~ÿ\5].nlö¿Š™ğÿÏo
-¦^´l½~ÓdìÏFÃıîë§X{‹eñ+¯}rû¨šrWgAë<r¡í8O¾	ƒï!«CD¬ä@lÚ‘åzH‹Ñ’ZâC¶dœd3ÖùhÓVõÈn¦ÁüæF-ÕŒz‚®0jıÙ–×0+·Lµæ­À50e‰¤cíœyÑ ‰ˆÙ5ÅbAY¦,—g9{4#>ƒ’ÿyÊ|Š²ÿÕ\¬»¯Á¦Á«GÙ”éä[ jQª(˜L 2&£Ğ#~E¦¡"C$K¦Ÿ Üÿ«
-Ü:˜öş€;÷Yå$ªå¥cw1îÆòÍ©e*n××ML­„A
-¥
-šL@àÑ9:İ]€œî`JaÂBˆÖMUå*òW*Ü´¦D¨ˆÓn“!çŞê¯wv8/·Ùò§Ì€©q&_hSÈó¨€xO¿A:?ßd™½š‚Üÿ`Õcj0ØÃ´ôó3¯Õ$Ûf'-…=’¥K’%/5ØU&³Pì‚áOWnşy+)gÓ‹ š;oJƒboDoÆ˜Gvgm‰e?°Î”ÃÁúÍ$4¡Zœb¹:ÛÃWv‘–µ àå¸ûâ.—ì{³5;Í[…-#ëÅm \Êu›©Í`Ş…úÙ1J Ë_Nq2©‹'2‡i™¡ğ®C7JŠ@bŸò¬z–@Á¾”fQhá(eßï¶dëõ÷›¯ÈËõA¿4Œ.¥˜™aòQÓÊğ¦ÇÂÒHéê~äQçÃówŠß•—€˜3j´ÆeB~ç´0Úd—T^’mTáÂŒzgù˜úêâyıÔÕ6Œjk0½/‘¯W¿P•É?İö"ßæJşRIçŞéş¨(“(ƒä;RÍ­:ÑTzâ“Bö
-çoÚEµ&±Rib‘x­y]yÁ9,”xB–&]»’Ün—Tğ±nœŠnÛ6ä{ë·e\UoeZ¥-QZÃágG›Yc<:CÛÉìè¥)G¿¸“£ßkp—Vq:GBÑï¾³¶Á ¬Ï]5Y`/nXâÂA‹›^h§[kÌ¸	 ­Ñl›ŒŠş¨y³"©’”J(ÅğJ}ò ËÉ¼*(GÈö ~‡§Ò=«ËJÆS¾•æs°^>Q
-±Íâ{°¥)‹ím°)ŞC¿@……f>ÉU"wõ±cEËÖ™—r˜ëÛZmj&ÈâÉÂú­œc"¥Ö2D
-¤‘®Jåğ1C«Ø §Õ5¹zÔª±f‰å’[%^BR3Ğzù5Ö¬œ*c¢'­Qö‡,õL£ã|´@ĞWĞÂ6X¼ÉÒÜ=ÍËÉÏ'{E“pù,„qr<¥…[]OGuÍ l6²J›XOAİ96®y¬™†×!–‡-ÌuœœcN³İ/ñN6K¨Å5¢ã|÷:¥YS²˜m¹ö kw -’dÉ—#Ï÷ùå(Ê°†eÜ|ÂÉ`*¹°§p”‹iÚ^ærÓ«›çö=eaEÃÆre©¥EêíÍRık‘èm³¦nå¡f]Ehj³ÚÇ¾¾Ù¬Î·»µôX¨Ò®Ù/·³¡×C{«µÙz?°fûş9DÄÅ=—pÚr4±¯ù,À¯)å:mÕ¤ˆµËn¯bõÆºŞOÏ»îíÊÈ7O§C•Å,ÿA<=ç—çƒ
-ªäáÆ?@Y¡“©<;åQSÖÛ¼ª+Q•:=$Ã£lpm|TŒ²ŞM¡QC‡ÚØHEEÙˆú°Èˆ²®õQ}I­8H¿n*e›c›æÊY™‡3…@&óœHFÇ0í,°³c˜ºó+ƒêÑ%Ûåsõ±×##³—K ¯B¯ª¬Ù¾oODÏÓO´ã­œNJÁŠŞ¯.T
-?1ÿsAs¿Rÿ
-;8å¦ã”ë6A4õJRd^ÉŠ	<÷õ×îæ`c«C¹ò½»Şßêwğ¼#—Äw°æ~¤:¦ÈMTˆ>	½X,¢DX@ŠªxVÙñäYz«$ÌæsÊUEàIBöÑ‘š†ÄÆ XŸ{ª2êû^zS¼¤<·¢[ìÍ4ƒ¾Á$55\ªHç!AµMËÅ
-SYŸmî®:)v4&ödÉf§‘iñFõ¼Z™iÖ©LPgÉB’tŠúŒ0Ö9ÂÃñ!9gQfêb–ìß Aß§Æ™…ÔËÈ—{*sÜaİwĞXtJdä†Ñüpø­ ]@w‰Dî-n xCË.>9§ñbÅñ¨ü8^ã÷ŞÂãæÎû])$4äŒ;ŸËš¦S"—†7î£ãÃ“Ã ÏÅûÑÏxnÍûJ[ª\\ÓÕĞ eÜÍ®‚{Ò““³©¼p ó4ÇKæû½õ8]Ó·8,È'§û£‹ÑÉGòV• ÅO¥#ËŠJJşopúâİzàzUA!Nd
-’Ó^>nƒ¶ä0eµ™‘[(`¹Ş3±Ùë60ŠC*h!ºù4B­×Î`uÊD‚ìR‘èB]^0+œŞú¨övrJ ŒmP$k™yÚV7)–ß6 QêŞÿP»•73\H3èw‘,ÇÌ«§Ù¶'IIÎÏÇšzòäşnÚıD¯&Ñôš&r£åG)ºD—¼CÑÍj-ÛARãwÈ"Ib]µÕ‚ÅH°ªã­Ú.d #õ$IËLŒœÁ@T7šBï m<Ì'Ik*¯qı‚MŠûµdiñuÍ[Î'ƒÿgm   åÕlD‚¼{Æ£å¶#gt…œİUqıPùÃ¶µ¡†{Vˆ÷ŞK7ë…x-Lƒ ßÔbB7ï‘ ;ÈƒØzkX3ö8ˆÚ‡³#"3"…lFuçn‡HâìJsµ£,Á_,×¿£Îê´-YMypzõ‹¦=Ì,#@x)£XÜ%rn»×{q‡0 Í]€·“=0HğÉ¹¿lÛŞIĞ@RIrGÃÙôøt1VI«”e‰«#ÃKc»ìyìÀåY¬nz.áhêU—{&„ÁJŠ÷$w[YEæÑ³«;øÊˆ”ŒuW“5ÇLÀÜÓñè¤Tı6cP1[›œ¸j¿“ÍV ŞÅz¥>Vƒ'ú…6}pÚ)Yf0™ì;^K„ôˆ3t J2“Ç"›C…NĞ® ¶­j‘…á¯eµå;Ê¹UN¶[Bc¹øÚÕªb/Ó#ÿí9Aµb` Zq/`‰Üfû¤VîğÃşáia“JÄ”N{53A\ŠÂWß$/«\¥,H>>ÔIÏ¡OÛBß)õ¼/¾(<ğ$]‚ŒòT§v—?G)ÁkQxİìY¨»ªX1„gN‘éy	Å“¼ÀëBÒl‹4ÆCùò.j 4uÅcëi‚}ñjl‚Dò®Ñ3û2mT·-AÆƒn‚Ùœ¼ûâÎÒ²{wqZàUN€;\vdÙº>çàÌ'€½¢¾`>%K¼îÀİµap‹·Æ®)É*J9 ]S¸Š×ÑŞC™ ï¼šr/Ps¨^²ÂÄœËë½ävƒñT¹W~!¥I}wí€1·à†òÎ0ÚN¡®Áb0àÍ]ˆ¡ˆ¾§¢¨¦ï5u0$º‘Hg[¦ò˜
-Æ–²'—§Y …V4› <ĞÒ»…à3Ä£­"…tEAt×gò«9ıâËûPWTî8,mÈPv	\PiYØY}Ö‹'…
-ä*l6cSXÂŠ\¡£]`îÜ!l‰¨ƒ<êÀú7çP*Ù"ÜD¯2°Q˜sñ´$:WŞôZµM‘Æ[Ù¯#i&Ğë"F!jQ¹İXr`ÉëLî75&×¨Âœx%/õY¤KÃk!}¶²B…nÚ#`Ï}UBÔ˜»*ø íO ‰]W=8»˜‘%b×ıÔÿ¼ë2yd‡îâU=ïMeaÙÜå­äGıƒv	rŒmğ{ÛÂµdËK7ÌÕÁ¥L‘ú%ÁKš¡º†WCì5ydíºëıyß
-§iïÊ¯*1Œ¯¥Ç]y99Cø	„@¬³«zBXyo§1Æsø·QA¶
-ÖÈ¯]†5¬Æz2ÉIuAOD5aO/ó«‰lÍÄ¶Ÿ‚_Á¥%G}‹P£÷M1¸N/ä¡C<ä;%°Õ¸Ñ«Šİ×oO§—FñB®TnŸ”Ğ|(Îz„z:ôÃ»s¹’ÕSÑ\ÍŠ#|¡¯‚–	÷/'Š	dó«¤»…-L‰¥
-F2Ë!O®ìgvkök×õô8]/ND
-Qús\>>:æ¥­½,ó„¸§1÷v-k¯	› ¢K¢ª¨v`‘8¿©jˆ€Iµ†ÕU	­Š^ƒÓşÆÊÚ¥Ü¡|Óx¥À­+I÷]	3ÿívÁ·Kë'æ®t„eñSÿ.â·
-6¯~#ã½cå2U €´ŠùÇB[ŠÒIyÆiñ†>~´/¾ÓuâYÂ˜sËq÷âéòŞuÜlöû}§’Ï‰åç¯pNéK›W(}:Cÿ¤e)¿j ?ˆh.KÖõŞêá¯:ÃôYY&H!B?ÀTXbµs»b°î«z^ViSQTKÚä^TÆÅº¬¤c;–ÇœJY†‘Y¡¿kä@õ¯#dq
-`8›‡‘¬˜6ÄæÁ#, óÚ¨Ñ—)•–¡ì)şM¶´¦âÑä3ô±u°€	ƒ¼ÿ7Ú`µO©·yÍşØ”Éh«Â+7€l™†-¼æİ!Nß•ÿ•DÎ·K•ò†xo9‘èÅNq¯Òê¼¦š1úÉBŞeVQûI.7EQxóÿ   ÿÿ ’ö¸
+  // Vite middleware for developmentxœ\‘AOÃ0…ïı&â¢*ã\TNŒÛÓ®,jÌ”%!q·¡©ÿt]Ù •RÙ~zŸ_›èà>¸chwb6š¾Og+¸©*`i¢Úš´³,‡céÔÎF‚&„
+ä^j‚: $\¥Ö†>(â©,á[­”Á½øâ–@¡EèŠ³Nz¿üö©Í¢—lèvùCv‰6"ï‰âbOãĞDü³™Ò‘’š´O/ñé´ıMXïÏ`½ˆıàÁ‡^I’®ùè“_É6Hœİ±xÀ¯ú- z„1nªED«µA~N‰«­ÂƒhhkØè;äì²l@˜$FËó×eÒß‹ÓÓ¯H}PgP·áëá“Ch­ÕvÎBCäËÉÄ¸ZšÆE*o½]·HéN´”2Ğùw¥Î   ÿÿ ¡Ÿ©

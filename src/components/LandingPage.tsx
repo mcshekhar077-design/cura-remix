@@ -31,10 +31,14 @@ import {
   Layers,
   LayoutDashboard,
   ShieldCheck,
-  Brain
+  Brain,
+  LogOut,
+  UserCheck
 } from "lucide-react";
 import { ClinicLead } from "../types";
 import ProductTour from "./ProductTour";
+import { useAuth } from "../context/AuthContext";
+import CuraAuthModal from "./CuraAuthModal";
 
 interface LandingPageProps {
   onNavigateToDashboard: () => void;
@@ -67,7 +71,43 @@ interface LandingPageProps {
   onNavigateToCareNavigation?: () => void;
 }
 
-export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, onNavigateToPatient, onNavigateToPharmacy, onNavigateToAyush, onNavigateToMR, onNavigateToMentalHealth, onNavigateToCardiology, onNavigateToPediatrics, onNavigateToWomensHealth, onNavigateToOrthopedics, onNavigateToDermatology, onNavigateToNeurology, onNavigateToOncology, onNavigateToEmergency, onNavigateToENT, onNavigateToAICore, onNavigateToOphthalmology, onNavigateToHematology, onNavigateToNephrology, onNavigateToRheumatology, onNavigateToCriticalCare, onNavigateToGastroenterology, onNavigateToAnalytics, onNavigateToDentistry, onNavigateToPhysiology, onNavigateToVideoConsultation, onNavigateToCareNavigation }: LandingPageProps) {
+export default function LandingPage({ 
+  onNavigateToDashboard, 
+  onNavigateToAdmin, 
+  onNavigateToPatient, 
+  onNavigateToPharmacy, 
+  onNavigateToAyush, 
+  onNavigateToMR, 
+  onNavigateToMentalHealth, 
+  onNavigateToCardiology, 
+  onNavigateToPediatrics, 
+  onNavigateToWomensHealth, 
+  onNavigateToOrthopedics, 
+  onNavigateToDermatology, 
+  onNavigateToNeurology, 
+  onNavigateToOncology, 
+  onNavigateToEmergency, 
+  onNavigateToENT, 
+  onNavigateToAICore, 
+  onNavigateToOphthalmology, 
+  onNavigateToHematology, 
+  onNavigateToNephrology, 
+  onNavigateToRheumatology, 
+  onNavigateToCriticalCare, 
+  onNavigateToGastroenterology, 
+  onNavigateToAnalytics, 
+  onNavigateToDentistry, 
+  onNavigateToPhysiology, 
+  onNavigateToVideoConsultation, 
+  onNavigateToCareNavigation 
+}: LandingPageProps) {
+  const { currentUser, isAuthenticated, logout, signup } = useAuth();
+
+  // Guarded auth modal state
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [intendedModuleTitle, setIntendedModuleTitle] = useState<string | null>(null);
+  const [pendingNavigationAction, setPendingNavigationAction] = useState<(() => void) | null>(null);
+
   // Signup Form State
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -95,6 +135,31 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
     }
   }, []);
 
+  /**
+   * CRITICAL AUTH GUARD:
+   * Every module touch/click passes through here.
+   * If the user is not authenticated, opens the CURA Auth Gate Modal with the intended destination!
+   */
+  const triggerGuardedNavigation = (navFn: (() => void) | undefined, moduleTitle: string) => {
+    if (!navFn) return;
+    
+    if (isAuthenticated) {
+      navFn();
+    } else {
+      setIntendedModuleTitle(moduleTitle);
+      setPendingNavigationAction(() => navFn);
+      setAuthModalOpen(true);
+    }
+  };
+
+  const handleAuthModalSuccess = () => {
+    if (pendingNavigationAction) {
+      const action = pendingNavigationAction;
+      setPendingNavigationAction(null);
+      action();
+    }
+  };
+
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agree) {
@@ -118,6 +183,17 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
           fullName: fullName,
           clinicName: clinicName
         });
+        
+        // Auto-authenticate this new clinician so they can immediately access the portal
+        await signup({
+          fullName,
+          email,
+          phone,
+          role: "doctor",
+          clinicName,
+          doctorCount,
+          password: password || "trial123"
+        });
       } else {
         setErrorMsg(result.detail || "Something went wrong. Please try again.");
       }
@@ -131,7 +207,18 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
   return (
     <div className="min-h-screen bg-white">
-      {/* NAVIGATION */}
+      {/* UNIVERSAL AUTHENTICATION & SIGNUP MODAL */}
+      <CuraAuthModal
+        isOpen={authModalOpen}
+        onClose={() => {
+          setAuthModalOpen(false);
+          setPendingNavigationAction(null);
+        }}
+        intendedModuleTitle={intendedModuleTitle}
+        onSuccess={handleAuthModalSuccess}
+      />
+
+      {/* TOP NAVIGATION BAR */}
       <nav className="bg-white/90 backdrop-blur-xl fixed w-full z-50 border-b border-slate-200/70 shadow-xs transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -200,7 +287,10 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                         <p className="text-[10px] text-slate-400">Integrated OPD, IPD, and specialized care suites</p>
                       </div>
                       <button
-                        onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDashboard(); }}
+                        onClick={() => { 
+                          setSpecialtiesDropdownOpen(false); 
+                          triggerGuardedNavigation(onNavigateToDashboard, "Allopathy Doctor EHR"); 
+                        }}
                         className="text-[11px] font-bold text-sky-700 hover:text-sky-800 hover:underline flex items-center gap-1 cursor-pointer bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-200/60"
                       >
                         <span>Main EHR</span>
@@ -211,7 +301,10 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                     {/* Primary 4 Medical Systems */}
                     <div className="grid grid-cols-2 gap-2">
                       <button 
-                        onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDashboard(); }} 
+                        onClick={() => { 
+                          setSpecialtiesDropdownOpen(false); 
+                          triggerGuardedNavigation(onNavigateToDashboard, "Allopathy Clinical Suite"); 
+                        }} 
                         className="p-2.5 rounded-xl border border-sky-200/80 bg-sky-50/50 hover:bg-sky-100/80 text-left transition-all group cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
@@ -227,7 +320,10 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                       </button>
 
                       <button 
-                        onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToAyush(); }} 
+                        onClick={() => { 
+                          setSpecialtiesDropdownOpen(false); 
+                          triggerGuardedNavigation(onNavigateToAyush, "AYUSH & Holistic Health"); 
+                        }} 
                         className="p-2.5 rounded-xl border border-purple-200/80 bg-purple-50/50 hover:bg-purple-100/80 text-left transition-all group cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
@@ -244,7 +340,10 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
                       {onNavigateToDentistry && (
                         <button 
-                          onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDentistry(); }} 
+                          onClick={() => { 
+                            setSpecialtiesDropdownOpen(false); 
+                            triggerGuardedNavigation(onNavigateToDentistry, "Dentistry & Oral Health"); 
+                          }} 
                           className="p-2.5 rounded-xl border border-cyan-200/80 bg-cyan-50/50 hover:bg-cyan-100/80 text-left transition-all group cursor-pointer"
                         >
                           <div className="flex items-center gap-2">
@@ -259,7 +358,10 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
                       {onNavigateToPhysiology && (
                         <button 
-                          onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToPhysiology(); }} 
+                          onClick={() => { 
+                            setSpecialtiesDropdownOpen(false); 
+                            triggerGuardedNavigation(onNavigateToPhysiology, "Physiology & Rehab Suite"); 
+                          }} 
                           className="p-2.5 rounded-xl border border-teal-200/80 bg-teal-50/50 hover:bg-teal-100/80 text-left transition-all group cursor-pointer"
                         >
                           <div className="flex items-center gap-2">
@@ -280,92 +382,92 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                       </div>
                       <div className="grid grid-cols-3 gap-1 max-h-[220px] overflow-y-auto pr-1">
                         {onNavigateToCardiology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToCardiology(); }} className="px-2 py-1.5 rounded-lg hover:bg-rose-50 text-slate-700 hover:text-rose-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToCardiology, "Cardiology & Echo Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-rose-50 text-slate-700 hover:text-rose-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>❤️ Cardiology</span>
                           </button>
                         )}
                         {onNavigateToPediatrics && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToPediatrics(); }} className="px-2 py-1.5 rounded-lg hover:bg-pink-50 text-slate-700 hover:text-pink-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToPediatrics, "Pediatrics & Child Health"); }} className="px-2 py-1.5 rounded-lg hover:bg-pink-50 text-slate-700 hover:text-pink-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>👶 Pediatrics</span>
                           </button>
                         )}
                         {onNavigateToWomensHealth && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToWomensHealth(); }} className="px-2 py-1.5 rounded-lg hover:bg-fuchsia-50 text-slate-700 hover:text-fuchsia-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToWomensHealth, "Women's Health & OB-GYN"); }} className="px-2 py-1.5 rounded-lg hover:bg-fuchsia-50 text-slate-700 hover:text-fuchsia-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>👩 Women&apos;s Health</span>
                           </button>
                         )}
                         {onNavigateToOrthopedics && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToOrthopedics(); }} className="px-2 py-1.5 rounded-lg hover:bg-blue-50 text-slate-700 hover:text-blue-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToOrthopedics, "Orthopedics & Sports Med"); }} className="px-2 py-1.5 rounded-lg hover:bg-blue-50 text-slate-700 hover:text-blue-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🦴 Orthopedics</span>
                           </button>
                         )}
                         {onNavigateToDermatology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToDermatology(); }} className="px-2 py-1.5 rounded-lg hover:bg-amber-50 text-slate-700 hover:text-amber-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToDermatology, "Dermatology & Skin Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-amber-50 text-slate-700 hover:text-amber-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>☀️ Dermatology</span>
                           </button>
                         )}
                         {onNavigateToMentalHealth && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToMentalHealth(); }} className="px-2 py-1.5 rounded-lg hover:bg-purple-50 text-slate-700 hover:text-purple-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToMentalHealth, "Mental Health & Psychiatry"); }} className="px-2 py-1.5 rounded-lg hover:bg-purple-50 text-slate-700 hover:text-purple-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🧠 Psychiatry</span>
                           </button>
                         )}
                         {onNavigateToNeurology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToNeurology(); }} className="px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToNeurology, "Neurology & Stroke Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>⚡ Neurology</span>
                           </button>
                         )}
                         {onNavigateToOncology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToOncology(); }} className="px-2 py-1.5 rounded-lg hover:bg-rose-50 text-slate-700 hover:text-rose-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToOncology, "Oncology & Chemo Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-rose-50 text-slate-700 hover:text-rose-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🎗️ Oncology</span>
                           </button>
                         )}
                         {onNavigateToEmergency && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToEmergency(); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToEmergency, "Emergency & Trauma Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🚑 Emergency</span>
                           </button>
                         )}
                         {onNavigateToENT && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToENT(); }} className="px-2 py-1.5 rounded-lg hover:bg-purple-50 text-slate-700 hover:text-purple-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToENT, "ENT & Audiology Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-purple-50 text-slate-700 hover:text-purple-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>👂 ENT</span>
                           </button>
                         )}
                         {onNavigateToOphthalmology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToOphthalmology(); }} className="px-2 py-1.5 rounded-lg hover:bg-sky-50 text-slate-700 hover:text-sky-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToOphthalmology, "Ophthalmology & Vision"); }} className="px-2 py-1.5 rounded-lg hover:bg-sky-50 text-slate-700 hover:text-sky-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>👁️ Ophthalmology</span>
                           </button>
                         )}
                         {onNavigateToHematology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToHematology(); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToHematology, "Hematology & Blood Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🩸 Hematology</span>
                           </button>
                         )}
                         {onNavigateToNephrology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToNephrology(); }} className="px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToNephrology, "Nephrology & Dialysis"); }} className="px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🫘 Nephrology</span>
                           </button>
                         )}
                         {onNavigateToRheumatology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToRheumatology(); }} className="px-2 py-1.5 rounded-lg hover:bg-pink-50 text-slate-700 hover:text-pink-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToRheumatology, "Rheumatology Suite"); }} className="px-2 py-1.5 rounded-lg hover:bg-pink-50 text-slate-700 hover:text-pink-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🦴 Rheumatology</span>
                           </button>
                         )}
                         {onNavigateToCriticalCare && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToCriticalCare(); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToCriticalCare, "Critical Care & ICU"); }} className="px-2 py-1.5 rounded-lg hover:bg-red-50 text-slate-700 hover:text-red-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🏥 Critical Care</span>
                           </button>
                         )}
                         {onNavigateToGastroenterology && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToGastroenterology(); }} className="px-2 py-1.5 rounded-lg hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToGastroenterology, "Gastroenterology & Endoscopy"); }} className="px-2 py-1.5 rounded-lg hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🩺 Gastroenterology</span>
                           </button>
                         )}
                         {onNavigateToAnalytics && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToAnalytics(); }} className="px-2 py-1.5 rounded-lg hover:bg-blue-50 text-slate-700 hover:text-blue-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToAnalytics, "Analytics & BI Hub"); }} className="px-2 py-1.5 rounded-lg hover:bg-blue-50 text-slate-700 hover:text-blue-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>📊 Analytics</span>
                           </button>
                         )}
                         {onNavigateToAICore && (
-                          <button onClick={() => { setSpecialtiesDropdownOpen(false); onNavigateToAICore(); }} className="px-2 py-1.5 rounded-lg hover:bg-cyan-50 text-slate-700 hover:text-cyan-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                          <button onClick={() => { setSpecialtiesDropdownOpen(false); triggerGuardedNavigation(onNavigateToAICore, "Shared AI Clinical Core"); }} className="px-2 py-1.5 rounded-lg hover:bg-cyan-50 text-slate-700 hover:text-cyan-900 text-left transition-all flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
                             <span>🧠 AI Core</span>
                           </button>
                         )}
@@ -411,7 +513,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
                     <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToPatient(); }}
+                        onClick={() => { setPortalsDropdownOpen(false); triggerGuardedNavigation(onNavigateToPatient, "Patient Mobile App"); }}
                         className="p-2.5 rounded-xl border border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/40 text-left transition-all group cursor-pointer"
                       >
                         <div className="flex items-start gap-2.5">
@@ -426,7 +528,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                       </button>
 
                       <button
-                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToPharmacy(); }}
+                        onClick={() => { setPortalsDropdownOpen(false); triggerGuardedNavigation(onNavigateToPharmacy, "Central Pharmacy Portal"); }}
                         className="p-2.5 rounded-xl border border-slate-200/80 hover:border-cyan-300 hover:bg-cyan-50/40 text-left transition-all group cursor-pointer"
                       >
                         <div className="flex items-start gap-2.5">
@@ -442,7 +544,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
                       {onNavigateToCareNavigation && (
                         <button
-                          onClick={() => { setPortalsDropdownOpen(false); onNavigateToCareNavigation(); }}
+                          onClick={() => { setPortalsDropdownOpen(false); triggerGuardedNavigation(onNavigateToCareNavigation, "AI Care Navigation"); }}
                           className="p-2.5 rounded-xl border border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/40 text-left transition-all group cursor-pointer"
                         >
                           <div className="flex items-start gap-2.5">
@@ -459,7 +561,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
                       {onNavigateToVideoConsultation && (
                         <button
-                          onClick={() => { setPortalsDropdownOpen(false); onNavigateToVideoConsultation(); }}
+                          onClick={() => { setPortalsDropdownOpen(false); triggerGuardedNavigation(onNavigateToVideoConsultation, "Video Teleconsultation"); }}
                           className="p-2.5 rounded-xl border border-slate-200/80 hover:border-purple-300 hover:bg-purple-50/40 text-left transition-all group cursor-pointer"
                         >
                           <div className="flex items-start gap-2.5">
@@ -475,7 +577,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                       )}
 
                       <button
-                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToMR(); }}
+                        onClick={() => { setPortalsDropdownOpen(false); triggerGuardedNavigation(onNavigateToMR, "MR Partner Portal"); }}
                         className="p-2.5 rounded-xl border border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/40 text-left transition-all group cursor-pointer"
                       >
                         <div className="flex items-start gap-2.5">
@@ -490,7 +592,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                       </button>
 
                       <button
-                        onClick={() => { setPortalsDropdownOpen(false); onNavigateToAdmin(); }}
+                        onClick={() => { setPortalsDropdownOpen(false); triggerGuardedNavigation(onNavigateToAdmin, "Clinic Leads CRM"); }}
                         className="p-2.5 rounded-xl border border-slate-200/80 hover:border-slate-300 hover:bg-slate-50 text-left transition-all group cursor-pointer"
                       >
                         <div className="flex items-start gap-2.5">
@@ -509,23 +611,70 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
               </div>
             </div>
 
-            {/* RIGHT ACTION BUTTONS */}
+            {/* RIGHT ACTION BUTTONS: AUTHENTICATED VS UNAUTHENTICATED */}
             <div className="flex items-center gap-2.5">
-              <button 
-                onClick={onNavigateToDashboard} 
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-700 bg-white hover:bg-sky-50/60 border border-slate-200/90 hover:border-sky-300 px-3.5 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
-              >
-                <LayoutDashboard className="h-3.5 w-3.5 text-sky-600" />
-                <span>Doctor EHR</span>
-              </button>
+              {isAuthenticated && currentUser ? (
+                /* Authenticated User Banner */
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 rounded-2xl p-1 pl-3 shadow-2xs">
+                  <div className="flex flex-col text-left">
+                    <div className="text-xs font-extrabold text-slate-800 leading-tight truncate max-w-[130px] sm:max-w-[180px]">
+                      {currentUser.fullName}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-sky-100 text-sky-800 uppercase tracking-wider">
+                        {currentUser.role}
+                      </span>
+                      <span className="text-[10px] text-slate-400 truncate max-w-[100px]">
+                        {currentUser.clinicName}
+                      </span>
+                    </div>
+                  </div>
 
-              <a 
-                href="#signup" 
-                className="gradient-btn-cura text-white px-4.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm shadow-sky-500/20 hover:shadow-md hover:shadow-sky-500/30 hover:scale-[1.02] flex items-center gap-1.5"
-              >
-                <span>Start Free Trial</span>
-                <ArrowRight className="h-3 w-3" />
-              </a>
+                  <button
+                    onClick={() => triggerGuardedNavigation(onNavigateToDashboard, "Doctor EHR Dashboard")}
+                    className="p-1.5 sm:px-3 sm:py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+                    title="Enter Clinical Console"
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Console</span>
+                  </button>
+
+                  <button
+                    onClick={logout}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                    title="Log Out of CURA"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                /* Unauthenticated Buttons: Sign In / Create Account */
+                <>
+                  <button 
+                    onClick={() => {
+                      setIntendedModuleTitle("Doctor EHR Portal");
+                      setPendingNavigationAction(() => onNavigateToDashboard);
+                      setAuthModalOpen(true);
+                    }} 
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-700 bg-white hover:bg-sky-50/60 border border-slate-200/90 hover:border-sky-300 px-3.5 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
+                  >
+                    <UserCheck className="h-3.5 w-3.5 text-sky-600" />
+                    <span>Sign In</span>
+                  </button>
+
+                  <button 
+                    onClick={() => {
+                      setIntendedModuleTitle("CURA Healthcare Suite");
+                      setPendingNavigationAction(() => onNavigateToDashboard);
+                      setAuthModalOpen(true);
+                    }} 
+                    className="gradient-btn-cura text-white px-4.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm shadow-sky-500/20 hover:shadow-md hover:shadow-sky-500/30 hover:scale-[1.02] flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Sign Up Free</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </button>
+                </>
+              )}
 
               {/* Mobile menu toggle */}
               <button
@@ -543,6 +692,23 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
         {/* MOBILE SLIDE-DOWN DRAWER MENU */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-b border-slate-200 shadow-xl px-4 py-4 space-y-4 max-h-[85vh] overflow-y-auto animate-fadeIn">
+            {/* User Session Info if Logged In */}
+            {isAuthenticated && currentUser && (
+              <div className="p-3 bg-sky-50 border border-sky-200 rounded-2xl flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-extrabold text-sky-950">{currentUser.fullName}</div>
+                  <div className="text-[10px] text-sky-700 font-semibold">{currentUser.clinicName} • {currentUser.role}</div>
+                </div>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); logout(); }}
+                  className="p-2 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold flex items-center gap-1"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            )}
+
             {/* Quick Links */}
             <div className="flex items-center justify-around py-2 bg-slate-50 rounded-xl border border-slate-200/70 text-xs font-bold text-slate-700">
               <a href="#features" onClick={() => setMobileMenuOpen(false)} className="hover:text-sky-600 py-1">Features</a>
@@ -555,24 +721,24 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
             {/* Core Systems */}
             <div className="space-y-2">
               <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-1">
-                Clinical Suites
+                Clinical Suites (Auth Guarded)
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onNavigateToDashboard(); }}
+                  onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToDashboard, "Allopathy Suite"); }}
                   className="p-2 bg-sky-50 border border-sky-200 rounded-xl text-left text-xs font-bold text-sky-900 flex items-center gap-1.5"
                 >
                   <span>🏥 Allopathy</span>
                 </button>
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onNavigateToAyush(); }}
+                  onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToAyush, "AYUSH Suite"); }}
                   className="p-2 bg-purple-50 border border-purple-200 rounded-xl text-left text-xs font-bold text-purple-900 flex items-center gap-1.5"
                 >
                   <span>🌿 AYUSH</span>
                 </button>
                 {onNavigateToDentistry && (
                   <button
-                    onClick={() => { setMobileMenuOpen(false); onNavigateToDentistry(); }}
+                    onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToDentistry, "Dentistry Suite"); }}
                     className="p-2 bg-cyan-50 border border-cyan-200 rounded-xl text-left text-xs font-bold text-cyan-900 flex items-center gap-1.5"
                   >
                     <span>🦷 Dentistry</span>
@@ -580,7 +746,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToPhysiology && (
                   <button
-                    onClick={() => { setMobileMenuOpen(false); onNavigateToPhysiology(); }}
+                    onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToPhysiology, "Physiology Suite"); }}
                     className="p-2 bg-teal-50 border border-teal-200 rounded-xl text-left text-xs font-bold text-teal-900 flex items-center gap-1.5"
                   >
                     <span>⚡ Physiology</span>
@@ -592,18 +758,18 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
             {/* Portals */}
             <div className="space-y-2">
               <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-1">
-                Portals & Modules
+                Portals & Modules (Auth Guarded)
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs font-medium">
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onNavigateToPatient(); }}
+                  onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToPatient, "Patient Mobile App"); }}
                   className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
                 >
                   <Smartphone className="h-3.5 w-3.5 text-emerald-600" />
                   <span>Patient App</span>
                 </button>
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onNavigateToPharmacy(); }}
+                  onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToPharmacy, "Central Pharmacy"); }}
                   className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
                 >
                   <Pill className="h-3.5 w-3.5 text-cyan-600" />
@@ -611,7 +777,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 </button>
                 {onNavigateToCareNavigation && (
                   <button
-                    onClick={() => { setMobileMenuOpen(false); onNavigateToCareNavigation(); }}
+                    onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToCareNavigation, "AI Care Navigation"); }}
                     className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
                   >
                     <Compass className="h-3.5 w-3.5 text-blue-600" />
@@ -620,7 +786,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToVideoConsultation && (
                   <button
-                    onClick={() => { setMobileMenuOpen(false); onNavigateToVideoConsultation(); }}
+                    onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToVideoConsultation, "Video Consult"); }}
                     className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
                   >
                     <Video className="h-3.5 w-3.5 text-purple-600" />
@@ -628,14 +794,14 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                   </button>
                 )}
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onNavigateToMR(); }}
+                  onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToMR, "MR Portal"); }}
                   className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
                 >
                   <Briefcase className="h-3.5 w-3.5 text-indigo-600" />
                   <span>MR Portal</span>
                 </button>
                 <button
-                  onClick={() => { setMobileMenuOpen(false); onNavigateToAdmin(); }}
+                  onClick={() => { setMobileMenuOpen(false); triggerGuardedNavigation(onNavigateToAdmin, "Clinic Leads CRM"); }}
                   className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left flex items-center gap-1.5"
                 >
                   <Terminal className="h-3.5 w-3.5 text-slate-600" />
@@ -647,20 +813,27 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
             {/* Mobile CTAs */}
             <div className="pt-2 flex flex-col gap-2">
               <button
-                onClick={() => { setMobileMenuOpen(false); onNavigateToDashboard(); }}
+                onClick={() => { 
+                  setMobileMenuOpen(false); 
+                  triggerGuardedNavigation(onNavigateToDashboard, "Doctor EHR Portal"); 
+                }}
                 className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2"
               >
                 <LayoutDashboard className="h-4 w-4 text-sky-600" />
                 <span>Launch Doctor EHR</span>
               </button>
-              <a
-                href="#signup"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIntendedModuleTitle("CURA Healthcare Suite");
+                  setPendingNavigationAction(() => onNavigateToDashboard);
+                  setAuthModalOpen(true);
+                }}
                 className="w-full py-2.5 rounded-xl gradient-btn-cura text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm"
               >
                 <span>Start Free 14-Day Trial</span>
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </button>
             </div>
           </div>
         )}
@@ -709,6 +882,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 and send diagnostic summaries instantly via WhatsApp—all from one beautiful AI-powered dashboard.
               </motion.p>
 
+              {/* HERO MODULE BUTTONS: ALL PASS THROUGH AUTH GUARD */}
               <motion.div 
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -730,14 +904,14 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                   <ArrowRight className="h-5 w-5 text-cura-primary" />
                 </a>
                 <button 
-                  onClick={onNavigateToDashboard}
+                  onClick={() => triggerGuardedNavigation(onNavigateToDashboard, "Allopathic Doctor Portal")}
                   className="bg-sky-600 hover:bg-sky-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-sky-500/10 hover:shadow-sky-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                 >
                   🏥 Allopathic Doctor Portal
                 </button>
                 {onNavigateToNeurology && (
                   <button 
-                    onClick={onNavigateToNeurology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToNeurology, "Neurology Suite")}
                     className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🧠 Neurology Suite
@@ -745,7 +919,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToOncology && (
                   <button 
-                    onClick={onNavigateToOncology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToOncology, "Oncology Suite")}
                     className="bg-rose-600 hover:bg-rose-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-rose-500/10 hover:shadow-rose-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🧬 Oncology Suite
@@ -753,7 +927,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToEmergency && (
                   <button 
-                    onClick={onNavigateToEmergency}
+                    onClick={() => triggerGuardedNavigation(onNavigateToEmergency, "Emergency & ICU Suite")}
                     className="bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-red-500/10 hover:shadow-red-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🚑 Emergency & ICU Suite
@@ -761,7 +935,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToENT && (
                   <button 
-                    onClick={onNavigateToENT}
+                    onClick={() => triggerGuardedNavigation(onNavigateToENT, "ENT & Audiology Suite")}
                     className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     👂 ENT & Audiology Suite
@@ -769,7 +943,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToOphthalmology && (
                   <button 
-                    onClick={onNavigateToOphthalmology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToOphthalmology, "Ophthalmology Suite")}
                     className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     👁️ Ophthalmology Suite
@@ -777,7 +951,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToHematology && (
                   <button 
-                    onClick={onNavigateToHematology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToHematology, "Hematology Suite")}
                     className="bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-red-500/10 hover:shadow-red-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🩸 Hematology Suite
@@ -785,7 +959,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToNephrology && (
                   <button 
-                    onClick={onNavigateToNephrology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToNephrology, "Nephrology Suite")}
                     className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🧪 Nephrology Suite
@@ -793,7 +967,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToRheumatology && (
                   <button 
-                    onClick={onNavigateToRheumatology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToRheumatology, "Rheumatology Suite")}
                     className="bg-pink-600 hover:bg-pink-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-pink-500/10 hover:shadow-pink-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🦴 Rheumatology Suite
@@ -801,7 +975,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToCriticalCare && (
                   <button 
-                    onClick={onNavigateToCriticalCare}
+                    onClick={() => triggerGuardedNavigation(onNavigateToCriticalCare, "Critical Care (ICU) Suite")}
                     className="bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-red-500/10 hover:shadow-red-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     ⚡ Critical Care (ICU) Suite
@@ -809,7 +983,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToGastroenterology && (
                   <button 
-                    onClick={onNavigateToGastroenterology}
+                    onClick={() => triggerGuardedNavigation(onNavigateToGastroenterology, "Gastroenterology Suite")}
                     className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🩺 Gastroenterology Suite
@@ -817,7 +991,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToAnalytics && (
                   <button 
-                    onClick={onNavigateToAnalytics}
+                    onClick={() => triggerGuardedNavigation(onNavigateToAnalytics, "Analytics & BI Hub")}
                     className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     📊 Analytics & Reporting Hub
@@ -825,14 +999,14 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                 )}
                 {onNavigateToAICore && (
                   <button 
-                    onClick={onNavigateToAICore}
+                    onClick={() => triggerGuardedNavigation(onNavigateToAICore, "Shared AI Clinical Core")}
                     className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-cyan-500/10 hover:shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                   >
                     🧠 Shared AI Clinical Core
                   </button>
                 )}
                 <button 
-                  onClick={onNavigateToPatient}
+                  onClick={() => triggerGuardedNavigation(onNavigateToPatient, "Patient Mobile App")}
                   className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-8 py-4 rounded-full text-lg font-black shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer"
                 >
                   📱 Patient App
@@ -912,8 +1086,8 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                     <div className="flex items-center justify-between pt-2">
                       <span className="text-xs font-medium text-slate-400">Prescription ready for approval</span>
                       <button 
-                        onClick={onNavigateToDashboard}
-                        className="gradient-btn-cura text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1 shadow-md shadow-sky-500/20"
+                        onClick={() => triggerGuardedNavigation(onNavigateToDashboard, "Doctor EHR Dashboard")}
+                        className="gradient-btn-cura text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1 shadow-md shadow-sky-500/20 cursor-pointer"
                       >
                         Accept & WhatsApp <ArrowRight className="h-3.5 w-3.5" />
                       </button>
@@ -1126,9 +1300,16 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                   </li>
                 </ul>
               </div>
-              <a href="#signup" className="mt-8 block text-center bg-slate-50 border border-slate-200 hover:bg-slate-100 text-cura-primary-dark text-xs font-bold py-3 px-4 rounded-xl transition-all">
-                Select Plan
-              </a>
+              <button 
+                onClick={() => {
+                  setIntendedModuleTitle("Solo Clinic Plan");
+                  setPendingNavigationAction(() => onNavigateToDashboard);
+                  setAuthModalOpen(true);
+                }} 
+                className="mt-8 block w-full text-center bg-slate-50 border border-slate-200 hover:bg-slate-100 text-cura-primary-dark text-xs font-bold py-3 px-4 rounded-xl transition-all cursor-pointer"
+              >
+                Select Plan & Sign Up
+              </button>
             </div>
 
             {/* Nursing Home */}
@@ -1162,9 +1343,16 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                   </li>
                 </ul>
               </div>
-              <a href="#signup" className="mt-8 block text-center gradient-btn-cura hover:opacity-95 text-white text-xs font-bold py-3.5 px-4 rounded-xl transition-all shadow-md shadow-sky-500/10">
-                Start 14-Day Trial
-              </a>
+              <button 
+                onClick={() => {
+                  setIntendedModuleTitle("Nursing Home Plan");
+                  setPendingNavigationAction(() => onNavigateToDashboard);
+                  setAuthModalOpen(true);
+                }} 
+                className="mt-8 block w-full text-center gradient-btn-cura hover:opacity-95 text-white text-xs font-bold py-3.5 px-4 rounded-xl transition-all shadow-md shadow-sky-500/10 cursor-pointer"
+              >
+                Start 14-Day Free Trial
+              </button>
             </div>
 
             {/* Hospital Suite */}
@@ -1312,7 +1500,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
                       required 
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min 8 characters" 
+                      placeholder="Min 6 characters" 
                       className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cura-primary/20 focus:border-cura-primary outline-none text-sm transition-all text-slate-800 font-semibold"
                     />
                   </div>
@@ -1353,7 +1541,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
               <button 
                 type="submit" 
                 disabled={submitting}
-                className="w-full py-4 gradient-btn-cura hover:opacity-95 text-white font-extrabold text-base rounded-full shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.01]"
+                className="w-full py-4 gradient-btn-cura hover:opacity-95 text-white font-extrabold text-base rounded-full shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.01] cursor-pointer"
               >
                 {submitting ? "⏳ Creating Your Clinic Space..." : "Create 14-Day Free Trial Account"}
               </button>
@@ -1392,14 +1580,14 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
 
               <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
-                  onClick={onNavigateToDashboard}
-                  className="gradient-btn-cura text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-sky-500/20 hover:opacity-95"
+                  onClick={() => triggerGuardedNavigation(onNavigateToDashboard, "Doctor EHR Dashboard")}
+                  className="gradient-btn-cura text-white font-extrabold px-8 py-3.5 rounded-full shadow-lg shadow-sky-500/20 hover:opacity-95 cursor-pointer"
                 >
                   Enter Clinic Portal
                 </button>
                 <button 
-                  onClick={onNavigateToAdmin}
-                  className="bg-slate-100 text-slate-700 font-bold px-8 py-3.5 rounded-full hover:bg-slate-200"
+                  onClick={() => triggerGuardedNavigation(onNavigateToAdmin, "Clinic Leads Database")}
+                  className="bg-slate-100 text-slate-700 font-bold px-8 py-3.5 rounded-full hover:bg-slate-200 cursor-pointer"
                 >
                   Inspect leads database
                 </button>
@@ -1427,7 +1615,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
             </p>
           </div>
           <div>
-            <h4 className="text-white font-bold text-sm mb-4">Product Capabilties</h4>
+            <h4 className="text-white font-bold text-sm mb-4">Product Capabilities</h4>
             <ul className="space-y-3 text-xs font-semibold">
               <li><a href="#features" className="hover:text-white transition">Voice-Powered Diagnosis Assistant</a></li>
               <li><a href="#features" className="hover:text-white transition">WhatsApp Prescription Node</a></li>
@@ -1448,29 +1636,29 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
             <h4 className="text-white font-bold text-sm mb-4">System Console</h4>
             <div className="space-y-3 font-semibold">
               <button 
-                onClick={onNavigateToDashboard} 
-                className="w-full text-left text-xs bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-between transition-all"
+                onClick={() => triggerGuardedNavigation(onNavigateToDashboard, "Live Doctor Console")} 
+                className="w-full text-left text-xs bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-between transition-all cursor-pointer"
               >
                 <span>Live Doctor Console</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
               <button 
-                onClick={onNavigateToPharmacy} 
-                className="w-full text-left text-xs bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-between transition-all"
+                onClick={() => triggerGuardedNavigation(onNavigateToPharmacy, "Central Pharmacy Portal")} 
+                className="w-full text-left text-xs bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-between transition-all cursor-pointer"
               >
                 <span>Central Pharmacy Portal</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
               <button 
-                onClick={onNavigateToAdmin} 
-                className="w-full text-left text-xs bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-between transition-all"
+                onClick={() => triggerGuardedNavigation(onNavigateToAdmin, "Registered Leads Database")} 
+                className="w-full text-left text-xs bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-between transition-all cursor-pointer"
               >
                 <span>Registered Leads Database</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
               <button 
-                onClick={onNavigateToMR} 
-                className="w-full text-left text-xs bg-purple-950/40 hover:bg-purple-900/40 border border-purple-800/60 text-purple-200 px-3.5 py-2 rounded-lg flex items-center justify-between transition-all"
+                onClick={() => triggerGuardedNavigation(onNavigateToMR, "MR Referral Program")} 
+                className="w-full text-left text-xs bg-purple-950/40 hover:bg-purple-900/40 border border-purple-800/60 text-purple-200 px-3.5 py-2 rounded-lg flex items-center justify-between transition-all cursor-pointer"
               >
                 <span>🤝 MR Referral Program</span>
                 <ArrowRight className="h-3 w-3 text-purple-400" />
@@ -1494,7 +1682,7 @@ export default function LandingPage({ onNavigateToDashboard, onNavigateToAdmin, 
         onClose={() => setIsTourOpen(false)}
         onNavigateToFeature={() => {
           setIsTourOpen(false);
-          onNavigateToDashboard();
+          triggerGuardedNavigation(onNavigateToDashboard, "Doctor EHR Dashboard");
         }}
       />
     </div>
