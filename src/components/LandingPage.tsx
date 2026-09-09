@@ -33,7 +33,8 @@ import {
   ShieldCheck,
   Brain,
   LogOut,
-  UserCheck
+  UserCheck,
+  Network
 } from "lucide-react";
 import { ClinicLead } from "../types";
 import ProductTour from "./ProductTour";
@@ -69,6 +70,7 @@ interface LandingPageProps {
   onNavigateToPhysiology?: () => void;
   onNavigateToVideoConsultation?: () => void;
   onNavigateToCareNavigation?: () => void;
+  onNavigateToBlueprint?: () => void;
 }
 
 export default function LandingPage({ 
@@ -99,7 +101,8 @@ export default function LandingPage({
   onNavigateToDentistry, 
   onNavigateToPhysiology, 
   onNavigateToVideoConsultation, 
-  onNavigateToCareNavigation 
+  onNavigateToCareNavigation,
+  onNavigateToBlueprint
 }: LandingPageProps) {
   const { currentUser, isAuthenticated, logout, signup } = useAuth();
 
@@ -613,6 +616,21 @@ export default function LandingPage({
 
             {/* RIGHT ACTION BUTTONS: AUTHENTICATED VS UNAUTHENTICATED */}
             <div className="flex items-center gap-2.5">
+              {/* TARGET PRODUCTION ARCHITECTURE BLUEPRINT BUTTON */}
+              {onNavigateToBlueprint && (
+                <button
+                  type="button"
+                  onClick={onNavigateToBlueprint}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-teal-300 border border-slate-700 hover:border-teal-500/50 text-xs font-bold transition-all shadow-xs cursor-pointer group"
+                  title="Open CURA Production Architecture Blueprint & API Gateway Sandbox"
+                >
+                  <Network className="h-3.5 w-3.5 text-teal-400 group-hover:rotate-12 transition-transform" />
+                  <span className="hidden sm:inline">Target Blueprint</span>
+                  <span className="sm:hidden">Blueprint</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                </button>
+              )}
+
               {isAuthenticated && currentUser ? (
                 /* Authenticated User Banner */
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 rounded-2xl p-1 pl-3 shadow-2xs">
@@ -850,15 +868,31 @@ export default function LandingPage({
           <div className="flex flex-col lg:flex-row items-center gap-16">
             {/* Left Content */}
             <div className="flex-1 text-center lg:text-left">
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold mb-6 border border-white/10"
-              >
-                <span className="pulse-dot h-2.5 w-2.5 bg-emerald-400 rounded-full inline-block"></span>
-                <span>Trusted by 500+ Smart Clinics across India</span>
-              </motion.div>
+              <div className="flex flex-wrap items-center gap-3 mb-6 justify-center lg:justify-start">
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold border border-white/10"
+                >
+                  <span className="pulse-dot h-2.5 w-2.5 bg-emerald-400 rounded-full inline-block"></span>
+                  <span>Trusted by 500+ Smart Clinics across India</span>
+                </motion.div>
+
+                {onNavigateToBlueprint && (
+                  <motion.button
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.05 }}
+                    onClick={onNavigateToBlueprint}
+                    className="inline-flex items-center gap-2 bg-slate-950/85 hover:bg-slate-900 text-teal-300 px-4 py-2 rounded-full text-xs font-bold border border-teal-500/40 backdrop-blur-md transition-all shadow-lg hover:scale-[1.02] cursor-pointer"
+                  >
+                    <Network className="h-3.5 w-3.5 text-teal-400" />
+                    <span>Target Architecture Blueprint & Gateway</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  </motion.button>
+                )}
+              </div>
               
               <motion.h1 
                 initial={{ opacity: 0, y: 15 }}

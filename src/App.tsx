@@ -28,6 +28,7 @@ import DentistrySuite from "./components/DentistrySuite";
 import PhysiologySuite from "./components/PhysiologySuite";
 import VideoConsultation from "./components/VideoConsultation";
 import AICareNavigation from "./components/AICareNavigation";
+import ProductionBlueprintSuite from "./components/ProductionBlueprintSuite";
 import ThemeSelectorWidget, { ThemeProvider } from "./components/ThemeSelector";
 import OfflineSyncEngine from "./components/OfflineSyncEngine";
 import GlobalEmergencySOS from "./components/GlobalEmergencySOS";
@@ -63,7 +64,8 @@ type ViewState =
   | "dentistry" 
   | "physiology" 
   | "video_consultation" 
-  | "care_navigation";
+  | "care_navigation"
+  | "blueprint";
 
 function MainRouter() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
@@ -125,6 +127,7 @@ function MainRouter() {
           onNavigateToPhysiology={() => navigateTo("physiology")}
           onNavigateToVideoConsultation={() => navigateTo("video_consultation")}
           onNavigateToCareNavigation={() => navigateTo("care_navigation")}
+          onNavigateToBlueprint={() => navigateTo("blueprint")}
         />
       )}
 
@@ -270,6 +273,11 @@ function MainRouter() {
       )}
       {currentView === "care_navigation" && (
         <AICareNavigation 
+          onBack={() => navigateTo("landing")}
+        />
+      )}
+      {currentView === "blueprint" && (
+        <ProductionBlueprintSuite 
           onBack={() => navigateTo("landing")}
         />
       )}

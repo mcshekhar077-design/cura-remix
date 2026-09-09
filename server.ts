@@ -12,6 +12,8 @@ import {
   getAppointmentEmailHTML 
 } from "./server/services/communicationService";
 import { FHIRService } from "./server/services/fhirService";
+import { gatewayRouter } from "./server/gateway/routes";
+import { featureApiRouter } from "./server/routes/featureApiRouter";
 
 dotenv.config();
 
@@ -4229,6 +4231,15 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(express.json());
+
+  // Mount CURA Production API Gateway
+  app.use("/api/gateway", gatewayRouter);
+
+  // Mount Clean Multi-Tier Feature APIs & Domain Services (NEW CURA Architecture)
+  app.use("/api/v2", featureApiRouter);
+
+  // Fallback mount for gateway routes under /api (e.g. /api/audit/ledger)
+  app.use("/api", gatewayRouter);
 
   // API 1: Clinic Lead Signup (now supports MR Referral Tracking)
   app.post("/api/v1/clinic/signup", (req, res) => {
@@ -13044,6 +13055,16 @@ function generateMockAyurvedicResponse(symptoms: string) {
 
   app.get("/api/admin/logs", (req, res) => {
     return res.status(200).json({ success: true, data: adminLogsStore });
+  });
+
+  // API 404 JSON fallback: prevent unhandled /api/* calls from falling through to Vite index.html
+  app.all("/api/*", (req, res) => {
+    return res.status(404).json({
+      success: false,
+      error: "Not Found",
+      message: `API endpoint ${req.method} ${req.originalUrl} not found`,
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Vite middleware for development
