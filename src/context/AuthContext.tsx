@@ -216,50 +216,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await fetch("/api/v1/auth/universal-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password })
       });
 
       if (response.ok) {
         const data = await response.json();
-        const user: AuthUser = data.user || {
-          id: `usr_${Date.now()}`,
-          fullName: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
-          email,
-          role: "doctor",
-          clinicName: "Smart Healthcare Clinic",
-          phone: "+91 98765 43210",
-          createdAt: new Date().toISOString()
-        };
-        onAuthenticationSuccess(user);
-        return { success: true };
+        if (data.user) {
+          onAuthenticationSuccess(data.user);
+          return { success: true };
+        }
       }
-    } catch {
-      // Offline fallback
+
+      const errData = await response.json().catch(() => ({}));
+      return { success: false, error: errData.detail || errData.error || "Invalid credentials provided." };
+    } catch (e: any) {
+      return { success: false, error: "Network error: Unable to connect to authentication server." };
     }
-
-    // Client-side fallback for smooth UX
-    const foundPreset = DEMO_PRESETS.find(p => p.email.toLowerCase() === email.toLowerCase().trim());
-    const user: AuthUser = foundPreset ? {
-      id: foundPreset.id,
-      fullName: foundPreset.name,
-      email: foundPreset.email,
-      role: foundPreset.role,
-      clinicName: foundPreset.clinicName,
-      specialty: foundPreset.specialty,
-      phone: "+91 98765 43210",
-      createdAt: new Date().toISOString()
-    } : {
-      id: `usr_${Date.now()}`,
-      fullName: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
-      email,
-      role: "doctor",
-      clinicName: "Smart Healthcare Clinic",
-      phone: "+91 98765 43210",
-      createdAt: new Date().toISOString()
-    };
-
-    onAuthenticationSuccess(user);
-    return { success: true };
   };
 
   const signup = async (payload: {
@@ -276,6 +249,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await fetch("/api/v1/auth/universal-signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload)
       });
 
@@ -286,40 +260,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: true };
         }
       }
+
+      const errData = await response.json().catch(() => ({}));
+      return { success: false, error: errData.detail || errData.error || "Signup failed. Please verify your details." };
     } catch {
-      // offline fallback
+      return { success: false, error: "Network error: Could not reach registration service." };
     }
-
-    // Create local user session
-    const newUser: AuthUser = {
-      id: `usr_${Date.now()}`,
-      fullName: payload.fullName,
-      email: payload.email,
-      phone: payload.phone,
-      role: payload.role || "doctor",
-      clinicName: payload.clinicName || `${payload.fullName}'s Practice`,
-      doctorCount: payload.doctorCount || "1",
-      abhaId: payload.abhaId,
-      subdomain: payload.clinicName ? payload.clinicName.toLowerCase().replace(/[^a-z0-9]/g, "-") : "clinic",
-      createdAt: new Date().toISOString()
-    };
-
-    onAuthenticationSuccess(newUser);
-    return { success: true };
   };
 
-  const loginWithPreset = (preset: DemoUserPreset) => {
-    const user: AuthUser = {
-      id: preset.id,
-      fullName: preset.name,
-      email: preset.email,
-      role: preset.role,
-      clinicName: preset.clinicName,
-      specialty: preset.specialty,
-      phone: "+91 98765 43210",
-      createdAt: new Date().toISOString()
+  const loginWithPreset = async (preset: DemoUserPreset) => {
+    // Authenticate preset via server to acquire signed session token
+    const presetPasswords: Record<string, string> = {
+      "dr.sharma@cura.in": "CuraDoctor@2026!",
+      "rajesh.kumar@gmail.com": "CuraPatient@2026!",
+      "dr.priya@ayush.cura.in": "CuraAyush@2026!",
+      "dr.ananya@apexcardio.com": "CuraSpecialist@2026!",
+      "dispenser@medplus.cura.in": "CuraPharmacist@2026!",
+      "admin@cura.in": "CuraAdmin@2026!",
+      "amit.verma@sunpharma.com": "CuraMR@2026!"
     };
-    onAuthenticationSuccess(user);
+
+    const password = presetPasswords[preset.email] || "CuraDoctor@2026!";
+    const res = await login(preset.email, password);
+    if (!res.success) {
+      console.warn("Preset server login failed, fallback to local preset identity:", res.error);
+      const user: AuthUser = {
+        id: preset.id,
+        fullName: preset.name,
+        email: preset.email,
+        role: preset.role,
+        clinicName: preset.clinicName,
+        specialty: preset.specialty,
+        phone: "+91 98765 43210",
+        createdAt: new Date().toISOString()
+      };
+      onAuthenticationSuccess(user);
+    }
   };
 
   const logout = () => {

@@ -36,6 +36,12 @@ import {
   YAxis,
   Tooltip
 } from "recharts";
+import { AyushClinicalEHR } from "./ayush/AyushClinicalEHR";
+import { AyushClinicalAI } from "./ayush/AyushClinicalAI";
+import { AyushMedicineIntelligence } from "./ayush/AyushMedicineIntelligence";
+import { AyushLongitudinalRecord } from "./ayush/AyushLongitudinalRecord";
+import { AyushCareJourney } from "./ayush/AyushCareJourney";
+import { AyushGridIntegration } from "./ayush/AyushGridIntegration";
 
 interface Practitioner {
   id: string;
@@ -85,8 +91,21 @@ interface Remedy {
 }
 
 export function AyushWellness({ onBackToLanding, onNavigateToAllopathic }: { onBackToLanding: () => void; onNavigateToAllopathic?: () => void }) {
-  // Navigation Tabs inside AYUSH
-  const [activeTab, setActiveTab] = useState<"explore" | "prakriti" | "register" | "remedies" | "grid" | "ai-engines">("explore");
+  // Navigation Tabs inside AYUSH (5-Layer Clinical Suite + Grid + Directory)
+  const [activeTab, setActiveTab] = useState<
+    | "clinical-ehr"
+    | "clinical-ai"
+    | "medicine-intel"
+    | "longitudinal-ehr"
+    | "care-journey"
+    | "grid-abdm"
+    | "explore"
+    | "prakriti"
+    | "remedies"
+    | "register"
+    | "grid"
+    | "ai-engines"
+  >("clinical-ehr");
   
   // Search and Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -1178,73 +1197,83 @@ export function AyushWellness({ onBackToLanding, onNavigateToAllopathic }: { onB
                 className="p-1.5 hover:bg-slate-100 rounded-full transition cursor-pointer"
                 title="Back to Landing"
               >
-                <ArrowLeft className="h-5 w-5 text-purple-700" />
+                <ArrowLeft className="h-5 w-5 text-emerald-700" />
               </button>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-extrabold text-purple-700">AYUSH<span className="text-yellow-500">.</span></span>
-                <span className="text-[10px] uppercase font-black tracking-wider text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full">
-                  Traditional Wellness
+                <span className="text-xl font-extrabold text-emerald-800 tracking-tight">
+                  CURA <span className="text-indigo-900">AYUSH</span>
+                </span>
+                <span className="text-[10px] uppercase font-black tracking-wider text-emerald-900 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Integrated Traditional Medicine
                 </span>
               </div>
             </div>
             
-            <div className="hidden md:flex items-center space-x-5">
+            <div className="hidden xl:flex items-center space-x-4">
+              <button
+                onClick={() => { setActiveTab("clinical-ehr"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "clinical-ehr" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🩺 Clinical EHR
+              </button>
+              <button
+                onClick={() => { setActiveTab("clinical-ai"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "clinical-ai" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🧠 Clinical AI
+              </button>
+              <button
+                onClick={() => { setActiveTab("medicine-intel"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "medicine-intel" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🌿 Medicine & Safety
+              </button>
+              <button
+                onClick={() => { setActiveTab("longitudinal-ehr"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "longitudinal-ehr" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                📋 Longitudinal EHR
+              </button>
+              <button
+                onClick={() => { setActiveTab("care-journey"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "care-journey" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🔄 Care Journey
+              </button>
+              <button
+                onClick={() => { setActiveTab("grid-abdm"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "grid-abdm" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                🌐 National Grid (ABDM)
+              </button>
               <button
                 onClick={() => { setActiveTab("explore"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className={`text-xs font-bold tracking-wider uppercase transition cursor-pointer ${
-                  activeTab === "explore" ? "text-purple-700 border-b-2 border-purple-700 pb-1" : "text-slate-500 hover:text-slate-800"
+                className={`text-xs font-black tracking-wide uppercase transition cursor-pointer ${
+                  activeTab === "explore" ? "text-emerald-700 border-b-2 border-emerald-700 pb-1" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                🌿 Explore Directory
-              </button>
-              <button
-                onClick={() => { setActiveTab("prakriti"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className={`text-xs font-bold tracking-wider uppercase transition cursor-pointer ${
-                  activeTab === "prakriti" ? "text-purple-700 border-b-2 border-purple-700 pb-1" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                🧠 AI Prakriti Test
-              </button>
-              <button
-                onClick={() => { setActiveTab("remedies"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className={`text-xs font-bold tracking-wider uppercase transition cursor-pointer ${
-                  activeTab === "remedies" ? "text-purple-700 border-b-2 border-purple-700 pb-1" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                💊 Remedies & herbs
-              </button>
-              <button
-                onClick={() => { setActiveTab("register"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className={`text-xs font-bold tracking-wider uppercase transition cursor-pointer ${
-                  activeTab === "register" ? "text-purple-700 border-b-2 border-purple-700 pb-1" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                ✍️ Register Practitioner
-              </button>
-              <button
-                onClick={() => { setActiveTab("grid"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className={`text-xs font-bold tracking-wider uppercase transition cursor-pointer ${
-                  activeTab === "grid" ? "text-purple-700 border-b-2 border-purple-700 pb-1" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                🌐 Ayush Grid (ABDM)
-              </button>
-              <button
-                onClick={() => { setActiveTab("ai-engines"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className={`text-xs font-bold tracking-wider uppercase transition cursor-pointer ${
-                  activeTab === "ai-engines" ? "text-purple-700 border-b-2 border-purple-700 pb-1" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                🤖 AYUSH AI Engines
+                🏛️ Directory
               </button>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={onNavigateToAllopathic || onBackToLanding}
-                className="text-[11px] font-black uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl transition cursor-pointer"
+                className="text-[11px] font-black uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl transition cursor-pointer shadow-sm"
               >
-                🏥 Open CURA Allopathic
+                🏥 Open Allopathic EHR
               </button>
             </div>
           </div>
@@ -1254,59 +1283,102 @@ export function AyushWellness({ onBackToLanding, onNavigateToAllopathic }: { onB
       {/* BODY CONTENT CONTAINER */}
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* MOBILE SUB-NAVIGATION BAR (Shows on small screens) */}
-        <div className="flex md:hidden items-center justify-between bg-white p-3 rounded-2xl border border-slate-100 shadow-sm mb-6 overflow-x-auto gap-2">
-          <button
-            onClick={() => setActiveTab("explore")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black shrink-0 ${
-              activeTab === "explore" ? "bg-purple-100 text-purple-700" : "text-slate-500"
-            }`}
-          >
-            🌿 Explore
-          </button>
-          <button
-            onClick={() => setActiveTab("prakriti")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black shrink-0 ${
-              activeTab === "prakriti" ? "bg-purple-100 text-purple-700" : "text-slate-500"
-            }`}
-          >
-            🧠 AI Test
-          </button>
-          <button
-            onClick={() => setActiveTab("remedies")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black shrink-0 ${
-              activeTab === "remedies" ? "bg-purple-100 text-purple-700" : "text-slate-500"
-            }`}
-          >
-            💊 Remedies
-          </button>
-          <button
-            onClick={() => setActiveTab("register")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black shrink-0 ${
-              activeTab === "register" ? "bg-purple-100 text-purple-700" : "text-slate-500"
-            }`}
-          >
-            ✍️ Join Net
-          </button>
-          <button
-            onClick={() => setActiveTab("grid")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black shrink-0 ${
-              activeTab === "grid" ? "bg-purple-100 text-purple-700" : "text-slate-500"
-            }`}
-          >
-            🌐 Ayush Grid
-          </button>
-          <button
-            onClick={() => setActiveTab("ai-engines")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-black shrink-0 ${
-              activeTab === "ai-engines" ? "bg-purple-100 text-purple-700" : "text-slate-500"
-            }`}
-          >
-            🤖 AI Engines
-          </button>
+        {/* SUB-NAVIGATION BAR (Shows on smaller screens & tablets) */}
+        <div className="flex xl:hidden items-center bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-x-auto gap-2">
+          {[
+            { id: "clinical-ehr", label: "🩺 Clinical EHR" },
+            { id: "clinical-ai", label: "🧠 Clinical AI" },
+            { id: "medicine-intel", label: "🌿 Medicine & Safety" },
+            { id: "longitudinal-ehr", label: "📋 Longitudinal EHR" },
+            { id: "care-journey", label: "🔄 Care Journey" },
+            { id: "grid-abdm", label: "🌐 National Grid" },
+            { id: "explore", label: "🏛️ Directory" }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black shrink-0 transition cursor-pointer ${
+                activeTab === tab.id ? "bg-emerald-800 text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <AnimatePresence mode="wait">
+          
+          {/* TAB 1: CLINICAL EHR & HITL DOCTOR SUITE */}
+          {activeTab === "clinical-ehr" && (
+            <motion.div
+              key="clinical-ehr"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AyushClinicalEHR onNavigateToAllopathic={onNavigateToAllopathic} />
+            </motion.div>
+          )}
+
+          {/* TAB 2: UNIFIED AYUSH CLINICAL AI GATEWAY */}
+          {activeTab === "clinical-ai" && (
+            <motion.div
+              key="clinical-ai"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AyushClinicalAI />
+            </motion.div>
+          )}
+
+          {/* TAB 3: AYUSH MEDICINE INTELLIGENCE & HERB-DRUG INTERACTIONS */}
+          {activeTab === "medicine-intel" && (
+            <motion.div
+              key="medicine-intel"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AyushMedicineIntelligence />
+            </motion.div>
+          )}
+
+          {/* TAB 4: INTEGRATED LONGITUDINAL HEALTH RECORD */}
+          {activeTab === "longitudinal-ehr" && (
+            <motion.div
+              key="longitudinal-ehr"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AyushLongitudinalRecord onNavigateToAllopathic={onNavigateToAllopathic} />
+            </motion.div>
+          )}
+
+          {/* TAB 5: AYUSH CARE JOURNEY */}
+          {activeTab === "care-journey" && (
+            <motion.div
+              key="care-journey"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AyushCareJourney />
+            </motion.div>
+          )}
+
+          {/* TAB 6: NATIONAL AYUSH GRID (ABDM, HPR, NAMASTE & TRANSLATION) */}
+          {activeTab === "grid-abdm" && (
+            <motion.div
+              key="grid-abdm"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AyushGridIntegration />
+            </motion.div>
+          )}
           
           {/* TAB 1: EXPLORE DIRECTORY */}
           {activeTab === "explore" && (

@@ -75,6 +75,7 @@ import GastroenterologySuite from "./GastroenterologySuite";
 import AnalyticsSuite from "./AnalyticsSuite";
 import DentistrySuite from "./DentistrySuite";
 import { PmjaySuite } from "./PmjaySuite";
+import { useTheme } from "./ThemeSelector";
 
 interface DoctorDashboardProps {
   onBackToLanding: () => void;
@@ -82,6 +83,7 @@ interface DoctorDashboardProps {
 }
 
 export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem = "allopathy" }: DoctorDashboardProps) {
+  const { setCustomPrimary, openPalette } = useTheme();
   // State
   const [medicalSystem, setMedicalSystem] = useState<"allopathy" | "ayurveda" | "homeopathy" | "unani" | "siddha" | "yoga">(initialMedicalSystem);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -6019,17 +6021,32 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
                               <input 
                                 type="color" 
                                 value={brandingPrimaryColor}
-                                onChange={(e) => setBrandingPrimaryColor(e.target.value)}
+                                onChange={(e) => {
+                                  setBrandingPrimaryColor(e.target.value);
+                                  setCustomPrimary(e.target.value);
+                                }}
                                 className="h-10 w-12 p-0.5 border border-slate-200 bg-white rounded-xl cursor-pointer shrink-0"
                               />
                               <input 
                                 type="text" 
                                 value={brandingPrimaryColor}
-                                onChange={(e) => setBrandingPrimaryColor(e.target.value)}
+                                onChange={(e) => {
+                                  setBrandingPrimaryColor(e.target.value);
+                                  if (e.target.value.startsWith("#") && e.target.value.length === 7) {
+                                    setCustomPrimary(e.target.value);
+                                  }
+                                }}
                                 placeholder="#0ea5e9"
                                 className="w-full px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold focus:outline-none text-slate-700"
                               />
                             </div>
+                            <button
+                              type="button"
+                              onClick={openPalette}
+                              className="mt-2 text-[10.5px] font-bold text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              Explore Clinical Theme Presets & Palette Drawer
+                            </button>
                           </div>
 
                           <div>

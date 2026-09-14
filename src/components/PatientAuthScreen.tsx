@@ -304,42 +304,29 @@ export default function PatientAuthScreen({
         return;
       }
 
-      // Try local patient match first
-      const trimmed = identifier.toLowerCase();
-      const match = patients.find(
-        p => p.id.toLowerCase() === trimmed ||
-             (p.patientCode && p.patientCode.toLowerCase() === trimmed) ||
-             (p.phone && p.phone.replace(/\s+/g, "").includes(identifier.replace(/\s+/g, ""))) ||
-             (p.email && p.email.toLowerCase() === trimmed) ||
-             (p.abhaId && p.abhaId.toLowerCase() === trimmed)
-      );
+      // Authenticate directly against secure server endpoint with credentials
+      try {
+        const response = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ 
+            identifier, 
+            password: signInPassword || undefined 
+          })
+        });
 
-      if (match) {
-        completeLoginForPatient(match);
-      } else {
-        // Try API call
-        try {
-          const response = await fetch("/api/v1/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              identifier, 
-              password: signInPassword || undefined 
-            })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            completeLoginForPatient(data.patient);
-          } else {
-            const errData = await response.json();
-            setAuthError(errData.detail || "Invalid credentials. Please try again.");
-            setIsLoading(false);
-          }
-        } catch (apiError) {
-          setAuthError("Network error. Please check your connection and try again.");
+        if (response.ok) {
+          const data = await response.json();
+          completeLoginForPatient(data.patient);
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          setAuthError(errData.detail || "Invalid credentials. Please verify your credentials or password.");
           setIsLoading(false);
         }
+      } catch (apiError) {
+        setAuthError("Network connection error. Unable to verify credentials with server.");
+        setIsLoading(false);
       }
     } catch (error) {
       setAuthError("An unexpected error occurred. Please try again.");

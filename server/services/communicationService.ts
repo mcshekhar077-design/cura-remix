@@ -51,14 +51,14 @@ export async function sendEmail({
   html: string;
   text?: string;
 }): Promise<{ success: boolean; error?: string; mode: "real" | "simulated" }> {
-  const mailjetKey = process.env.MAILJET_API_KEY || "37b4ca145341ce8a45f2144e65b0961a";
-  const mailjetSecret = process.env.MAILJET_API_SECRET || "ec9a61b62547d2f63fdd92bdc42615bf";
+  const mailjetKey = process.env.MAILJET_API_KEY;
+  const mailjetSecret = process.env.MAILJET_API_SECRET;
   const fromEmail = process.env.SMTP_FROM || "no-reply@cura-healthcare.com";
 
-  // If Mailjet is configured, attempt sending via REST API
-  const hasMailjet = mailjetKey && mailjetSecret && 
+  // If Mailjet is configured via environment variables, attempt sending via REST API
+  const hasMailjet = !!(mailjetKey && mailjetSecret && 
                      mailjetKey !== "YOUR_MAILJET_KEY" && 
-                     mailjetSecret !== "YOUR_MAILJET_SECRET";
+                     mailjetSecret !== "YOUR_MAILJET_SECRET");
 
   if (hasMailjet) {
     try {
