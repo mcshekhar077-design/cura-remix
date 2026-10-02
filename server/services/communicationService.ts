@@ -53,7 +53,7 @@ export async function sendEmail({
 }): Promise<{ success: boolean; error?: string; mode: "real" | "simulated" }> {
   const mailjetKey = process.env.MAILJET_API_KEY;
   const mailjetSecret = process.env.MAILJET_API_SECRET;
-  const fromEmail = process.env.SMTP_FROM || "no-reply@cura-healthcare.com";
+  const fromEmail = process.env.SMTP_FROM || "no-reply@clinitial-healthcare.com";
 
   // If Mailjet is configured via environment variables, attempt sending via REST API
   const hasMailjet = !!(mailjetKey && mailjetSecret && 
@@ -77,7 +77,7 @@ export async function sendEmail({
             {
               From: {
                 Email: fromEmail,
-                Name: "Cura Healthcare Auto-Alert"
+                Name: "Clinitial Healthcare Auto-Alert"
               },
               To: [
                 {
@@ -176,7 +176,7 @@ export async function sendSMS({
 }): Promise<{ success: boolean; mode: "real" | "simulated"; error?: string }> {
   const apiEndpoint = process.env.SMS_API_ENDPOINT;
   const apiKey = process.env.SMS_API_KEY;
-  const senderId = process.env.SMS_SENDER_ID || "CURAH";
+  const senderId = process.env.SMS_SENDER_ID || "CLINITIALH";
 
   if (apiEndpoint && apiKey) {
     try {

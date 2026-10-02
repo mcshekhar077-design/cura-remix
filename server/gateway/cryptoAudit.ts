@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { AuditLogBlock, UserRole } from "./types";
 
 const GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
-const AUDIT_SECRET = process.env.AUDIT_SIGNING_SECRET || "cura_audit_tamper_proof_secret_2026";
+const AUDIT_SECRET = process.env.AUDIT_SIGNING_SECRET || "clinitial_audit_tamper_proof_secret_2026";
 
 // In-memory append-only audit ledger
 const auditLedger: AuditLogBlock[] = [];
@@ -44,7 +44,7 @@ export function appendAuditEvent(params: {
   const prevHash = index === 0 ? GENESIS_HASH : auditLedger[index - 1].hash;
   const timestamp = new Date().toISOString();
   const ipAddress = params.ipAddress || "127.0.0.1";
-  const userAgent = params.userAgent || "CURA-Web/Client";
+  const userAgent = params.userAgent || "CLINITIAL-Web/Client";
 
   const hash = computeBlockHash(
     index,

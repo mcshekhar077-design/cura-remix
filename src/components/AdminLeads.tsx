@@ -235,58 +235,67 @@ export default function AdminLeads({ onBackToLanding }: AdminLeadsProps) {
   const [resRating, setResRating] = useState(5);
   const [resFeedback, setResFeedback] = useState("");
 
+  // Safe JSON fetch helper to prevent syntax errors when HTML is returned
+  const safeFetchJson = async (url: string, init?: RequestInit) => {
+    try {
+      const res = await fetch(url, init);
+      if (!res.ok) return null;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        return await res.json();
+      }
+      return null;
+    } catch (e) {
+      console.warn(`Failed to fetch JSON from ${url}:`, e);
+      return null;
+    }
+  };
+
   // Fetch all CRM and Trial data
   const fetchAllCrmData = async () => {
     setLoading(true);
     setErrorMsg("");
     try {
       // 1. Fetch Trial Signups
-      const resTrials = await fetch("/api/v1/clinic/leads");
-      if (resTrials.ok) {
-        const data = await resTrials.json();
-        setTrialLeads(data);
+      const dataTrials = await safeFetchJson("/api/v1/clinic/leads");
+      if (dataTrials) {
+        setTrialLeads(Array.isArray(dataTrials) ? dataTrials : (dataTrials.leads || []));
       }
 
       // 2. Fetch CRM Dashboard
-      const resDash = await fetch("/api/v1/crm/dashboard");
-      if (resDash.ok) {
-        const data = await resDash.json();
-        setCrmStats(data);
+      const dataDash = await safeFetchJson("/api/v1/crm/dashboard");
+      if (dataDash) {
+        setCrmStats(dataDash.stats || dataDash.dashboard || dataDash);
       }
 
       // 3. Fetch CRM Leads
-      const resLeads = await fetch("/api/v1/crm/leads");
-      if (resLeads.ok) {
-        const data = await resLeads.json();
-        setLeads(data);
+      const dataLeads = await safeFetchJson("/api/v1/crm/leads");
+      if (dataLeads) {
+        setLeads(Array.isArray(dataLeads) ? dataLeads : (dataLeads.leads || []));
       }
 
       // 4. Fetch CRM Customers
-      const resCusts = await fetch("/api/v1/crm/customers");
-      if (resCusts.ok) {
-        const data = await resCusts.json();
-        setCustomers(data);
+      const dataCusts = await safeFetchJson("/api/v1/crm/customers");
+      if (dataCusts) {
+        setCustomers(Array.isArray(dataCusts) ? dataCusts : (dataCusts.customers || []));
       }
 
       // 5. Fetch CRM Deals
-      const resDeals = await fetch("/api/v1/crm/deals");
-      if (resDeals.ok) {
-        const data = await resDeals.json();
-        setDeals(data);
+      const dataDeals = await safeFetchJson("/api/v1/crm/deals");
+      if (dataDeals) {
+        setDeals(Array.isArray(dataDeals) ? dataDeals : (dataDeals.deals || []));
       }
 
       // 6. Fetch CRM Interactions
-      const resInts = await fetch("/api/v1/crm/interactions");
-      if (resInts.ok) {
-        const data = await resInts.json();
-        setInteractions(data);
+      const dataInts = await safeFetchJson("/api/v1/crm/interactions");
+      if (dataInts) {
+        setInteractions(Array.isArray(dataInts) ? dataInts : (dataInts.interactions || []));
       }
 
       // 7. Fetch CRM Tickets
-      const resTkts = await fetch("/api/v1/crm/tickets");
-      if (resTkts.ok) {
-        const data = await resTkts.json();
-        setTickets(data);
+      const dataTkts = await safeFetchJson("/api/v1/crm/tickets");
+      if (dataTkts) {
+        setTickets(Array.isArray(dataTkts) ? dataTkts : (dataTkts.tickets || []));
       }
 
     } catch (e) {
@@ -538,27 +547,30 @@ export default function AdminLeads({ onBackToLanding }: AdminLeadsProps) {
 
   // Recharts Data formatting helpers
   const getLeadsByStatusData = () => {
+    const safeLeads = Array.isArray(leads) ? leads : [];
     const statuses = ["new", "contacted", "qualified", "converted", "lost"];
     return statuses.map(s => ({
       name: s.toUpperCase(),
-      count: leads.filter(l => l.status === s).length
+      count: safeLeads.filter(l => l.status === s).length
     }));
   };
 
   const getPipelineStageData = () => {
+    const safeDeals = Array.isArray(deals) ? deals : [];
     const stages = ["prospecting", "qualification", "proposal", "negotiation", "closed_won", "closed_lost"];
     return stages.map(s => ({
       name: s.replace("_", " ").toUpperCase(),
-      value: deals.filter(d => d.stage === s).reduce((sum, d) => sum + d.amount, 0)
+      value: safeDeals.filter(d => d.stage === s).reduce((sum, d) => sum + (Number(d.amount) || 0), 0)
     }));
   };
 
   const getTicketsByCategoryData = () => {
+    const safeTickets = Array.isArray(tickets) ? tickets : [];
     const cats = ["billing", "technical", "support", "consultation"];
     const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ec4899"];
     return cats.map((c, i) => ({
       name: c.toUpperCase(),
-      value: tickets.filter(t => t.category === c).length,
+      value: safeTickets.filter(t => t.category === c).length,
       color: COLORS[i]
     }));
   };

@@ -54,7 +54,7 @@ export function createRateLimiter(options: RateLimiterOptions) {
 
     if (currentCount >= maxRequests) {
       return res.status(statusCode).json({
-        type: "https://cura.in/errors/rate-limit-exceeded",
+        type: "https://clinitial.in/errors/rate-limit-exceeded",
         title: "Too Many Requests",
         status: 429,
         detail: message,

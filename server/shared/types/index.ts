@@ -60,6 +60,8 @@ export interface Patient {
   allergies: string[];
   chronicConditions: string[];
   currentMedications: string[];
+  scannedReports?: any[];
+  history?: any[];
   createdAt: string;
   updatedAt: string;
 }

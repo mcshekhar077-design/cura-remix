@@ -4,17 +4,32 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   
-  --color-cura-primary: var(--cura-primary);
-  --color-cura-primary-dark: var(--cura-primary-dark);
-  --color-cura-primary-light: var(--cura-primary-light);
-  --color-cura-secondary: var(--cura-secondary);
-  --color-cura-accent: var(--cura-accent);
+  --color-clinitial-primary: var(--clinitial-primary);
+  --color-clinitial-primary-dark: var(--clinitial-primary-dark);
+  --color-clinitial-primary-light: var(--clinitial-primary-light);
+  --color-clinitial-secondary: var(--clinitial-secondary);
+  --color-clinitial-accent: var(--clinitial-accent);
+  --color-clinitial-text: #0F172A;
+  --color-clinitial-text-secondary: #475569;
+  --color-clinitial-text-muted: #94A3B8;
+  --color-clinitial-bg-subtle: var(--clinitial-bg-subtle);
+  --color-clinitial-border: #E2E8F0;
+  --color-clinitial-success: #22C55E;
+  --color-clinitial-warning: #F59E0B;
+  --color-clinitial-error: #EF4444;
+  --color-clinitial-info: #8B5CF6;
+
+  /* Backward compatibility aliases */
+  --color-cura-primary: var(--clinitial-primary);
+  --color-cura-primary-dark: var(--clinitial-primary-dark);
+  --color-cura-primary-light: var(--clinitial-primary-light);
+  --color-cura-secondary: var(--clinitial-secondary);
+  --color-cura-accent: var(--clinitial-accent);
   --color-cura-text: #0F172A;
   --color-cura-text-secondary: #475569;
   --color-cura-text-muted: #94A3B8;
-  --color-cura-bg-subtle: var(--cura-bg-subtle);
+  --color-cura-bg-subtle: var(--clinitial-bg-subtle);
   --color-cura-border: #E2E8F0;
-  
   --color-cura-success: #22C55E;
   --color-cura-warning: #F59E0B;
   --color-cura-error: #EF4444;
@@ -22,22 +37,37 @@
 }
 
 :root {
-  --cura-primary: #0EA5E9;
-  --cura-primary-dark: #0C4A6E;
-  --cura-primary-light: #38BDF8;
-  --cura-secondary: #10B981;
-  --cura-accent: #EF4444;
-  --cura-text: #0F172A;
-  --cura-text-secondary: #475569;
-  --cura-text-muted: #94A3B8;
-  --cura-background: #FFFFFF;
-  --cura-background-subtle: #F8FAFC;
-  --cura-border: #E2E8F0;
+  --clinitial-primary: #0EA5E9;
+  --clinitial-primary-dark: #0C4A6E;
+  --clinitial-primary-light: #38BDF8;
+  --clinitial-secondary: #10B981;
+  --clinitial-accent: #EF4444;
+  --clinitial-text: #0F172A;
+  --clinitial-text-secondary: #475569;
+  --clinitial-text-muted: #94A3B8;
+  --clinitial-background: #FFFFFF;
+  --clinitial-background-subtle: #F8FAFC;
+  --clinitial-border: #E2E8F0;
+  --clinitial-bg-subtle: #F8FAFC;
+
+  /* Legacy variables alias */
+  --cura-primary: var(--clinitial-primary);
+  --cura-primary-dark: var(--clinitial-primary-dark);
+  --cura-primary-light: var(--clinitial-primary-light);
+  --cura-secondary: var(--clinitial-secondary);
+  --cura-accent: var(--clinitial-accent);
+  --cura-text: var(--clinitial-text);
+  --cura-text-secondary: var(--clinitial-text-secondary);
+  --cura-text-muted: var(--clinitial-text-muted);
+  --cura-background: var(--clinitial-background);
+  --cura-background-subtle: var(--clinitial-background-subtle);
+  --cura-border: var(--clinitial-border);
+  --cura-bg-subtle: var(--clinitial-bg-subtle);
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--cura-bg-subtle, #ffffff);
+  background-color: var(--clinitial-bg-subtle, #ffffff);
   color: #0F172A;
   scroll-behavior: smooth;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -53,24 +83,24 @@ body {
   animation: pulse-opacity 2s infinite;
 }
 
-.gradient-text-cura {
-  background: linear-gradient(135deg, var(--cura-primary), var(--cura-secondary));
+.gradient-text-clinitial, .gradient-text-cura {
+  background: linear-gradient(135deg, var(--clinitial-primary), var(--clinitial-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.gradient-bg-cura {
-  background: linear-gradient(135deg, var(--cura-primary-dark) 0%, var(--cura-primary) 100%);
+.gradient-bg-clinitial, .gradient-bg-cura {
+  background: linear-gradient(135deg, var(--clinitial-primary-dark) 0%, var(--clinitial-primary) 100%);
 }
 
-.gradient-btn-cura {
-  background: linear-gradient(135deg, var(--cura-primary), var(--cura-secondary));
+.gradient-btn-clinitial, .gradient-btn-cura {
+  background: linear-gradient(135deg, var(--clinitial-primary), var(--clinitial-secondary));
 }
 
-.shadow-glow-cura {
-  box-shadow: 0 0 40px var(--cura-primary);
+.shadow-glow-clinitial, .shadow-glow-cura {
+  box-shadow: 0 0 40px var(--clinitial-primary);
 }
 
 .shadow-glow-cta {
-  box-shadow: 0 20px 60px var(--cura-primary);
+  box-shadow: 0 20px 60px var(--clinitial-primary);
 }

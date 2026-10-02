@@ -48,7 +48,7 @@ import {
 } from "lucide-react";
 import ProductTour from "./ProductTour";
 import { useAuth } from "../context/AuthContext";
-import CuraAuthModal from "./CuraAuthModal";
+import ClinitialAuthModal from "./ClinitialAuthModal";
 import { useTheme } from "./ThemeSelector";
 
 interface LandingPageProps {
@@ -160,8 +160,29 @@ export default function LandingPage({
     }
   }, []);
 
+  const isUserAdmin = Boolean(
+    currentUser && (
+      currentUser.role === "admin" ||
+      (currentUser as any).role === "super_admin" ||
+      (currentUser as any).role === "hospital_admin"
+    )
+  );
+
   const triggerGuardedNavigation = (navFn: (() => void) | undefined, moduleTitle: string) => {
     if (!navFn) return;
+    
+    // Strict RBAC boundary check for Admin OS
+    if (navFn === onNavigateToAdmin) {
+      if (isAuthenticated && isUserAdmin) {
+        onNavigateToAdmin();
+        return;
+      }
+      setIntendedModuleTitle("Clinitial Admin OS & Governance Console (Restricted)");
+      setPendingNavigationAction(() => onNavigateToAdmin);
+      setAuthModalOpen(true);
+      return;
+    }
+
     if (isAuthenticated) {
       navFn();
     } else {
@@ -176,6 +197,17 @@ export default function LandingPage({
       const action = pendingNavigationAction;
       setPendingNavigationAction(null);
       action();
+      return;
+    }
+    // Smart routing based on authenticated identity role
+    if (isUserAdmin) {
+      onNavigateToAdmin();
+    } else if (currentUser?.role === "patient") {
+      onNavigateToPatient();
+    } else if (currentUser?.role === "pharmacist") {
+      onNavigateToPharmacy();
+    } else {
+      onNavigateToDashboard();
     }
   };
 
@@ -351,7 +383,7 @@ export default function LandingPage({
     },
     {
       id: "ayush",
-      name: "CURA AYUSH — Integrated Traditional Medicine",
+      name: "Clinitial AYUSH — Integrated Traditional Medicine",
       icon: Sparkles,
       color: "text-emerald-700 bg-emerald-50 border-emerald-200",
       description: "Clinical AYUSH EHR, AI CDSS (Prakriti, Mizaj, Mukkuttram), Herb-Allopathic interaction engine, and longitudinal care journeys.",
@@ -362,7 +394,7 @@ export default function LandingPage({
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 selection:bg-cyan-500 selection:text-white">
       {/* GLOBAL AUTHENTICATION MODAL */}
-      <CuraAuthModal
+      <ClinitialAuthModal
         isOpen={authModalOpen}
         onClose={() => {
           setAuthModalOpen(false);
@@ -399,7 +431,7 @@ export default function LandingPage({
                   </div>
                   <h3 className="text-xl font-bold text-white">Book a Demo with Clinical Specialists</h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
-                    Discover how CURA unified clinical intelligence connects doctors, patients, and hospital systems.
+                    Discover how Clinitial unified clinical intelligence connects doctors, patients, and hospital systems.
                   </p>
 
                   <form onSubmit={handleDemoSubmit} className="space-y-3.5">
@@ -504,7 +536,7 @@ export default function LandingPage({
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-lg font-bold tracking-tight text-white">CURA</span>
+                    <span className="text-lg font-bold tracking-tight text-white">Clinitial</span>
                     <span className="text-[10px] uppercase font-bold tracking-widest text-cyan-400 bg-cyan-950/60 border border-cyan-800/40 px-1.5 py-0.5 rounded">
                       OS
                     </span>
@@ -556,17 +588,35 @@ export default function LandingPage({
                 <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700 rounded-xl p-1 pl-3">
                   <div className="text-left">
                     <div className="text-xs font-semibold text-white truncate max-w-[120px]">{currentUser.fullName}</div>
-                    <div className="text-[10px] text-cyan-400 uppercase tracking-wider">{currentUser.role}</div>
+                    <div className={`text-[10px] font-bold uppercase tracking-wider ${
+                      isUserAdmin ? "text-purple-400" : "text-cyan-400"
+                    }`}>
+                      {isUserAdmin ? "Admin OS" : currentUser.role}
+                    </div>
                   </div>
                   <button 
-                    onClick={() => triggerGuardedNavigation(onNavigateToDashboard, "Doctor Clinical Workspace")}
-                    className="px-2.5 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold transition"
+                    onClick={() => {
+                      if (isUserAdmin) {
+                        onNavigateToAdmin();
+                      } else if (currentUser.role === "patient") {
+                        onNavigateToPatient();
+                      } else if (currentUser.role === "pharmacist") {
+                        onNavigateToPharmacy();
+                      } else {
+                        triggerGuardedNavigation(onNavigateToDashboard, "Doctor Clinical Workspace");
+                      }
+                    }}
+                    className={`px-2.5 py-1.5 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer ${
+                      isUserAdmin 
+                        ? "bg-purple-600 hover:bg-purple-500 shadow-purple-600/30" 
+                        : "bg-cyan-600 hover:bg-cyan-500 shadow-cyan-600/30"
+                    }`}
                   >
-                    Open Console
+                    {isUserAdmin ? "Admin OS" : "Open Console"}
                   </button>
                   <button 
                     onClick={logout} 
-                    className="p-1.5 text-slate-400 hover:text-rose-400 transition"
+                    className="p-1.5 text-slate-400 hover:text-rose-400 transition cursor-pointer"
                     title="Log Out"
                   >
                     <LogOut className="h-3.5 w-3.5" />
@@ -576,11 +626,11 @@ export default function LandingPage({
                 <>
                   <button 
                     onClick={() => {
-                      setIntendedModuleTitle("Doctor Clinical Console");
-                      setPendingNavigationAction(() => onNavigateToDashboard);
+                      setIntendedModuleTitle("Clinitial Healthcare OS");
+                      setPendingNavigationAction(null);
                       setAuthModalOpen(true);
                     }}
-                    className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 transition"
+                    className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 transition cursor-pointer"
                   >
                     Sign In
                   </button>
@@ -708,7 +758,7 @@ export default function LandingPage({
                 <div className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
                 <div className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
                 <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
-                <span className="font-mono text-slate-400 ml-2 text-[11px]">cura.clinical.os / consultation-view</span>
+                <span className="font-mono text-slate-400 ml-2 text-[11px]">clinitial.clinical.os / consultation-view</span>
               </div>
               <div className="flex items-center gap-2 text-[11px] text-slate-400">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -881,17 +931,17 @@ export default function LandingPage({
 
           <div className="mt-8 p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-blue-950/40 border border-cyan-800/40 text-center">
             <p className="text-sm font-semibold text-cyan-300">
-              CURA brings every thread into one unified, intelligent continuum.
+              Clinitial brings every thread into one unified, intelligent continuum.
             </p>
           </div>
         </div>
       </section>
 
-      {/* CURA PLATFORM ARCHITECTURE SECTION */}
+      {/* CLINITIAL PLATFORM ARCHITECTURE SECTION */}
       <section id="solutions" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-950/80 border-t border-slate-800">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">CURA Platform</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">Clinitial Platform</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">One healthcare operating system</h2>
             <p className="text-sm text-slate-400 mt-3 leading-relaxed">
               Architected to connect clinical intelligence, patient engagement, and operational scale.
@@ -904,7 +954,7 @@ export default function LandingPage({
             <div className="max-w-xs mx-auto p-3.5 rounded-xl bg-gradient-to-r from-cyan-950 to-blue-950 border border-cyan-500/50 text-center shadow-lg shadow-cyan-950/50">
               <div className="flex items-center justify-center gap-1.5 text-cyan-300 font-bold text-sm">
                 <Brain className="h-4 w-4 text-cyan-400" />
-                <span>CURA AI CORE</span>
+                <span>CLINITIAL AI CORE</span>
               </div>
               <p className="text-[10px] text-slate-400 mt-0.5">Central intelligence & decision support engine</p>
             </div>
@@ -1004,7 +1054,7 @@ export default function LandingPage({
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">Intelligence Engine</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">The intelligence layer behind CURA.</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">The intelligence layer behind Clinitial.</h2>
             <p className="text-sm text-slate-400 mt-3 leading-relaxed">
               Clinical decision support grounded in medical reasoning, voice intelligence, and patient context.
             </p>
@@ -1071,10 +1121,10 @@ export default function LandingPage({
 
           <div className="mt-8 text-center">
             <button 
-              onClick={() => triggerGuardedNavigation(onNavigateToAICore, "CURA AI Clinical Core")}
+              onClick={() => triggerGuardedNavigation(onNavigateToAICore, "Clinitial AI Clinical Core")}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition"
             >
-              <span>Explore CURA AI Core</span>
+              <span>Explore Clinitial AI Core</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -1095,7 +1145,7 @@ export default function LandingPage({
                 </h2>
               </div>
               <p className="text-sm text-slate-300 leading-relaxed">
-                CURA re-engineers the documentation burden into ambient assistance, keeping your eyes on the patient rather than the screen.
+                Clinitial re-engineers the documentation burden into ambient assistance, keeping your eyes on the patient rather than the screen.
               </p>
 
               <div className="grid grid-cols-2 gap-3 text-xs text-slate-300">
@@ -1257,7 +1307,7 @@ export default function LandingPage({
                 </div>
 
                 <div className="p-3 rounded-xl bg-gradient-to-r from-blue-950/50 to-cyan-950/50 border border-cyan-800/40 text-[11px] text-cyan-200">
-                  💬 Have a question about your medication? Ask CURA AI Health Coach in Hindi, English, or 8 regional languages.
+                  💬 Have a question about your medication? Ask Clinitial AI Health Coach in Hindi, English, or 8 regional languages.
                 </div>
               </div>
             </div>
@@ -1399,7 +1449,7 @@ export default function LandingPage({
             <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">Clinical Suites</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">AI-powered workflows across specialties.</h2>
             <p className="text-sm text-slate-400 mt-3 leading-relaxed">
-              Every medical discipline has unique documentation needs. CURA provides dedicated, specialized suites configured for specific clinical requirements.
+              Every medical discipline has unique documentation needs. Clinitial provides dedicated, specialized suites configured for specific clinical requirements.
             </p>
           </div>
 
@@ -1453,7 +1503,7 @@ export default function LandingPage({
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-950/80 border-t border-slate-800">
         <div className="max-w-5xl mx-auto text-center">
           <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">The Connected Ecosystem</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">CURA connects the healthcare ecosystem.</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Clinitial connects the healthcare ecosystem.</h2>
           <p className="text-sm text-slate-400 mt-3 max-w-xl mx-auto leading-relaxed">
             Real-time synchronization ensures that when a patient visits an OPD or undergoes a test, every relevant care stakeholder has synchronized visibility.
           </p>
@@ -1492,12 +1542,12 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* HOW CURA WORKS (5 STEPS) */}
+      {/* HOW CLINITIAL WORKS (5 STEPS) */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">Methodology</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">How CURA Works</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">How Clinitial Works</h2>
             <p className="text-sm text-slate-400 mt-3 leading-relaxed">
               A five-stage clinical intelligence cycle designed for speed and diagnostic rigor.
             </p>
@@ -1842,7 +1892,7 @@ export default function LandingPage({
                   className="mt-0.5 h-4 w-4 rounded bg-slate-950 border-slate-800 text-cyan-500 focus:ring-cyan-500"
                 />
                 <label htmlFor="agree" className="text-xs text-slate-400 select-none cursor-pointer leading-relaxed">
-                  I agree to CURA&apos;s <a href="#" className="text-cyan-400 hover:underline">Terms of Service</a> and <a href="#" className="text-cyan-400 hover:underline">Privacy Notice</a>.
+                  I agree to Clinitial&apos;s <a href="#" className="text-cyan-400 hover:underline">Terms of Service</a> and <a href="#" className="text-cyan-400 hover:underline">Privacy Notice</a>.
                 </label>
               </div>
 
@@ -1884,14 +1934,14 @@ export default function LandingPage({
             Healthcare shouldn&apos;t work in silos.
           </h2>
           <p className="text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
-            CURA connects the intelligence, people, and systems behind better care.
+            Clinitial connects the intelligence, people, and systems behind better care.
           </p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <a 
               href="#signup"
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-sm font-semibold shadow-lg shadow-cyan-500/20 transition"
             >
-              Start with CURA
+              Start with Clinitial
             </a>
             <button 
               onClick={() => setIsDemoModalOpen(true)}
@@ -1912,13 +1962,13 @@ export default function LandingPage({
               <div className="h-6 w-6 rounded-md bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
                 <Heart className="h-3.5 w-3.5 fill-red-500" />
               </div>
-              <span className="text-base font-bold text-white tracking-tight">CURA.OS</span>
+              <span className="text-base font-bold text-white tracking-tight">Clinitial.OS</span>
             </div>
             <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
               The AI healthcare operating system connecting doctors, patients, and hospital operations from consultation to continuous care.
             </p>
             <p className="text-[11px] text-slate-500">
-              © {new Date().getFullYear()} CURA Health Technologies. All rights reserved.
+              © {new Date().getFullYear()} Clinitial Health Technologies. All rights reserved.
             </p>
           </div>
 
@@ -1937,7 +1987,7 @@ export default function LandingPage({
           <div className="space-y-2">
             <div className="text-xs font-bold text-white uppercase tracking-wider">Platform & AI</div>
             <ul className="space-y-1.5 text-slate-400">
-              <li><a href="#ai-core" className="hover:text-slate-200 transition">CURA AI Core</a></li>
+              <li><a href="#ai-core" className="hover:text-slate-200 transition">Clinitial AI Core</a></li>
               <li><a href="#ai-core" className="hover:text-slate-200 transition">Ambient Voice Capture</a></li>
               <li><a href="#ai-core" className="hover:text-slate-200 transition">Clinical Decision Support</a></li>
               {onNavigateToBlueprint && (
@@ -1964,9 +2014,18 @@ export default function LandingPage({
                     setPendingNavigationAction(() => onNavigateToDashboard);
                     setAuthModalOpen(true);
                   }}
-                  className="hover:text-slate-200 transition text-left"
+                  className="hover:text-slate-200 transition text-left cursor-pointer"
                 >
                   Clinician Sign In
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => triggerGuardedNavigation(onNavigateToAdmin, "Clinitial Admin OS & Governance Console")}
+                  className="hover:text-purple-400 transition text-left flex items-center gap-1.5 cursor-pointer text-slate-400"
+                >
+                  <Lock className="h-3 w-3 text-purple-400/80" />
+                  <span>Administrator Portal</span>
                 </button>
               </li>
               <li><a href="#" className="hover:text-slate-200 transition">Privacy Notice</a></li>

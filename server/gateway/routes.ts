@@ -53,7 +53,7 @@ gatewayRouter.get("/health", (req, res) => {
   const nodes: ArchitectureNodeStatus[] = [
     {
       id: "node_web",
-      name: "CURA Web (Doctor/Hospital/Patient/Pharmacy)",
+      name: "CLINITIAL Web (Doctor/Hospital/Patient/Pharmacy)",
       tier: "presentation",
       status: "healthy",
       latencyMs: 12,
@@ -166,7 +166,7 @@ gatewayRouter.get("/health", (req, res) => {
   return res.status(200).json({
     success: true,
     timestamp: new Date().toISOString(),
-    system: "CURA Production Healthcare Gateway",
+    system: "CLINITIAL Production Healthcare Gateway",
     version: "2.5.0-production",
     overallHealth: "ALL_SYSTEMS_OPERATIONAL",
     nodes
@@ -192,7 +192,7 @@ gatewayRouter.post("/auth/login", (req, res) => {
 });
 
 gatewayRouter.get("/auth/me", authenticateGateway, (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   return res.status(200).json({
     success: true,
     context: {
@@ -264,7 +264,7 @@ gatewayRouter.post("/validation/test", (req, res) => {
   if (!parseResult.success) {
     const formattedErrors = parseResult.error.format();
     return res.status(400).json({
-      type: "https://cura.in/errors/validation-failed",
+      type: "https://clinitial.in/errors/validation-failed",
       title: "Input Validation Failed",
       status: 400,
       detail: "One or more payload parameters failed strict clinical schema validation.",
@@ -289,7 +289,7 @@ gatewayRouter.post("/validation/test", (req, res) => {
 // 6. RBAC PERMISSION TEST ACTION
 // ==========================================
 gatewayRouter.post("/rbac/test-action", authenticateGateway, (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   const { action } = req.body;
 
   // Action to required permission mapping
@@ -345,7 +345,7 @@ gatewayRouter.post("/rbac/test-action", authenticateGateway, (req, res) => {
     });
 
     return res.status(403).json({
-      type: "https://cura.in/errors/forbidden-rbac",
+      type: "https://clinitial.in/errors/forbidden-rbac",
       title: "Action Forbidden by RBAC Policy",
       status: 403,
       action,
@@ -384,7 +384,7 @@ gatewayRouter.post("/rbac/test-action", authenticateGateway, (req, res) => {
 // 7. CLINICAL SERVICES (TENANT-ISOLATED DB)
 // ==========================================
 gatewayRouter.get("/clinical/patients", authenticateGateway, (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   const search = req.query.search as string;
   const status = req.query.status as string;
 
@@ -408,7 +408,7 @@ gatewayRouter.get("/clinical/patients", authenticateGateway, (req, res) => {
 });
 
 gatewayRouter.post("/clinical/patients", authenticateGateway, requireRole("DOCTOR", "HOSPITAL_ADMIN", "NURSE"), (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
 
   const newPatient = insertTenantClinicalRecord(context.tenantId, {
     mrn: `${context.tenantId.toUpperCase().slice(-3)}-MRN-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -459,7 +459,7 @@ gatewayRouter.get("/ai/prompts", (req, res) => {
 });
 
 gatewayRouter.post("/ai/clinical-query", authenticateGateway, async (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   const { query, promptVersionId, patientContext } = req.body;
 
   if (!query) {
@@ -489,7 +489,7 @@ gatewayRouter.post("/ai/clinical-query", authenticateGateway, async (req, res) =
 // 9. OBJECT STORE (SECURE MEDICAL VAULT)
 // ==========================================
 gatewayRouter.get("/storage/files", authenticateGateway, (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   const category = req.query.category as string;
   const files = listStoredObjects(context.tenantId, category);
 
@@ -502,7 +502,7 @@ gatewayRouter.get("/storage/files", authenticateGateway, (req, res) => {
 });
 
 gatewayRouter.post("/storage/upload", authenticateGateway, requirePermission("storage:upload"), (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   const { fileName, category, fileSizeBytes, mimeType, metadata } = req.body;
 
   if (!fileName || !category) {
@@ -567,7 +567,7 @@ gatewayRouter.post("/redis/enqueue", authenticateGateway, (req, res) => {
 // 11. AUDIT STORE (IMMUTABLE CRYPTO LEDGER)
 // ==========================================
 gatewayRouter.get("/audit/ledger", authenticateGateway, (req, res) => {
-  const context: GatewayAuthContext = (req as any).curaContext;
+  const context: GatewayAuthContext = (req as any).clinitialContext;
   const tenantFilter = req.query.tenantId as string || (context.user.role === "AUDITOR" ? "all" : context.tenantId);
   const action = req.query.action as string;
   const limit = req.query.limit ? Number(req.query.limit) : 50;

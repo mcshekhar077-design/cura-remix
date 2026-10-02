@@ -17,6 +17,6 @@ export const messagingConfig = {
     port: parseInt(process.env.SMTP_PORT || "587", 10),
     user: process.env.SMTP_USER,
     password: process.env.SMTP_PASSWORD,
-    from: process.env.SMTP_FROM || "CURA Health <notifications@cura.health>"
+    from: process.env.SMTP_FROM || "CLINITIAL Health <notifications@clinitial.health>"
   }
 };

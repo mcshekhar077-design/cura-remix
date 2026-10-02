@@ -20,7 +20,8 @@ class PostgresDatabaseAdapter implements DatabaseAdapter {
     users: new Map<string, User & { passwordHash: string; salt: string }>(),
     patients: new Map<string, Patient>(),
     encounters: new Map<string, ClinicalEncounter>(),
-    prescriptions: new Map<string, Prescription>()
+    prescriptions: new Map<string, Prescription>(),
+    passwordResetTokens: new Map<string, { email: string; token: string; code: string; expiresAt: number; used?: boolean }>()
   };
 
   constructor() {
@@ -82,6 +83,104 @@ class PostgresDatabaseAdapter implements DatabaseAdapter {
       updatedAt: new Date().toISOString()
     };
     this.fallbackTables.users.set(doctorUser.id, doctorUser);
+
+    // Seed Platform Super-Admin (Dr. K.S. Murthy CMO)
+    const adminPwd = hashPassword("ClinitialAdmin@2026!");
+    const adminUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-admin-1",
+      tenantId: "tenant_apollo",
+      email: "admin@clinitial.in",
+      phone: "+91 98111 22334",
+      fullName: "Dr. K.S. Murthy (CMO & Super Admin)",
+      role: "super_admin",
+      specialization: "Clinical Governance & Platform Operations",
+      registrationCouncilNumber: "MCI-ADMIN-001",
+      isActive: true,
+      mfaEnabled: true,
+      passwordHash: adminPwd.hash,
+      salt: adminPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(adminUser.id, adminUser);
+
+    // Seed Hospital Admin
+    const hospAdminPwd = hashPassword("AdminSecurePass2026!");
+    const hospAdminUser: User & { passwordHash: string; salt: string } = {
+      id: "user_admin_1",
+      tenantId: "tenant_apollo",
+      email: "admin@apollo.com",
+      phone: "+91 98490 99887",
+      fullName: "Admin Sharma",
+      role: "hospital_admin",
+      specialization: "Hospital Facility Administration",
+      registrationCouncilNumber: "HOSP-ADMIN-77",
+      isActive: true,
+      mfaEnabled: true,
+      passwordHash: hospAdminPwd.hash,
+      salt: hospAdminPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(hospAdminUser.id, hospAdminUser);
+
+    // Seed Demo Doctor Sharma
+    const docSharmaPwd = hashPassword("ClinitialDoctor@2026!");
+    const docSharmaUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-doc-1",
+      tenantId: "tenant_apollo",
+      email: "dr.sharma@clinitial.in",
+      phone: "+91 98765 43210",
+      fullName: "Dr. Rajesh Sharma",
+      role: "doctor",
+      specialization: "Internal Medicine & Allopathy",
+      registrationCouncilNumber: "MCI-55210",
+      isActive: true,
+      mfaEnabled: false,
+      passwordHash: docSharmaPwd.hash,
+      salt: docSharmaPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(docSharmaUser.id, docSharmaUser);
+
+    // Seed Demo Patient Rajesh Kumar
+    const patPwd = hashPassword("ClinitialPatient@2026!");
+    const patUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-pat-1",
+      tenantId: "tenant_apollo",
+      email: "rajesh.kumar@gmail.com",
+      phone: "+91 98765 43210",
+      fullName: "Rajesh Kumar",
+      role: "patient",
+      specialization: "Patient Health Record",
+      isActive: true,
+      mfaEnabled: false,
+      passwordHash: patPwd.hash,
+      salt: patPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(patUser.id, patUser);
+
+    // Seed Demo Pharmacist
+    const pharmPwd = hashPassword("ClinitialPharmacist@2026!");
+    const pharmUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-pharm-1",
+      tenantId: "tenant_apollo",
+      email: "dispenser@medplus.clinitial.in",
+      phone: "+91 98222 33445",
+      fullName: "Vikram Patel",
+      role: "pharmacist",
+      specialization: "Central Dispensing & Barcode POS",
+      isActive: true,
+      mfaEnabled: false,
+      passwordHash: pharmPwd.hash,
+      salt: pharmPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(pharmUser.id, pharmUser);
 
     // Seed Sample Patient
     const patient1: Patient = {

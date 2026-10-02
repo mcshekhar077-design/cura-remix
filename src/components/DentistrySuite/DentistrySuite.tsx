@@ -843,7 +843,7 @@ export function DentistrySuite({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black tracking-tight text-white">CURA Dental & Oral Health Suite</h1>
+                <h1 className="text-lg font-black tracking-tight text-white">Clinitial Dental & Oral Health Suite</h1>
                 <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                   {isProduction ? 'Enterprise v1.0' : 'Clinical Preview'}
                 </span>

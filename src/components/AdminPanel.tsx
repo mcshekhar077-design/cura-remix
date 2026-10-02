@@ -51,12 +51,15 @@ import {
   Area 
 } from "recharts";
 import AdminLeads from "./AdminLeads";
+import { useAuth, getAuthHeaders } from "../context/AuthContext";
 
 interface AdminPanelProps {
   onBackToLanding: () => void;
 }
 
 export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
+  const { currentUser, isAdmin, openAuthModal, logout } = useAuth();
+
   const [activeNav, setActiveNav] = useState<
     "dashboard" | "users" | "clinics" | "subscriptions" | "ai_usage" | "whatsapp" | "crm" | "logs" | "settings"
   >("dashboard");
@@ -70,6 +73,7 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
   const [systemConfig, setSystemConfig] = useState<any>(null);
 
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [alertMsg, setAlertMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -98,16 +102,33 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
   // Fetch metrics and administrative state
   const fetchAdminData = async () => {
     setLoading(true);
+    setAuthError(null);
     try {
+      const authHeaders = getAuthHeaders();
+      const requestOptions: RequestInit = {
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders
+        },
+        credentials: "include"
+      };
+
       const [dashRes, userRes, clinicRes, aiRes, waRes, logRes, cfgRes] = await Promise.all([
-        fetch("/api/admin/dashboard"),
-        fetch("/api/admin/users"),
-        fetch("/api/admin/clinics"),
-        fetch("/api/admin/ai-usage"),
-        fetch("/api/admin/whatsapp-analytics"),
-        fetch("/api/admin/logs"),
-        fetch("/api/admin/config/system")
+        fetch("/api/admin/dashboard", requestOptions),
+        fetch("/api/admin/users", requestOptions),
+        fetch("/api/admin/clinics", requestOptions),
+        fetch("/api/admin/ai-usage", requestOptions),
+        fetch("/api/admin/whatsapp-analytics", requestOptions),
+        fetch("/api/admin/logs", requestOptions),
+        fetch("/api/admin/config/system", requestOptions)
       ]);
+
+      // Check for authentication failure
+      if (dashRes.status === 401 || dashRes.status === 403) {
+        setAuthError("Administrator privileges required. Please sign in with an administrator account.");
+        setLoading(false);
+        return;
+      }
 
       if (dashRes.ok) {
         const d = await dashRes.json();
@@ -150,9 +171,14 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
 
   const toggleUserStatus = async (userId: number, currentStatus: boolean) => {
     try {
+      const authHeaders = getAuthHeaders();
       const res = await fetch(`/api/admin/users/${userId}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...authHeaders
+        },
+        credentials: "include",
         body: JSON.stringify({ is_active: !currentStatus })
       });
       if (res.ok) {
@@ -170,9 +196,14 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
 
   const toggleConfigSwitch = async (key: string, value: any) => {
     try {
+      const authHeaders = getAuthHeaders();
       const res = await fetch("/api/admin/config", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...authHeaders
+        },
+        credentials: "include",
         body: JSON.stringify({ key, value })
       });
       if (res.ok) {
@@ -441,11 +472,11 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
             </button>
             <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/80 px-2.5 py-1.5 rounded-xl">
               <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0">
-                SA
+                {currentUser?.fullName ? currentUser.fullName.charAt(0).toUpperCase() : "A"}
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-xs font-extrabold text-white">Super Admin</p>
-                <p className="text-[9px] text-slate-400 font-mono">admin@cura.in</p>
+                <p className="text-xs font-extrabold text-white truncate max-w-[140px]">{currentUser?.fullName || "Administrator"}</p>
+                <p className="text-[9px] text-purple-400 font-mono font-bold uppercase">{currentUser?.role || "admin"}</p>
               </div>
             </div>
           </div>
@@ -454,6 +485,25 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
         {/* CONTENT DISPLAY */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
           
+          {/* AUTHENTICATION ERROR BANNER */}
+          {authError && (
+            <div className="p-5 bg-red-950/50 border border-red-500/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-red-950/40">
+              <div className="flex items-center gap-3">
+                <ShieldAlert className="w-7 h-7 text-red-400 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-black text-white">Administrator Authorization Required</h3>
+                  <p className="text-xs text-slate-300 mt-0.5">{authError}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => openAuthModal("admin", "CURA Enterprise Admin Console")}
+                className="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition shrink-0 cursor-pointer shadow-lg shadow-purple-600/30"
+              >
+                Sign In as Administrator
+              </button>
+            </div>
+          )}
+
           {/* ALERT NOTIFICATION */}
           {alertMsg && (
             <div className={`p-4 rounded-2xl border text-xs font-bold flex items-center justify-between ${
@@ -466,6 +516,14 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
                 <span>{alertMsg.text}</span>
               </div>
               <button onClick={() => setAlertMsg(null)} className="text-slate-400 hover:text-white cursor-pointer">✕</button>
+            </div>
+          )}
+
+          {/* LOADING STATE */}
+          {loading && !metrics && (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-3">
+              <RefreshCw className="h-8 w-8 text-purple-400 animate-spin" />
+              <p className="text-xs font-semibold">Synchronizing Administrative Telemetry...</p>
             </div>
           )}
 

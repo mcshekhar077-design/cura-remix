@@ -247,13 +247,13 @@ export const useTheme = () => useContext(ThemeContext);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [selectedThemeId, setSelectedThemeId] = useState<string>(() => {
-    return localStorage.getItem("cura_theme_id") || "clinical-sapphire";
+    return localStorage.getItem("clinitial_theme_id") || localStorage.getItem("cura_theme_id") || "clinical-sapphire";
   });
   const [customPrimary, setCustomPrimary] = useState<string>(() => {
-    return localStorage.getItem("cura_custom_primary") || "";
+    return localStorage.getItem("clinitial_custom_primary") || localStorage.getItem("cura_custom_primary") || "";
   });
   const [colorMode, setColorMode] = useState<"dark" | "light">(() => {
-    return (localStorage.getItem("cura_color_mode") as "dark" | "light") || "dark";
+    return (localStorage.getItem("clinitial_color_mode") as "dark" | "light") || (localStorage.getItem("cura_color_mode") as "dark" | "light") || "dark";
   });
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -279,8 +279,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const handleSetTheme = (themeId: string) => {
     setSelectedThemeId(themeId);
     setCustomPrimary("");
-    localStorage.setItem("cura_theme_id", themeId);
-    localStorage.removeItem("cura_custom_primary");
+    localStorage.setItem("clinitial_theme_id", themeId);
+    localStorage.removeItem("clinitial_custom_primary");
     const found = THEME_PRESETS.find(t => t.id === themeId);
     if (found) {
       showNotification(`Theme applied: ${found.name}`);
@@ -290,16 +290,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const handleSetCustomPrimary = (color: string) => {
     setCustomPrimary(color);
     if (color) {
-      localStorage.setItem("cura_custom_primary", color);
+      localStorage.setItem("clinitial_custom_primary", color);
       showNotification(`Custom Accent applied: ${color.toUpperCase()}`);
     } else {
-      localStorage.removeItem("cura_custom_primary");
+      localStorage.removeItem("clinitial_custom_primary");
       showNotification(`Reset to ${currentTheme.name} default`);
     }
   };
 
   useEffect(() => {
-    localStorage.setItem("cura_color_mode", colorMode);
+    localStorage.setItem("clinitial_color_mode", colorMode);
     const root = document.documentElement;
 
     if (colorMode === "dark") {
@@ -343,27 +343,34 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.style.setProperty(`--color-indigo-${step}`, sVal);
     });
 
-    // 2. CURA Core Branding Variables
-    root.style.setProperty("--cura-primary", pScale[600]);
-    root.style.setProperty("--cura-primary-dark", pScale[800]);
-    root.style.setProperty("--cura-primary-light", pScale[400]);
-    root.style.setProperty("--cura-secondary", sScale[500]);
-    root.style.setProperty("--cura-accent", aScale[500]);
-    root.style.setProperty("--cura-bg-subtle", bgSubtle);
+    // 2. CLINITIAL Core Branding Variables
+    root.style.setProperty("--clinitial-primary", pScale[600]);
+    root.style.setProperty("--clinitial-primary-dark", pScale[800]);
+    root.style.setProperty("--clinitial-primary-light", pScale[400]);
+    root.style.setProperty("--clinitial-secondary", sScale[500]);
+    root.style.setProperty("--clinitial-accent", aScale[500]);
+    root.style.setProperty("--clinitial-bg-subtle", bgSubtle);
 
-    root.style.setProperty("--color-cura-primary", pScale[600]);
-    root.style.setProperty("--color-cura-primary-dark", pScale[800]);
-    root.style.setProperty("--color-cura-primary-light", pScale[400]);
-    root.style.setProperty("--color-cura-secondary", sScale[500]);
-    root.style.setProperty("--color-cura-accent", aScale[500]);
-    root.style.setProperty("--color-cura-bg-subtle", bgSubtle);
+    root.style.setProperty("--color-clinitial-primary", pScale[600]);
+    root.style.setProperty("--color-clinitial-primary-dark", pScale[800]);
+    root.style.setProperty("--color-clinitial-primary-light", pScale[400]);
+    root.style.setProperty("--color-clinitial-secondary", sScale[500]);
+    root.style.setProperty("--color-clinitial-accent", aScale[500]);
+    root.style.setProperty("--color-clinitial-bg-subtle", bgSubtle);
+
+    root.style.setProperty("--color-clinitial-primary", pScale[600]);
+    root.style.setProperty("--color-clinitial-primary-dark", pScale[800]);
+    root.style.setProperty("--color-clinitial-primary-light", pScale[400]);
+    root.style.setProperty("--color-clinitial-secondary", sScale[500]);
+    root.style.setProperty("--color-clinitial-accent", aScale[500]);
+    root.style.setProperty("--color-clinitial-bg-subtle", bgSubtle);
 
     // 3. Dynamic injected stylesheet to guarantee all buttons, borders, texts,
     //    and backgrounds across pre-compiled components update instantly
-    let styleEl = document.getElementById("cura-dynamic-theme-style") as HTMLStyleElement;
+    let styleEl = document.getElementById("clinitial-dynamic-theme-style") as HTMLStyleElement;
     if (!styleEl) {
       styleEl = document.createElement("style");
-      styleEl.id = "cura-dynamic-theme-style";
+      styleEl.id = "clinitial-dynamic-theme-style";
       document.head.appendChild(styleEl);
     }
 
@@ -428,18 +435,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
 
       /* 6. Dynamic Gradients & Glows */
-      .gradient-text-cura {
+      .gradient-text-clinitial, .gradient-text-clinitial {
         background: linear-gradient(135deg, ${pScale[400]}, ${sScale[400]}) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
       }
-      .gradient-bg-cura {
+      .gradient-bg-clinitial, .gradient-bg-clinitial {
         background: linear-gradient(135deg, ${pScale[800]} 0%, ${pScale[600]} 100%) !important;
       }
-      .gradient-btn-cura {
+      .gradient-btn-clinitial, .gradient-btn-clinitial {
         background: linear-gradient(135deg, ${pScale[600]}, ${sScale[600]}) !important;
       }
-      .shadow-glow-cura {
+      .shadow-glow-clinitial, .shadow-glow-clinitial {
         box-shadow: 0 0 35px ${hexToRgba(pScale[500], 0.45)} !important;
       }
       .shadow-glow-cta {
@@ -516,7 +523,7 @@ export default function ThemeSelectorWidget() {
         <div className="fixed bottom-5 left-5 z-50 font-sans">
           <button
             onClick={openPalette}
-            id="cura-floating-palette-trigger"
+            id="clinitial-floating-palette-trigger"
             className="group relative flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-slate-900/95 hover:bg-black text-white shadow-2xl border border-slate-700/90 backdrop-blur-xl transition-all hover:scale-105 cursor-pointer"
             title="Change Platform Color Palette & Theme"
           >
@@ -555,7 +562,7 @@ export default function ThemeSelectorWidget() {
                     Color Palette & Theme Engine
                   </h3>
                   <p className="text-[10.5px] text-slate-400 font-medium">
-                    Customize CURA Health OS in Real-Time
+                    Customize CLINITIAL Health OS in Real-Time
                   </p>
                 </div>
               </div>

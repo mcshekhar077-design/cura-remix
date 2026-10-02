@@ -78,6 +78,7 @@ import {
 import { Patient, Appointment } from "../types";
 import PatientDashboard from "./PatientDashboard";
 import { useWebAuthn } from "../hooks/useWebAuthn";
+import { queueFailedDiagnosticReport } from "./OfflineSyncEngine";
 
 const PREDEFINED_SYMPTOMS = [
   "Cough",
@@ -336,7 +337,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const [rxRefillLoading, setRxRefillLoading] = useState(false);
   const [scannedBoxHistory, setScannedBoxHistory] = useState<any[]>(() => {
     try {
-      const saved = localStorage.getItem("cura_scanned_med_boxes");
+      const saved = localStorage.getItem("clinitial_scanned_med_boxes");
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -349,7 +350,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       id: "BOX-LIP-2026",
       medName: "Atorvastatin 20mg",
       brandName: "Lipitor (Pfizer)",
-      qrCode: "CURA-RX|PAT-001|ATORVASTATIN-20MG|RX-88492|REFILL-OK",
+      qrCode: "CLINITIAL-RX|PAT-001|ATORVASTATIN-20MG|RX-88492|REFILL-OK",
       batchNo: "LIP-2026-88492",
       expiryDate: "12/2027",
       doctor: "Dr. Rajesh Sharma (Cardiology)",
@@ -370,7 +371,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       id: "BOX-GLU-2026",
       medName: "Metformin 500mg",
       brandName: "Glucophage ER (Merck)",
-      qrCode: "CURA-RX|PAT-001|METFORMIN-500MG|RX-10293|REFILL-DUE",
+      qrCode: "CLINITIAL-RX|PAT-001|METFORMIN-500MG|RX-10293|REFILL-DUE",
       batchNo: "GLU-2026-10293",
       expiryDate: "09/2026",
       doctor: "Dr. Ananya Reddy (Endocrinology)",
@@ -391,7 +392,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       id: "BOX-TEL-2026",
       medName: "Telmisartan 40mg",
       brandName: "Telma 40 (Glenmark)",
-      qrCode: "CURA-RX|PAT-001|TELMISARTAN-40MG|RX-55102|REFILL-OK",
+      qrCode: "CLINITIAL-RX|PAT-001|TELMISARTAN-40MG|RX-55102|REFILL-OK",
       batchNo: "TEL-2026-55102",
       expiryDate: "04/2028",
       doctor: "Dr. Rajesh Sharma (Cardiology)",
@@ -412,7 +413,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       id: "BOX-AZI-2026",
       medName: "Azithromycin 500mg",
       brandName: "Zithromax (Pfizer)",
-      qrCode: "CURA-RX|PAT-001|AZITHROMYCIN-500MG|RX-99120|COURSE-COMPLETE",
+      qrCode: "CLINITIAL-RX|PAT-001|AZITHROMYCIN-500MG|RX-99120|COURSE-COMPLETE",
       batchNo: "AZI-2026-99120",
       expiryDate: "11/2026",
       doctor: "Dr. Vikram Malhotra (General Medicine)",
@@ -485,7 +486,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       const filtered = prev.filter(b => b.id !== boxData.id);
       const updated = [{ ...boxData, scannedAt: new Date().toISOString() }, ...filtered];
       try {
-        localStorage.setItem("cura_scanned_med_boxes", JSON.stringify(updated));
+        localStorage.setItem("clinitial_scanned_med_boxes", JSON.stringify(updated));
       } catch (e) {
         console.warn(e);
       }
@@ -537,7 +538,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
 
   // 💊 MEDICATION PUSH NOTIFICATION & SCHEDULER STATES
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState<boolean>(() => {
-    return localStorage.getItem("cura_push_enabled") !== "false";
+    return localStorage.getItem("clinitial_push_enabled") !== "false";
   });
   const [pushPermissionGranted, setPushPermissionGranted] = useState<"default" | "granted" | "denied">(() => {
     if (typeof Notification !== "undefined") {
@@ -548,7 +549,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const [activeNotificationAlert, setActiveNotificationAlert] = useState<any | null>(null);
   const [triggeredAlertsToday, setTriggeredAlertsToday] = useState<Record<string, string[]>>(() => {
     try {
-      const stored = localStorage.getItem("cura_triggered_alerts_today");
+      const stored = localStorage.getItem("clinitial_triggered_alerts_today");
       return stored ? JSON.parse(stored) : {};
     } catch {
       return {};
@@ -556,7 +557,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   });
   const [notificationHistoryLog, setNotificationHistoryLog] = useState<any[]>(() => {
     try {
-      const stored = localStorage.getItem("cura_notification_history");
+      const stored = localStorage.getItem("clinitial_notification_history");
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -614,8 +615,8 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       setPushPermissionGranted(permission);
       if (permission === "granted") {
         setPushNotificationsEnabled(true);
-        localStorage.setItem("cura_push_enabled", "true");
-        new Notification("💊 Cura Health Push Activated!", {
+        localStorage.setItem("clinitial_push_enabled", "true");
+        new Notification("💊 Clinitial Health Push Activated!", {
           body: "You will now receive desktop alerts for scheduled daily medications.",
           icon: "https://cdn-icons-png.flaticon.com/512/822/822143.png"
         });
@@ -630,7 +631,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const togglePushNotificationsSetting = () => {
     const nextVal = !pushNotificationsEnabled;
     setPushNotificationsEnabled(nextVal);
-    localStorage.setItem("cura_push_enabled", String(nextVal));
+    localStorage.setItem("clinitial_push_enabled", String(nextVal));
     if (nextVal && typeof Notification !== "undefined" && Notification.permission !== "granted") {
       requestWebNotificationPermission();
     }
@@ -697,7 +698,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
 
     setNotificationHistoryLog(prev => {
       const updated = [newLog, ...prev].slice(0, 50); // keep last 50
-      localStorage.setItem("cura_notification_history", JSON.stringify(updated));
+      localStorage.setItem("clinitial_notification_history", JSON.stringify(updated));
       return updated;
     });
   };
@@ -730,7 +731,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
             const updatedList = [...todayTriggered, item.id];
             const updatedObj = { ...triggeredAlertsToday, [todayStr]: updatedList };
             setTriggeredAlertsToday(updatedObj);
-            localStorage.setItem("cura_triggered_alerts_today", JSON.stringify(updatedObj));
+            localStorage.setItem("clinitial_triggered_alerts_today", JSON.stringify(updatedObj));
             
             // Trigger!
             triggerMedicationNotification(item);
@@ -766,7 +767,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         }
         return log;
       });
-      localStorage.setItem("cura_notification_history", JSON.stringify(updated));
+      localStorage.setItem("clinitial_notification_history", JSON.stringify(updated));
       return updated;
     });
 
@@ -793,7 +794,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         }
         return log;
       });
-      localStorage.setItem("cura_notification_history", JSON.stringify(updated));
+      localStorage.setItem("clinitial_notification_history", JSON.stringify(updated));
       return updated;
     });
 
@@ -883,7 +884,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const [pipelineProgress, setPipelineProgress] = useState<number>(0);
   const [pipelineStep, setPipelineStep] = useState<"init" | "noise" | "ocr" | "indexing" | "synthesis" | "complete">("init");
 
-  // CURA Vision AI State Variables
+  // CLINITIAL Vision AI State Variables
   const visionVideoRef = useRef<HTMLVideoElement | null>(null);
   const activeVisionStreamRef = useRef<MediaStream | null>(null);
   const [visionActiveMode, setVisionActiveMode] = useState<"upload" | "camera">("upload");
@@ -938,7 +939,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   
   const [connectedFamilyMembers, setConnectedFamilyMembers] = useState<any[]>(() => {
     try {
-      const saved = localStorage.getItem("cura_connected_family_members");
+      const saved = localStorage.getItem("clinitial_connected_family_members");
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -948,7 +949,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   // Save connected family members to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem("cura_connected_family_members", JSON.stringify(connectedFamilyMembers));
+      localStorage.setItem("clinitial_connected_family_members", JSON.stringify(connectedFamilyMembers));
     } catch (err) {
       console.error("Failed to save connected family members", err);
     }
@@ -1257,25 +1258,44 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const saveVisionReportToEHR = async () => {
     if (!selectedPatient || !visionResult) return;
     setIsVisionSaving(true);
-    try {
-      const savePayload = {
-        title: visionResult.title,
-        date: new Date().toISOString().split("T")[0],
-        category: visionResult.category || "Symptom Scan",
-        fileName: visionType === "symptom" ? "symptom_capture.jpg" : "diagnostic_scan.jpg",
-        fileSize: "680 KB",
-        extractedText: "CURA Vision AI Diagnostic Sweep:\n" + visionResult.visualFindings.join("\n") + (visionResult.voiceTranscript || audioTranscript ? `\n\nWhisper Voice Description:\n${visionResult.voiceTranscript || audioTranscript}` : ""),
-        aiSummary: visionResult.aiSummary,
-        voiceTranscript: visionResult.voiceTranscript || audioTranscript,
-        keyFindings: visionResult.visualFindings,
-        riskLevel: visionResult.riskLevel,
-        possibleConditions: visionResult.possibleConditions.map((c: any) => `${c.name} (${c.probability})`),
-        suggestedSpecialist: visionResult.suggestedSpecialist,
-        suggestedDoctorName: visionResult.suggestedDoctorName,
-        followUpRecommendation: visionResult.followUpRecommendation || visionResult.careRecommendations?.join("; "),
-        summaryForDoctor: `CURA Vision AI evaluated this patient visual. Diagnosis: ${visionResult.title}. Findings: ${visionResult.visualFindings.join("; ")}.` + (visionResult.voiceTranscript || audioTranscript ? ` Voice Transcript: ${visionResult.voiceTranscript || audioTranscript}` : "")
-      };
+    const savePayload = {
+      title: visionResult.title,
+      date: new Date().toISOString().split("T")[0],
+      category: visionResult.category || "Symptom Scan",
+      fileName: visionType === "symptom" ? "symptom_capture.jpg" : "diagnostic_scan.jpg",
+      fileSize: "680 KB",
+      extractedText: "CLINITIAL Vision AI Diagnostic Sweep:\n" + visionResult.visualFindings.join("\n") + (visionResult.voiceTranscript || audioTranscript ? `\n\nWhisper Voice Description:\n${visionResult.voiceTranscript || audioTranscript}` : ""),
+      aiSummary: visionResult.aiSummary,
+      voiceTranscript: visionResult.voiceTranscript || audioTranscript,
+      keyFindings: visionResult.visualFindings,
+      riskLevel: visionResult.riskLevel,
+      possibleConditions: visionResult.possibleConditions.map((c: any) => `${c.name} (${c.probability})`),
+      suggestedSpecialist: visionResult.suggestedSpecialist,
+      suggestedDoctorName: visionResult.suggestedDoctorName,
+      followUpRecommendation: visionResult.followUpRecommendation || visionResult.careRecommendations?.join("; "),
+      summaryForDoctor: `CLINITIAL Vision AI evaluated this patient visual. Diagnosis: ${visionResult.title}. Findings: ${visionResult.visualFindings.join("; ")}.` + (visionResult.voiceTranscript || audioTranscript ? ` Voice Transcript: ${visionResult.voiceTranscript || audioTranscript}` : ""),
+      endpoint: `/api/v1/patients/${selectedPatient.id}/scanned-reports`
+    };
 
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      queueFailedDiagnosticReport({
+        ...savePayload,
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.fullName,
+        uploadError: "Offline network connection"
+      });
+      setScanToast("🌐 Offline: Vision analysis queued in Offline Sync Engine. Will automatically upload once internet connection is restored!");
+      setVisionResult(null);
+      setVisionPreviewUrl(null);
+      setVisionBase64(null);
+      setVisionNotes("");
+      setVisionTitle("");
+      resetAudioRecording();
+      setIsVisionSaving(false);
+      return;
+    }
+
+    try {
       const response = await fetch(`/api/v1/patients/${selectedPatient.id}/scanned-reports`, {
         method: "POST",
         headers: {
@@ -1297,8 +1317,21 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       setVisionNotes("");
       setVisionTitle("");
       resetAudioRecording();
-    } catch (err) {
-      console.error("Failed to save visual report:", err);
+    } catch (err: any) {
+      // Auto-queue to OfflineSyncEngine for auto-retry
+      queueFailedDiagnosticReport({
+        ...savePayload,
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.fullName,
+        uploadError: err?.message || "Upload network failure"
+      });
+      setScanToast("🌐 Network unavailable: Vision report queued in Offline Sync Engine. It will auto-retry and upload when connection is restored!");
+      setVisionResult(null);
+      setVisionPreviewUrl(null);
+      setVisionBase64(null);
+      setVisionNotes("");
+      setVisionTitle("");
+      resetAudioRecording();
     } finally {
       setIsVisionSaving(false);
     }
@@ -1795,26 +1828,48 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     if (!selectedPatient || !scanResult) return;
 
     setScanStep("saving");
+    const reportPayload = {
+      title: manualTitle,
+      date: manualDate,
+      category: manualCategory,
+      fileName: scannedFileName,
+      fileSize: scannedFileSize,
+      extractedText: scanResult.extractedText || "",
+      aiSummary: scanResult.aiSummary,
+      keyFindings: scanResult.keyFindings,
+      riskLevel: scanResult.riskLevel,
+      abnormalValues: scanResult.abnormalValues,
+      possibleConditions: scanResult.possibleConditions,
+      suggestedSpecialist: scanResult.suggestedSpecialist,
+      suggestedDoctorName: scanResult.suggestedDoctorName,
+      followUpRecommendation: scanResult.followUpRecommendation,
+      endpoint: `/api/v1/patients/${selectedPatient.id}/scanned-reports`
+    };
+
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      queueFailedDiagnosticReport({
+        ...reportPayload,
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.fullName,
+        uploadError: "Offline network connection"
+      });
+      setScanToast(`🌐 Offline: Diagnostic report "${manualTitle}" queued in Offline Sync Engine and will automatically upload when internet is restored!`);
+      setShowScanModal(false);
+      setScannedFile(null);
+      setScannedFileBase64("");
+      setScannedFileName("");
+      setScannedFileSize("");
+      setScanResult(null);
+      setScanStep("upload");
+      setShowOcrPreview(false);
+      return;
+    }
+
     try {
       const response = await fetch(`/api/v1/patients/${selectedPatient.id}/scanned-reports`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: manualTitle,
-          date: manualDate,
-          category: manualCategory,
-          fileName: scannedFileName,
-          fileSize: scannedFileSize,
-          extractedText: scanResult.extractedText || "",
-          aiSummary: scanResult.aiSummary,
-          keyFindings: scanResult.keyFindings,
-          riskLevel: scanResult.riskLevel,
-          abnormalValues: scanResult.abnormalValues,
-          possibleConditions: scanResult.possibleConditions,
-          suggestedSpecialist: scanResult.suggestedSpecialist,
-          suggestedDoctorName: scanResult.suggestedDoctorName,
-          followUpRecommendation: scanResult.followUpRecommendation
-        })
+        body: JSON.stringify(reportPayload)
       });
 
       if (response.ok) {
@@ -1846,12 +1901,41 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         setScanStep("upload");
         setShowOcrPreview(false);
       } else {
-        const errData = await response.json();
-        throw new Error(errData.detail || "Failed to save EMR report.");
+        const errData = await response.json().catch(() => ({}));
+        // Queue to OfflineSyncEngine for auto-retry
+        queueFailedDiagnosticReport({
+          ...reportPayload,
+          patientId: selectedPatient.id,
+          patientName: selectedPatient.fullName,
+          uploadError: errData?.detail || `HTTP ${response.status}`
+        });
+        setScanToast(`⚠️ Upload queued in Offline Sync Engine: will automatically retry.`);
+        setShowScanModal(false);
+        setScannedFile(null);
+        setScannedFileBase64("");
+        setScannedFileName("");
+        setScannedFileSize("");
+        setScanResult(null);
+        setScanStep("upload");
+        setShowOcrPreview(false);
       }
     } catch (err: any) {
-      setScanError(err.message || "Failed to sync to central EMR.");
-      setScanStep("review");
+      // Network failure: push to OfflineSyncEngine and notify
+      queueFailedDiagnosticReport({
+        ...reportPayload,
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.fullName,
+        uploadError: err?.message || "Network offline"
+      });
+      setScanToast(`🌐 Internet connection lost. Diagnostic report "${manualTitle}" queued in Offline Sync Engine for automatic upload upon reconnection.`);
+      setShowScanModal(false);
+      setScannedFile(null);
+      setScannedFileBase64("");
+      setScannedFileName("");
+      setScannedFileSize("");
+      setScanResult(null);
+      setScanStep("upload");
+      setShowOcrPreview(false);
     }
   };
 
@@ -1918,7 +2002,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(22);
     doc.setTextColor(15, 23, 42); // slate-900
-    doc.text("CURA HEALTH NETWORKS", 15, y);
+    doc.text("CLINITIAL HEALTH NETWORKS", 15, y);
     y += 6;
 
     doc.setFont("Helvetica", "normal");
@@ -2214,7 +2298,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
       setDeferredPwaPrompt(null);
     } else {
       // Direct instructions fallback for browsers or iOS Safari
-      alert("To install Remix CURA as a PWA:\n\n• On Mobile Chrome/Android: Tap Menu (⋮) → 'Install app' or 'Add to Home screen'\n• On iPhone/Safari: Tap Share (⎋) → 'Add to Home Screen'");
+      alert("To install Remix CLINITIAL as a PWA:\n\n• On Mobile Chrome/Android: Tap Menu (⋮) → 'Install app' or 'Add to Home screen'\n• On iPhone/Safari: Tap Share (⎋) → 'Add to Home Screen'");
     }
   };
 
@@ -2647,7 +2731,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     setFamilyViewAccessLevel("view");
     setOriginalSelfPatient(null);
     try {
-      localStorage.removeItem("cura_patient_session");
+      localStorage.removeItem("clinitial_patient_session");
       await fetch("/api/v1/auth/logout", { method: "POST" });
     } catch (e) {
       console.warn("Logout error", e);
@@ -2658,7 +2742,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const handlePatientSelectAndPersist = async (p: Patient) => {
     setSelectedPatient(p);
     try {
-      localStorage.setItem("cura_patient_session", JSON.stringify({
+      localStorage.setItem("clinitial_patient_session", JSON.stringify({
         id: p.id,
         patientCode: p.patientCode,
         fullName: p.fullName,
@@ -2705,7 +2789,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         }
 
         if (!restoredPatient && typeof window !== "undefined") {
-          const stored = localStorage.getItem("cura_patient_session");
+          const stored = localStorage.getItem("clinitial_patient_session") || localStorage.getItem("cura_patient_session");
           if (stored) {
             try {
               const parsed = JSON.parse(stored);
@@ -2757,7 +2841,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     setIsLoadingAuth(true);
 
     const trimmedCode = code.trim();
-    if (trimmedCode.toUpperCase().startsWith("CURA-FAM-")) {
+    if (trimmedCode.toUpperCase().startsWith("CLINITIAL-FAM-")) {
       try {
         const response = await fetch(`/api/v1/family-shares/verify/${trimmedCode}`);
         if (response.ok) {
@@ -3167,7 +3251,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
           </div>
           <div>
             <h1 className="text-lg font-black tracking-tight text-white flex items-center gap-2">
-              CURA Patient Mobile Gateway <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase font-black">Sandbox</span>
+              CLINITIAL Patient Mobile Gateway <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase font-black">Sandbox</span>
             </h1>
             <p className="text-xs text-slate-400 font-medium">Responsive Client Mobile Viewport and Secure Prescription Reader</p>
           </div>
@@ -3203,7 +3287,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
             onClick={onBackToLanding}
             className="text-xs bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-extrabold px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer"
           >
-            ← Back to Cura Landing
+            ← Back to Clinitial Landing
           </button>
         </div>
       </header>
@@ -3268,7 +3352,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                             ✙
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold text-slate-500 leading-none">Cura Mobile App</p>
+                            <p className="text-[10px] font-bold text-slate-500 leading-none">Clinitial Mobile App</p>
                             <p className="text-xs font-black text-white leading-tight">{selectedPatient.fullName}</p>
                           </div>
                         </div>
@@ -3282,7 +3366,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                                 : "bg-emerald-500 hover:bg-emerald-400 text-slate-950 border-emerald-400"
                             }`}
-                            title="Install CURA Progressive Web App"
+                            title="Install CLINITIAL Progressive Web App"
                           >
                             <span>📲</span>
                             <span>{isPwaInstalled ? "PWA Active" : "Install App"}</span>
@@ -3633,7 +3717,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                             activeTab === "vision" ? "bg-emerald-500 text-slate-950 animate-pulse" : "text-slate-400 hover:bg-slate-800 hover:text-white"
                           }`}
                         >
-                          <Sparkles className="h-4 w-4 text-amber-400" /> CURA Vision AI Diagnostics
+                          <Sparkles className="h-4 w-4 text-amber-400" /> CLINITIAL Vision AI Diagnostics
                           <span className="ml-auto bg-amber-400/20 text-amber-300 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full border border-amber-500/30">
                             NEW
                           </span>
@@ -3778,7 +3862,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 <div className="flex justify-between items-start border-b border-slate-200 pb-4">
                   <div>
                     <h2 className="text-base font-black text-slate-900 tracking-tight uppercase flex items-center gap-1.5">
-                      <span className="text-emerald-600">✙</span> CURA CLINICAL NETWORKS
+                      <span className="text-emerald-600">✙</span> CLINITIAL CLINICAL NETWORKS
                     </h2>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Digital Healthcare Prescription</p>
                     <p className="text-slate-500 font-semibold mt-1">EHR Register Ref: {selectedPatient?.patientCode || selectedPatient?.id}</p>
@@ -5051,7 +5135,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 <h3 className="text-sm font-black text-white flex items-center gap-2">
                   <MapPin className="h-4.5 w-4.5 text-sky-400" /> Clinic Route Navigation
                 </h3>
-                <p className="text-[10px] text-slate-400 mt-1">Simulated real-time route directions to Cura General Health Hub</p>
+                <p className="text-[10px] text-slate-400 mt-1">Simulated real-time route directions to Clinitial General Health Hub</p>
               </div>
 
               {/* Simulated Map Graphic with Canvas/Lines */}
@@ -5093,7 +5177,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                   <div className="h-7 w-7 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center text-white text-xs shadow-lg animate-bounce">
                     🏥
                   </div>
-                  <span className="text-[7.5px] bg-slate-900 border border-slate-800 px-1 py-0.5 rounded text-emerald-400 font-extrabold mt-1">Cura Hub Clinic</span>
+                  <span className="text-[7.5px] bg-slate-900 border border-slate-800 px-1 py-0.5 rounded text-emerald-400 font-extrabold mt-1">Clinitial Hub Clinic</span>
                 </div>
               </div>
 
@@ -5127,7 +5211,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                   </div>
                   <div className="flex gap-2.5 items-start">
                     <span className="text-emerald-400 flex-shrink-0 mt-0.5">4.</span>
-                    <p className="leading-tight">Destination is on your left, inside <span className="text-emerald-400 font-bold">Cura Plaza Building</span>. (50 meters)</p>
+                    <p className="leading-tight">Destination is on your left, inside <span className="text-emerald-400 font-bold">Clinitial Plaza Building</span>. (50 meters)</p>
                   </div>
                 </div>
 
@@ -6317,7 +6401,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                           <Bell className="h-3 w-3 animate-bounce" />
                         </span>
                         <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                          Cura Mobile Push
+                          Clinitial Mobile Push
                         </span>
                         <span className="h-1 w-1 rounded-full bg-slate-600" />
                         <span className="text-[9px] text-slate-500 font-bold">1h before</span>
@@ -6453,7 +6537,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                     <div className="bg-rose-950/50 border border-rose-500/20 p-2.5 rounded-xl flex items-start gap-2 text-[9.5px] text-rose-200">
                       <span className="text-xs mt-0.5">⚠️</span>
                       <div className="leading-relaxed">
-                        <span className="font-extrabold text-white">Medical Disclaimer:</span> These threshold limits are reference ranges only. If you are experiencing symptoms (chest pain, shortness of breath, severe dizziness), please contact emergency services or your primary clinician at <span className="text-white font-extrabold">Cura Care</span> immediately.
+                        <span className="font-extrabold text-white">Medical Disclaimer:</span> These threshold limits are reference ranges only. If you are experiencing symptoms (chest pain, shortness of breath, severe dizziness), please contact emergency services or your primary clinician at <span className="text-white font-extrabold">Clinitial Care</span> immediately.
                       </div>
                     </div>
                   </div>
@@ -8298,7 +8382,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
               );
             })()}
 
-            {/* CURA AI DOCUMENT SCANNER & ARCHIVE SYSTEM */}
+            {/* CLINITIAL AI DOCUMENT SCANNER & ARCHIVE SYSTEM */}
             <div className="bg-gradient-to-tr from-emerald-950/40 to-slate-950 border border-emerald-500/20 p-4.5 rounded-2xl space-y-3 shadow-xl">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
@@ -8687,7 +8771,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                 </div>
                 <div className="space-y-1">
                   <span className="text-[9px] bg-amber-400/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
-                    CURA Vision AI Suite
+                    CLINITIAL Vision AI Suite
                   </span>
                   <h3 className="text-base font-black text-white">Visual Symptom & Diagnostic Scanner</h3>
                   <p className="text-[11px] text-slate-400 leading-relaxed max-w-lg">
@@ -8720,7 +8804,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
               </div>
               <div className="space-y-1">
                 <span className="text-[9px] bg-amber-400/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
-                  CURA Vision AI Suite
+                  CLINITIAL Vision AI Suite
                 </span>
                 <h3 className="text-base font-black text-white">Visual Symptom & Diagnostic Scanner</h3>
                 <p className="text-[11px] text-slate-400 leading-relaxed max-w-lg">
@@ -9121,7 +9205,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                       Parsing Medical Document & Report
                     </h4>
                     <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                      CURA AI models are extracting biomarkers, physiological markers, and translating medical jargon.
+                      CLINITIAL AI models are extracting biomarkers, physiological markers, and translating medical jargon.
                     </p>
                   </div>
 
@@ -9234,7 +9318,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                         <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400">
                           <span>Diagnostic Frame Reference</span>
-                          <span className="font-mono text-amber-400">CURA-VISION-PRO v1.0</span>
+                          <span className="font-mono text-amber-400">CLINITIAL-VISION-PRO v1.0</span>
                         </div>
                       </div>
                     )}
@@ -9438,7 +9522,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
               </div>
               <div className="space-y-1">
                 <span className="text-[9px] bg-emerald-400/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
-                  CURA Family Care Suite
+                  CLINITIAL Family Care Suite
                 </span>
                 <h3 className="text-base font-black text-white">Secure Family Access Portal</h3>
                 <p className="text-[11px] text-slate-400 leading-relaxed max-w-lg">
@@ -9629,7 +9713,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                         required
                         value={familyShareCodeInput}
                         onChange={(e) => setFamilyShareCodeInput(e.target.value)}
-                        placeholder="e.g. CURA-FAM-XXXXXX"
+                        placeholder="e.g. CLINITIAL-FAM-XXXXXX"
                         className="flex-1 bg-slate-950 border border-slate-800 text-xs font-mono font-black text-white placeholder-slate-600 px-3 py-2 rounded-lg focus:outline-none focus:border-emerald-500 transition-all uppercase"
                       />
                       <button
@@ -9743,7 +9827,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                   </div>
                   <div>
                     <h4 className="text-[10px] font-black tracking-tight text-white uppercase">
-                      CURA HEALTH NETWORKS
+                      CLINITIAL HEALTH NETWORKS
                     </h4>
                     <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
                       INTEGRATED CLINICAL IDENTITY SYSTEM

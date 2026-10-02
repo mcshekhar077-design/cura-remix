@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ShieldAlert } from "lucide-react";
 import LandingPage from "./components/LandingPage";
 import DoctorDashboard from "./components/DoctorDashboard";
 import AdminPanel from "./components/AdminPanel";
@@ -33,7 +34,7 @@ import ThemeSelectorWidget, { ThemeProvider } from "./components/ThemeSelector";
 import OfflineSyncEngine from "./components/OfflineSyncEngine";
 import GlobalEmergencySOS from "./components/GlobalEmergencySOS";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import CuraAuthModal from "./components/CuraAuthModal";
+import ClinitialAuthModal from "./components/ClinitialAuthModal";
 
 type ViewState = 
   | "landing" 
@@ -71,23 +72,48 @@ function MainRouter() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
   const [dashboardMedicalSystem, setDashboardMedicalSystem] = useState<"allopathy" | "ayurveda" | "homeopathy" | "unani" | "siddha" | "yoga">("allopathy");
   
-  const { isAuthenticated, isAuthModalOpen, intendedView, closeAuthModal } = useAuth();
+  const { isAuthenticated, isAdmin, currentUser, isAuthModalOpen, intendedView, closeAuthModal, openAuthModal } = useAuth();
 
   const navigateTo = (view: ViewState) => {
+    if (view === "admin") {
+      if (!isAuthenticated || !isAdmin) {
+        openAuthModal("admin", "CURA Enterprise Admin Console");
+        return;
+      }
+    }
     setCurrentView(view);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleAuthSuccess = () => {
+    if (intendedView === "admin") {
+      if (isAdmin) {
+        setCurrentView("admin");
+      }
+      return;
+    }
     if (intendedView) {
       navigateTo(intendedView as ViewState);
     }
   };
 
+  // Support direct hash navigation for #admin
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.replace("#", "").toLowerCase();
+      if (hash === "admin") {
+        navigateTo("admin");
+      }
+    };
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, [isAuthenticated, isAdmin]);
+
   return (
     <>
       {/* Global Auth Modal Triggered by AuthContext */}
-      <CuraAuthModal
+      <ClinitialAuthModal
         isOpen={isAuthModalOpen}
         onClose={closeAuthModal}
         intendedModuleTitle={intendedView ? intendedView.toUpperCase().replace(/_/g, " ") : undefined}
@@ -138,9 +164,41 @@ function MainRouter() {
         />
       )}
       {currentView === "admin" && (
-        <AdminPanel 
-          onBackToLanding={() => navigateTo("landing")}
-        />
+        isAdmin ? (
+          <AdminPanel 
+            onBackToLanding={() => navigateTo("landing")}
+          />
+        ) : (
+          <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100">
+            <div className="max-w-md w-full bg-slate-900 border border-red-500/30 rounded-3xl p-8 text-center shadow-2xl space-y-5">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+                <ShieldAlert className="w-8 h-8" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black tracking-tight text-white">Administrator Privileges Required</h2>
+                <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                  {currentUser 
+                    ? `You are currently authenticated as ${currentUser.fullName} (${currentUser.role}). Access to the CURA Admin OS requires verified Hospital or System Administrator credentials.`
+                    : "Access to the CURA Admin OS and enterprise governance console requires verified Administrator credentials."}
+                </p>
+              </div>
+              <div className="pt-2 flex flex-col gap-2.5">
+                <button 
+                  onClick={() => openAuthModal("admin", "CURA Enterprise Admin Console")}
+                  className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-purple-600/30 transition cursor-pointer"
+                >
+                  Authenticate as Administrator
+                </button>
+                <button 
+                  onClick={() => navigateTo("landing")}
+                  className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition cursor-pointer"
+                >
+                  Return to Home
+                </button>
+              </div>
+            </div>
+          </div>
+        )
       )}
       {currentView === "patient" && (
         <PatientMobileApp 

@@ -14,8 +14,8 @@ const objectVault: StoredObject[] = [
     virusScanStatus: "clean",
     isEncrypted: true,
     encryptionAlgorithm: "AES-256-GCM",
-    storagePath: "s3://cura-clinical-vault-apollo/radiology/2026/09/DICOM_Cardiac_CT.dcm",
-    presignedUrl: "https://storage.cura.in/secure/vault/radiology/DICOM_Cardiac_CT.dcm?token=exp99281&sig=ae89f1",
+    storagePath: "s3://clinitial-clinical-vault-apollo/radiology/2026/09/DICOM_Cardiac_CT.dcm",
+    presignedUrl: "https://storage.clinitial.in/secure/vault/radiology/DICOM_Cardiac_CT.dcm?token=exp99281&sig=ae89f1",
     uploadedBy: "USR-RAD-006",
     uploadedAt: "2026-09-08T14:20:00Z",
     expiresAt: "2026-09-15T14:20:00Z",
@@ -37,8 +37,8 @@ const objectVault: StoredObject[] = [
     virusScanStatus: "clean",
     isEncrypted: true,
     encryptionAlgorithm: "AES-256-GCM",
-    storagePath: "s3://cura-clinical-vault-apollo/telemetry/2026/09/12Lead_ECG.pdf",
-    presignedUrl: "https://storage.cura.in/secure/vault/telemetry/12Lead_ECG.pdf?token=exp88121&sig=c18fa3",
+    storagePath: "s3://clinitial-clinical-vault-apollo/telemetry/2026/09/12Lead_ECG.pdf",
+    presignedUrl: "https://storage.clinitial.in/secure/vault/telemetry/12Lead_ECG.pdf?token=exp88121&sig=c18fa3",
     uploadedBy: "USR-DOC-001",
     uploadedAt: "2026-09-08T15:10:00Z",
     expiresAt: "2026-09-15T15:10:00Z",
@@ -59,8 +59,8 @@ const objectVault: StoredObject[] = [
     virusScanStatus: "clean",
     isEncrypted: true,
     encryptionAlgorithm: "AES-256-GCM",
-    storagePath: "s3://cura-clinical-vault-fortis/discharge/2026/09/Discharge_Summary_NehaSharma.pdf",
-    presignedUrl: "https://storage.cura.in/secure/vault/discharge/Discharge_Summary_NehaSharma.pdf?token=exp44211&sig=bb19ca",
+    storagePath: "s3://clinitial-clinical-vault-fortis/discharge/2026/09/Discharge_Summary_NehaSharma.pdf",
+    presignedUrl: "https://storage.clinitial.in/secure/vault/discharge/Discharge_Summary_NehaSharma.pdf?token=exp44211&sig=bb19ca",
     uploadedBy: "USR-ADM-002",
     uploadedAt: "2026-09-08T18:00:00Z",
     expiresAt: "2026-09-15T18:00:00Z",
@@ -81,8 +81,8 @@ const objectVault: StoredObject[] = [
     virusScanStatus: "clean",
     isEncrypted: true,
     encryptionAlgorithm: "AES-256-GCM",
-    storagePath: "s3://cura-clinical-vault-fortis/mri/2026/09/Lumbar_Spine_MRI.dcm",
-    presignedUrl: "https://storage.cura.in/secure/vault/mri/Lumbar_Spine_MRI.dcm?token=exp33901&sig=dd8801",
+    storagePath: "s3://clinitial-clinical-vault-fortis/mri/2026/09/Lumbar_Spine_MRI.dcm",
+    presignedUrl: "https://storage.clinitial.in/secure/vault/mri/Lumbar_Spine_MRI.dcm?token=exp33901&sig=dd8801",
     uploadedBy: "USR-RAD-006",
     uploadedAt: "2026-09-08T11:45:00Z",
     expiresAt: "2026-09-15T11:45:00Z",
@@ -121,7 +121,7 @@ export function uploadMedicalObject(params: {
   const id = `OBJ-MED-${Date.now().toString().slice(-4)}`;
   const sha256Checksum = crypto.createHash("sha256").update(`${params.fileName}:${Date.now()}`).digest("hex");
   const token = Math.random().toString(36).substring(2, 10);
-  const presignedUrl = `https://storage.cura.in/secure/vault/${params.category}/${encodeURIComponent(params.fileName)}?token=${token}&expires=604800`;
+  const presignedUrl = `https://storage.clinitial.in/secure/vault/${params.category}/${encodeURIComponent(params.fileName)}?token=${token}&expires=604800`;
 
   const newObj: StoredObject = {
     id,
@@ -134,7 +134,7 @@ export function uploadMedicalObject(params: {
     virusScanStatus: "clean",
     isEncrypted: true,
     encryptionAlgorithm: "AES-256-GCM",
-    storagePath: `s3://cura-clinical-vault-${params.tenantId}/${params.category}/${params.fileName}`,
+    storagePath: `s3://clinitial-clinical-vault-${params.tenantId}/${params.category}/${params.fileName}`,
     presignedUrl,
     uploadedBy: params.uploadedBy,
     uploadedAt: new Date().toISOString(),

@@ -388,7 +388,7 @@ export class DentalApiService {
           acquisitionDate: '2026-08-15T09:30:00Z',
           studyId: 'ST-2026-0815',
           seriesId: 'SER-PAN-01',
-          institution: 'CURA Dental Imaging & Diagnostics'
+          institution: 'Clinitial Dental Imaging & Diagnostics'
         }
       }
     ];
@@ -420,7 +420,7 @@ export class DentalApiService {
         acquisitionDate: now,
         studyId: `ST-${Date.now().toString().slice(-6)}`,
         seriesId: `SER-${Date.now().toString().slice(-4)}`,
-        institution: 'CURA Dental Radiology Center'
+        institution: 'Clinitial Dental Radiology Center'
       },
       createdAt: now,
       updatedAt: now,

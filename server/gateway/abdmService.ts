@@ -130,7 +130,7 @@ export function generateFhirR4Bundle(params: {
     spo2?: number;
   };
 }) {
-  const bundleId = `bundle-cura-${Date.now()}`;
+  const bundleId = `bundle-clinitial-${Date.now()}`;
   const timestamp = new Date().toISOString();
 
   const patientId = params.patient.id || "pat-01";
@@ -141,7 +141,7 @@ export function generateFhirR4Bundle(params: {
   const entries: any[] = [
     // 1. Composition Resource
     {
-      fullUrl: `https://cura.in/fhir/Composition/comp-${Date.now()}`,
+      fullUrl: `https://clinitial.in/fhir/Composition/comp-${Date.now()}`,
       resource: {
         resourceType: "Composition",
         id: `comp-${Date.now()}`,
@@ -167,7 +167,7 @@ export function generateFhirR4Bundle(params: {
             display: params.doctor.name
           }
         ],
-        title: "CURA Clinical Consultation Record",
+        title: "CLINITIAL Clinical Consultation Record",
         section: [
           {
             title: "Diagnosis",
@@ -179,7 +179,7 @@ export function generateFhirR4Bundle(params: {
 
     // 2. Patient Resource
     {
-      fullUrl: `https://cura.in/fhir/Patient/${patientId}`,
+      fullUrl: `https://clinitial.in/fhir/Patient/${patientId}`,
       resource: {
         resourceType: "Patient",
         id: patientId,
@@ -210,7 +210,7 @@ export function generateFhirR4Bundle(params: {
 
     // 3. Practitioner Resource
     {
-      fullUrl: `https://cura.in/fhir/Practitioner/${practitionerId}`,
+      fullUrl: `https://clinitial.in/fhir/Practitioner/${practitionerId}`,
       resource: {
         resourceType: "Practitioner",
         id: practitionerId,
@@ -230,7 +230,7 @@ export function generateFhirR4Bundle(params: {
 
     // 4. Condition (Diagnosis) Resource
     {
-      fullUrl: `https://cura.in/fhir/Condition/${conditionId}`,
+      fullUrl: `https://clinitial.in/fhir/Condition/${conditionId}`,
       resource: {
         resourceType: "Condition",
         id: conditionId,
@@ -254,7 +254,7 @@ export function generateFhirR4Bundle(params: {
   params.medications.forEach((med, idx) => {
     const medId = `medreq-${Date.now()}-${idx}`;
     entries.push({
-      fullUrl: `https://cura.in/fhir/MedicationRequest/${medId}`,
+      fullUrl: `https://clinitial.in/fhir/MedicationRequest/${medId}`,
       resource: {
         resourceType: "MedicationRequest",
         id: medId,
@@ -288,7 +288,7 @@ export function generateFhirR4Bundle(params: {
       profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"]
     },
     identifier: {
-      system: "https://cura.in/fhir/bundle",
+      system: "https://clinitial.in/fhir/bundle",
       value: bundleId
     },
     type: "document",

@@ -1,11 +1,11 @@
 export const openApiSpecification = {
   openapi: "3.0.3",
   info: {
-    title: "CURA AI Healthcare Platform API",
+    title: "CLINITIAL AI Healthcare Platform API",
     version: "2.0.0",
     description: "Production-grade, HIPAA, NABH, FHIR R4 and ABDM-ready healthcare backend API."
   },
-  servers: [{ url: "/api", description: "CURA Core Production Gateway" }],
+  servers: [{ url: "/api", description: "CLINITIAL Core Production Gateway" }],
   paths: {
     "/v1/auth/login": {
       post: {

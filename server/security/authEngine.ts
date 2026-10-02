@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { Request, Response, NextFunction } from "express";
 
 // Centralized secret retrieval with secure fallbacks
-const SESSION_SECRET = process.env.SESSION_SECRET || "cura_prod_sec_hmac_2026_key_998811";
+const SESSION_SECRET = process.env.SESSION_SECRET || "clinitial_prod_sec_hmac_2026_key_998811";
 const FIELD_ENCRYPTION_KEY = crypto.createHash("sha256").update(process.env.FIELD_ENCRYPTION_KEY || SESSION_SECRET).digest();
 
 export interface AuthenticatedUserContext {
@@ -277,7 +277,7 @@ export function extractAuthenticatedUser(req: Request): AuthenticatedUserContext
         return [k, decodeURIComponent(v.join("="))];
       })
     );
-    rawToken = cookies["cura_session"] || cookies["cura_patient_session"] || null;
+    rawToken = cookies["clinitial_session"] || cookies["cura_session"] || cookies["clinitial_patient_session"] || cookies["cura_patient_session"] || null;
   }
 
   // 2. Check Authorization Header (Bearer <token>)
@@ -307,7 +307,7 @@ export function requireAuthenticatedUser(req: Request, res: Response, next: Next
   const user = extractAuthenticatedUser(req);
   if (!user) {
     return res.status(401).json({
-      type: "https://cura.in/errors/unauthorized",
+      type: "https://clinitial.in/errors/unauthorized",
       title: "Authentication Required",
       status: 401,
       detail: "Valid cryptographic authentication session token is required to access this healthcare endpoint.",
@@ -323,7 +323,7 @@ export function requireRoles(...allowedRoles: string[]) {
     const user = extractAuthenticatedUser(req);
     if (!user) {
       return res.status(401).json({
-        type: "https://cura.in/errors/unauthorized",
+        type: "https://clinitial.in/errors/unauthorized",
         status: 401,
         detail: "Authentication required"
       });
@@ -334,7 +334,7 @@ export function requireRoles(...allowedRoles: string[]) {
 
     if (!normalizedAllowed.includes(normalizedUserRole) && !normalizedAllowed.includes("any")) {
       return res.status(403).json({
-        type: "https://cura.in/errors/forbidden",
+        type: "https://clinitial.in/errors/forbidden",
         status: 403,
         detail: `Access denied. Role '${user.role}' is not authorized for this operation. Required: [${allowedRoles.join(", ")}]`,
         timestamp: new Date().toISOString()

@@ -77,7 +77,7 @@ export function AyushClinicalAI() {
       const data = await response.json();
       if (data.success && data.assessment) {
         setAssessmentResult(data.assessment);
-        setModelUsed(data.modelUsed || "CURA AYUSH Intelligence");
+        setModelUsed(data.modelUsed || "Clinitial AYUSH Intelligence");
         setLatencyMs(data.latencyMs || 240);
       }
     } catch (err) {
@@ -94,7 +94,7 @@ export function AyushClinicalAI() {
         <div className="relative z-10 max-w-4xl space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="bg-indigo-500/20 text-indigo-300 text-xs font-black px-3 py-1 rounded-full border border-indigo-500/30 flex items-center gap-1.5">
-              <Brain className="w-3.5 h-3.5 text-indigo-400" /> CURA AI Gateway
+              <Brain className="w-3.5 h-3.5 text-indigo-400" /> Clinitial AI Gateway
             </span>
             <span className="bg-emerald-500/20 text-emerald-300 text-xs font-black px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5 text-emerald-400" /> Human-In-The-Loop (HITL) Gate
@@ -102,7 +102,7 @@ export function AyushClinicalAI() {
           </div>
 
           <h2 className="text-xl md:text-3xl font-black tracking-tight">
-            CURA AYUSH AI — Unified Clinical Intelligence
+            Clinitial AYUSH AI — Unified Clinical Intelligence
           </h2>
 
           <p className="text-xs md:text-sm text-slate-300 leading-relaxed font-normal">
@@ -114,7 +114,7 @@ export function AyushClinicalAI() {
           <div className="pt-2">
             <div className="p-3 bg-slate-900/80 rounded-2xl border border-indigo-900/60 font-mono text-[11px] text-indigo-200 hidden md:flex items-center justify-between">
               <span className="font-black text-white flex items-center gap-1.5">
-                <Brain className="w-3.5 h-3.5 text-indigo-400" /> CURA AI Gateway
+                <Brain className="w-3.5 h-3.5 text-indigo-400" /> Clinitial AI Gateway
               </span>
               <span className="text-indigo-400">&rarr;</span>
               <span className="text-emerald-300">🌿 Ayurveda (Prakriti/Vikriti/Dosha)</span>
@@ -270,7 +270,7 @@ export function AyushClinicalAI() {
         >
           {isLoading ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin" /> Processing via CURA AYUSH AI Gateway...
+              <RefreshCw className="w-4 h-4 animate-spin" /> Processing via Clinitial AYUSH AI Gateway...
             </>
           ) : (
             <>

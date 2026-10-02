@@ -7,11 +7,11 @@ export interface FHIRResource {
 }
 
 export class FHIRService {
-  private baseUrn = "https://cura.in/fhir";
+  private baseUrn = "https://clinitial.in/fhir";
   private abdmIgUrl = "https://nrces.in/ndhm/fhir/r4";
 
   /**
-   * Generate FHIR Patient Resource from CURA Patient
+   * Generate FHIR Patient Resource from CLINITIAL Patient
    */
   public generatePatientResource(patient: any): FHIRResource {
     const names = (patient.fullName || patient.patientName || "Unknown Patient").trim().split(/\s+/);
@@ -89,7 +89,7 @@ export class FHIRService {
   }
 
   /**
-   * Generate FHIR Encounter Resource from CURA Admission or Appointment
+   * Generate FHIR Encounter Resource from CLINITIAL Admission or Appointment
    */
   public generateEncounterResource(admissionOrAppt: any): FHIRResource {
     const fhirEncounter: FHIRResource = {

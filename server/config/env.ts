@@ -10,8 +10,8 @@ const envSchema = z.object({
   DIRECT_DATABASE_URL: z.string().optional(),
   
   // Security & Authentication Secrets
-  SESSION_SECRET: z.string().default("cura_production_secret_session_hmac_2026_salt_8877"),
-  FIELD_ENCRYPTION_KEY: z.string().default("cura_aes_256_gcm_master_key_clinical_vault_9922"),
+  SESSION_SECRET: z.string().default("clinitial_production_secret_session_hmac_2026_salt_8877"),
+  FIELD_ENCRYPTION_KEY: z.string().default("clinitial_aes_256_gcm_master_key_clinical_vault_9922"),
   
   // AI Gateway & Providers
   GEMINI_API_KEY: z.string().optional(),
@@ -28,11 +28,11 @@ const envSchema = z.object({
   
   // Messaging & Webhooks
   WHATSAPP_TOKEN: z.string().optional(),
-  WHATSAPP_VERIFY_TOKEN: z.string().default("cura_verified_meta_webhook_2026"),
+  WHATSAPP_VERIFY_TOKEN: z.string().default("clinitial_verified_meta_webhook_2026"),
   WHATSAPP_APP_SECRET: z.string().optional(),
   
   // Storage
-  STORAGE_BUCKET: z.string().default("cura-clinical-documents"),
+  STORAGE_BUCKET: z.string().default("clinitial-clinical-documents"),
   
   // Demo Mode
   DEMO_MODE: z.string().default("false")

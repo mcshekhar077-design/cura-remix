@@ -86,11 +86,60 @@ export async function createApp(): Promise<express.Application> {
   app.use("/pmjay", abdmRouter);
 
   // Fallback compatibility for clinic leads/signup
+  const trialLeadsList = [
+    {
+      id: "trial_1",
+      fullName: "Dr. Sandeep Deshmukh",
+      email: "sandeep.deshmukh@cureclinic.in",
+      phone: "+91 98230 11223",
+      clinicName: "CureWell Family Clinic",
+      doctorCount: "3",
+      subdomain: "curewell",
+      createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+      status: "pending" as const,
+      referralCode: "CLINITIAL-TOPDOC"
+    },
+    {
+      id: "trial_2",
+      fullName: "Dr. Meenakshi Sundaram",
+      email: "meenakshi@ayushwellness.co",
+      phone: "+91 94440 98765",
+      clinicName: "Sundaram Integrative Care",
+      doctorCount: "2",
+      subdomain: "sundaram",
+      createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+      status: "contacted" as const,
+      referralCode: "IMA-SPECIAL"
+    }
+  ];
+
   app.post("/api/v1/clinic/signup", (req: Request, res: Response) => {
-    res.status(201).json({ success: true, message: "Clinic signed up successfully." });
+    const lead = {
+      id: `trial_${Date.now()}`,
+      fullName: req.body.fullName || "New Doctor",
+      email: req.body.email || "",
+      phone: req.body.phone || "",
+      clinicName: req.body.clinicName || "My Clinic",
+      doctorCount: String(req.body.doctorCount || "1"),
+      subdomain: req.body.subdomain || "clinic",
+      createdAt: new Date().toISOString(),
+      status: "pending" as const,
+      referralCode: req.body.referralCode
+    };
+    trialLeadsList.unshift(lead);
+    res.status(201).json({ success: true, message: "Clinic signed up successfully.", lead });
   });
+
   app.get("/api/v1/clinic/leads", (req: Request, res: Response) => {
-    res.json({ success: true, leads: [] });
+    res.json(trialLeadsList);
+  });
+
+  // 5.9 Safe API 404 Catch-All: never allow unmatched /api routes to fall through to HTML SPA
+  app.all("/api/*", (req: Request, res: Response) => {
+    res.status(404).json({
+      success: false,
+      error: `API route not found: ${req.method} ${req.originalUrl}`
+    });
   });
 
   // 6. Vite Development or Production Static Serving

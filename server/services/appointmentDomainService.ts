@@ -71,7 +71,7 @@ export class AppointmentDomainService {
       tokenNumber,
       queueStatus: "SCHEDULED",
       consultationMode: data.consultationMode || "IN_PERSON",
-      meetingLink: data.consultationMode === "VIDEO" ? `https://telehealth.cura.in/room/meet_${id}` : undefined,
+      meetingLink: data.consultationMode === "VIDEO" ? `https://telehealth.clinitial.in/room/meet_${id}` : undefined,
       notes: data.notes,
       createdAt: new Date().toISOString()
     };

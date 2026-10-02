@@ -16,7 +16,7 @@ export const aiConfig = {
   },
   safety: {
     enforceHumanInTheLoop: true,
-    cdssDisclaimer: "ASSISTIVE CLINICAL DECISION SUPPORT: CURA AI outputs are assistive clinical observations and do not replace independent licensed medical judgement. Prescriptions and diagnoses require clinician verification."
+    cdssDisclaimer: "ASSISTIVE CLINICAL DECISION SUPPORT: CLINITIAL AI outputs are assistive clinical observations and do not replace independent licensed medical judgement. Prescriptions and diagnoses require clinician verification."
   },
   rateLimits: {
     maxRequestsPerMinutePerTenant: 60,

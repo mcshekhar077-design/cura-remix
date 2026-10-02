@@ -42,8 +42,8 @@ export const TENANTS: TenantInfo[] = [
   },
   {
     id: "tenant_default",
-    name: "CURA Central Clinical Tenant",
-    code: "CURA-GLOBAL",
+    name: "CLINITIAL Central Clinical Tenant",
+    code: "CLINITIAL-GLOBAL",
     city: "Bangalore",
     state: "Karnataka",
     tier: "secondary",
@@ -51,7 +51,7 @@ export const TENANTS: TenantInfo[] = [
     activeDoctors: 20,
     status: "active",
     dbSchema: "tenant_default_clinical",
-    encryptionKeyId: "kms-key-cura-global"
+    encryptionKeyId: "kms-key-clinitial-global"
   }
 ];
 

@@ -69,7 +69,7 @@ export class AIGateway {
           ? req.inputData 
           : JSON.stringify(req.inputData);
 
-        const systemInstruction = `You are CURA AI Assistive Clinical Intelligence.
+        const systemInstruction = `You are CLINITIAL AI Assistive Clinical Intelligence.
 Task: ${req.taskType}
 CRITICAL SAFETY DIRECTIVE:
 1. Provide accurate, evidence-based clinical insights, differential diagnoses, or drug considerations.
@@ -89,7 +89,7 @@ CRITICAL SAFETY DIRECTIVE:
         outputData = response.text;
       } else {
         // Safe Failure: No synthetic hallucination!
-        throw new ServiceUnavailableError("CURA AI Gateway: Clinical AI inference provider is not configured.");
+        throw new ServiceUnavailableError("CLINITIAL AI Gateway: Clinical AI inference provider is not configured.");
       }
 
       const latencyMs = Date.now() - startTime;

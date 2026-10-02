@@ -14,7 +14,7 @@ function getGeminiClient(): GoogleGenAI | null {
       apiKey,
       httpOptions: {
         headers: {
-          "User-Agent": "cura-ayush-suite"
+          "User-Agent": "clinitial-ayush-suite"
         }
       }
     });
@@ -412,7 +412,7 @@ ayushRouter.post("/interaction-check", (req: Request, res: Response) => {
 });
 
 // ============================================================================
-// ROUTE 3: Real AI-Assisted Clinical AYUSH Assessment (Unified CURA AI Gateway)
+// ROUTE 3: Real AI-Assisted Clinical AYUSH Assessment (Unified CLINITIAL AI Gateway)
 // ============================================================================
 ayushRouter.post("/clinical-assess", async (req: Request, res: Response) => {
   const {
@@ -435,7 +435,7 @@ ayushRouter.post("/clinical-assess", async (req: Request, res: Response) => {
   // Try real Gemini AI generation first
   if (client) {
     try {
-      const prompt = `You are CURA AYUSH Clinical Intelligence, an enterprise clinical decision support system (CDSS) for licensed AYUSH practitioners adhering to official Ministry of AYUSH clinical protocols, NAMASTE portal terminologies, and WHO traditional medicine benchmarks.
+      const prompt = `You are CLINITIAL AYUSH Clinical Intelligence, an enterprise clinical decision support system (CDSS) for licensed AYUSH practitioners adhering to official Ministry of AYUSH clinical protocols, NAMASTE portal terminologies, and WHO traditional medicine benchmarks.
 
 PATIENT INFORMATION:
 - Name: ${patient.name}, Age: ${patient.age}, Gender: ${patient.gender}
@@ -481,7 +481,7 @@ Respond strictly in JSON format with the following keys:
     "Highlight specific safety considerations with the patient's allopathic drugs: ${(patient.allopathicMeds || []).join(', ')}"
   ],
   "doctorApprovalRequired": true,
-  "disclaimer": "CURA AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals and does not substitute independent medical judgment."
+  "disclaimer": "CLINITIAL AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals and does not substitute independent medical judgment."
 }`;
 
       const aiResponse = await client.models.generateContent({
@@ -496,7 +496,7 @@ Respond strictly in JSON format with the following keys:
       const parsed = JSON.parse(responseText);
 
       appendAuditEvent({
-        tenantId: "TENANT-CURA-CORE",
+        tenantId: "TENANT-CLINITIAL-CORE",
         userId: "AYUSH-CLINICIAN-01",
         userRole: "DOCTOR",
         action: "CREATE",
@@ -509,7 +509,7 @@ Respond strictly in JSON format with the following keys:
         success: true,
         latencyMs: Date.now() - start,
         modelUsed: "gemini-3.8-flash",
-        source: "CURA_AYUSH_AI_GATEWAY",
+        source: "CLINITIAL_AYUSH_AI_GATEWAY",
         assessment: parsed
       });
     } catch (err: any) {
@@ -565,7 +565,7 @@ Respond strictly in JSON format with the following keys:
         "Patient is on Metformin: Shilajit and bitter herbs can have an additive glucose-lowering effect; monitor fasting CBG."
       ],
       doctorApprovalRequired: true,
-      disclaimer: "CURA AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
+      disclaimer: "CLINITIAL AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
     },
     unani: {
       system: "unani",
@@ -601,7 +601,7 @@ Respond strictly in JSON format with the following keys:
       ],
       herbAllopathicSafetyChecks: ["Ensure sugar-free Unani preparations if co-prescribed with Metformin."],
       doctorApprovalRequired: true,
-      disclaimer: "CURA AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
+      disclaimer: "CLINITIAL AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
     },
     siddha: {
       system: "siddha",
@@ -635,7 +635,7 @@ Respond strictly in JSON format with the following keys:
       ],
       herbAllopathicSafetyChecks: ["Separate Siddha choornams from Allopathic statins by 2 hours."],
       doctorApprovalRequired: true,
-      disclaimer: "CURA AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
+      disclaimer: "CLINITIAL AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
     },
     homeopathy: {
       system: "homeopathy",
@@ -669,7 +669,7 @@ Respond strictly in JSON format with the following keys:
       ],
       herbAllopathicSafetyChecks: ["Safe to co-administer with Atorvastatin and Metformin; maintain 45-minute mouth hygiene separation."],
       doctorApprovalRequired: true,
-      disclaimer: "CURA AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
+      disclaimer: "CLINITIAL AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
     },
     yoga: {
       system: "yoga",
@@ -705,7 +705,7 @@ Respond strictly in JSON format with the following keys:
       ],
       herbAllopathicSafetyChecks: ["Non-pharmacological; synergistic with allopathic cardiovascular management."],
       doctorApprovalRequired: true,
-      disclaimer: "CURA AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
+      disclaimer: "CLINITIAL AYUSH Clinical Decision Support is intended solely to assist accredited AYUSH healthcare professionals."
     }
   };
 
@@ -714,8 +714,8 @@ Respond strictly in JSON format with the following keys:
   res.json({
     success: true,
     latencyMs: Date.now() - start,
-    modelUsed: "CURA-AYUSH-Deterministic-CDSS-v2.0",
-    source: "CURA_AYUSH_KNOWLEDGE_BASE",
+    modelUsed: "CLINITIAL-AYUSH-Deterministic-CDSS-v2.0",
+    source: "CLINITIAL_AYUSH_KNOWLEDGE_BASE",
     assessment: selected
   });
 });
@@ -735,10 +735,10 @@ ayushRouter.post("/abha-verify", (req: Request, res: Response) => {
   // Link AYUSH Care Context
   const ayushCareContext = {
     referenceNumber: `AYUSH-CC-${Math.floor(100000 + Math.random() * 900000)}`,
-    display: "CURA AYUSH Integrated OPD & Panchakarma Record",
+    display: "CLINITIAL AYUSH Integrated OPD & Panchakarma Record",
     registeredAt: new Date().toISOString(),
-    hipId: "IN-HOSP-CURA-001",
-    hipName: "CURA Ayush Super-Specialty Medical Center",
+    hipId: "IN-HOSP-CLINITIAL-001",
+    hipName: "CLINITIAL Ayush Super-Specialty Medical Center",
     abdmMilestoneCertified: "M1, M2 & M3 Certified"
   };
 
@@ -835,7 +835,7 @@ Provide ONLY the translated text in ${targetLanguage}, without any conversationa
     sourceText: text,
     targetLanguage,
     translatedText: translated,
-    engine: "CURA-AYUSH-Linguistic-Dictionary"
+    engine: "CLINITIAL-AYUSH-Linguistic-Dictionary"
   });
 });
 
@@ -850,7 +850,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
       id: "TL-001",
       date: "2026-06-10",
       system: "Allopathy",
-      facility: "CURA Heart Institute",
+      facility: "CLINITIAL Heart Institute",
       doctor: "Dr. Arvind Rao, MD, DM (Cardiology)",
       type: "OPD Consultation",
       summary: "Primary diagnosis: Essential Hypertension & Mixed Dyslipidemia. Initiated Atorvastatin 20mg OD, Telmisartan 40mg OD.",
@@ -861,7 +861,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
       id: "TL-002",
       date: "2026-06-18",
       system: "Diagnostics",
-      facility: "CURA Central Laboratory",
+      facility: "CLINITIAL Central Laboratory",
       doctor: "Dr. Meera Sen, MD (Biochemistry)",
       type: "Comprehensive Metabolic & Lipid Panel",
       summary: "Lipid profile confirmed elevated ApoB and LDL (164 mg/dL). Normal hepatic enzymes (AST 26, ALT 31). Fasting glucose 118 mg/dL.",
@@ -872,7 +872,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
       id: "TL-003",
       date: "2026-07-02",
       system: "Ayurveda",
-      facility: "CURA Ayush Integrative Department",
+      facility: "CLINITIAL Ayush Integrative Department",
       doctor: "Dr. Rajeshwar Shastri, BAMS, MD (Ayur)",
       type: "Prakriti & Panchakarma Assessment",
       summary: "Evaluated Prakriti as Pitta-Kapha with Sama-Vata Medoroga. Initiated Arjuna Ksheerapaka and Arogyavardhini Vati with Atorvastatin stagger protocol. Checked herb-drug compatibility.",
@@ -883,7 +883,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
       id: "TL-004",
       date: "2026-07-15",
       system: "Yoga & Naturopathy",
-      facility: "CURA Ayush Wellness Pavilion",
+      facility: "CLINITIAL Ayush Wellness Pavilion",
       doctor: "Yogacharya Sneha Deshmukh, BNYS",
       type: "Integrative Yoga Prescription",
       summary: "Prescribed 30-minute daily protocol: Nadi Shodhana (15 min), Shavasana, and Pawanmuktasana series. Pathya Ahara low-sodium diet instituted.",
@@ -894,7 +894,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
       id: "TL-005",
       date: "2026-08-10",
       system: "Integrative Review",
-      facility: "CURA Joint Allopathic-AYUSH Tumor & Metabolic Board",
+      facility: "CLINITIAL Joint Allopathic-AYUSH Tumor & Metabolic Board",
       doctor: "Joint Review: Dr. Arvind Rao & Dr. Rajeshwar Shastri",
       type: "Synchronized Clinical Review",
       summary: "Exceptional clinical progress: BP stabilized to 122/78 mmHg, LDL reduced to 118 mg/dL (-50 mg/dL drop). Zero hepatic elevation, zero drug interactions recorded. Reduced Telmisartan from 40mg to 20mg.",
@@ -905,7 +905,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
 
   res.json({
     success: true,
-    patientId: patientId || "PAT-8841-CURA",
+    patientId: patientId || "PAT-8841-CLINITIAL",
     patientName: "Rajesh Kumar",
     age: 48,
     gender: "Male",
@@ -919,7 +919,7 @@ ayushRouter.get("/patient-timeline/:patientId", (req: Request, res: Response) =>
 // ROUTE 7: Continuous AYUSH Care Journey (Assessment -> Consultation -> Treatment -> Outcome)
 // ============================================================================
 ayushRouter.post("/care-journey", (req: Request, res: Response) => {
-  const { patientId = "PAT-8841-CURA", system = "Ayurveda", goal = "Hypertension & Metabolic Regulation" } = req.body;
+  const { patientId = "PAT-8841-CLINITIAL", system = "Ayurveda", goal = "Hypertension & Metabolic Regulation" } = req.body;
 
   const journey = {
     journeyId: `CJ-AYU-${Math.floor(100000 + Math.random() * 900000)}`,
@@ -971,7 +971,7 @@ ayushRouter.post("/care-journey", (req: Request, res: Response) => {
         name: "Yoga & Pranic Breathing",
         status: "IN_PROGRESS",
         streakDays: 18,
-        details: "Daily 25-min guided Pranayama logged via CURA Mobile Companion."
+        details: "Daily 25-min guided Pranayama logged via CLINITIAL Mobile Companion."
       },
       {
         stageNumber: 7,

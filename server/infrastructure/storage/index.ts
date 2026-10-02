@@ -63,7 +63,7 @@ export class SecureDocumentStorageService {
 
     const expiresAt = Date.now() + storageConfig.signedUrlExpirySeconds * 1000;
     const signature = crypto
-      .createHmac("sha256", process.env.SESSION_SECRET || "cura_secret")
+      .createHmac("sha256", process.env.SESSION_SECRET || "clinitial_secret")
       .update(`${docId}:${expiresAt}:${tenantId}`)
       .digest("hex");
 
@@ -73,7 +73,7 @@ export class SecureDocumentStorageService {
   static verifySignedDownloadUrl(docId: string, tenantId: string, expires: number, sig: string): boolean {
     if (Date.now() > expires) return false;
     const expectedSig = crypto
-      .createHmac("sha256", process.env.SESSION_SECRET || "cura_secret")
+      .createHmac("sha256", process.env.SESSION_SECRET || "clinitial_secret")
       .update(`${docId}:${expires}:${tenantId}`)
       .digest("hex");
 

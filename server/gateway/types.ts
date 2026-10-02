@@ -1,4 +1,4 @@
-// CURA API Gateway & Production Architecture Types
+// CLINITIAL API Gateway & Production Architecture Types
 
 export type UserRole = 
   | "DOCTOR" 

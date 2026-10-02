@@ -22,6 +22,7 @@ import {
   RotateCw
 } from "lucide-react";
 import { Patient, ScannedReport } from "../types";
+import { queueFailedDiagnosticReport } from "./OfflineSyncEngine";
 
 interface DoctorDocumentScannerProps {
   patient: Patient;
@@ -290,39 +291,83 @@ export function DoctorDocumentScanner({
     }
     
     setIsSaving(true);
+    const reportPayload = {
+      patientId: patient.id,
+      patientName: patient.fullName,
+      title,
+      date,
+      category,
+      fileName: file?.name || "scanned_report.pdf",
+      fileSize: "450 KB",
+      extractedText: analyzedData?.extractedText || "",
+      aiSummary: summary,
+      keyFindings: analyzedData?.keyFindings || labResults.map(l => `${l.test}: ${l.value} (${l.normalRange})`),
+      
+      // Dual-sided fields
+      riskLevel: analyzedData?.riskLevel || "low",
+      abnormalValues: analyzedData?.abnormalValues || [],
+      possibleConditions: analyzedData?.possibleConditions || [diagnosis].filter(Boolean),
+      suggestedSpecialist: analyzedData?.suggestedSpecialist || "",
+      suggestedDoctorName: "Dr. Rajesh Sharma",
+      followUpRecommendation: analyzedData?.followUpRecommendation || "",
+      
+      // Doctor EMR fields
+      extractedPatientName: analyzedData?.extractedPatientName || patient.fullName,
+      medications,
+      diagnosis,
+      labResults,
+      summaryForDoctor: summary,
+      suggestedIcdCode: icdCode,
+      action: "Add to patient record",
+      endpoint: `/api/v1/patients/${patient.id}/scanned-reports`
+    };
+
+    // If offline immediately, queue directly
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      queueFailedDiagnosticReport({
+        ...reportPayload,
+        uploadError: "Offline network connection"
+      });
+      setSuccessMsg(`🌐 Internet offline: Diagnostic report "${title}" has been safely queued in the Offline Sync Engine and will automatically upload once internet connection is restored.`);
+      
+      // Optimistically update patient record locally so doctor workflow isn't blocked
+      const optimisticReport: ScannedReport = {
+        id: `offline_${Date.now()}`,
+        title,
+        date,
+        category,
+        fileName: file?.name || "scanned_report.pdf",
+        fileSize: "450 KB",
+        extractedText: analyzedData?.extractedText || "",
+        aiSummary: summary,
+        keyFindings: reportPayload.keyFindings,
+        status: "scanned",
+        riskLevel: (analyzedData?.riskLevel as any) || "low",
+        abnormalValues: analyzedData?.abnormalValues,
+        possibleConditions: analyzedData?.possibleConditions,
+        suggestedSpecialist: analyzedData?.suggestedSpecialist,
+        suggestedDoctorName: "Dr. Rajesh Sharma",
+        followUpRecommendation: analyzedData?.followUpRecommendation,
+        extractedPatientName: patient.fullName
+      };
+      
+      const updatedLocal: Patient = {
+        ...patient,
+        scannedReports: [optimisticReport, ...(patient.scannedReports || [])]
+      };
+      onReportSaved(updatedLocal);
+      resetScanner();
+      setIsSaving(false);
+      return;
+    }
+
     try {
       const res = await fetch(`/api/v1/patients/${patient.id}/scanned-reports`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          title,
-          date,
-          category,
-          fileName: file?.name || "scanned_report.pdf",
-          fileSize: "450 KB",
-          extractedText: analyzedData?.extractedText || "",
-          aiSummary: summary,
-          keyFindings: analyzedData?.keyFindings || labResults.map(l => `${l.test}: ${l.value} (${l.normalRange})`),
-          
-          // Dual-sided fields
-          riskLevel: analyzedData?.riskLevel || "low",
-          abnormalValues: analyzedData?.abnormalValues || [],
-          possibleConditions: analyzedData?.possibleConditions || [diagnosis].filter(Boolean),
-          suggestedSpecialist: analyzedData?.suggestedSpecialist || "",
-          suggestedDoctorName: "Dr. Rajesh Sharma",
-          followUpRecommendation: analyzedData?.followUpRecommendation || "",
-          
-          // Doctor EMR fields
-          extractedPatientName: analyzedData?.extractedPatientName || patient.fullName,
-          medications,
-          diagnosis,
-          labResults,
-          summaryForDoctor: summary,
-          suggestedIcdCode: icdCode,
-          action: "Add to patient record"
-        })
+        body: JSON.stringify(reportPayload)
       });
 
       if (res.ok) {
@@ -331,11 +376,48 @@ export function DoctorDocumentScanner({
         onReportSaved(updatedPatient);
         resetScanner();
       } else {
-        const err = await res.json();
-        setErrorAlert(err.detail || "Failed to save record to patient file.");
+        // If server failure or gateway timeout, queue for auto-retry
+        queueFailedDiagnosticReport({
+          ...reportPayload,
+          uploadError: `Server error HTTP ${res.status}`
+        });
+        setSuccessMsg(`⚠️ Upload error: Report "${title}" has been queued in the Offline Sync Engine and will automatically retry.`);
+        resetScanner();
       }
     } catch (e: any) {
-      setErrorAlert(`Save failed: ${e.message}`);
+      // Network drop or fetch failure: automatically queue into OfflineSyncEngine!
+      queueFailedDiagnosticReport({
+        ...reportPayload,
+        uploadError: e?.message || "Network request failed"
+      });
+      setSuccessMsg(`🌐 Network unreachable. Diagnostic report "${title}" has been safely queued in the Offline Sync Engine and will automatically retry when internet connection is restored.`);
+      
+      const optimisticReport: ScannedReport = {
+        id: `offline_${Date.now()}`,
+        title,
+        date,
+        category,
+        fileName: file?.name || "scanned_report.pdf",
+        fileSize: "450 KB",
+        extractedText: analyzedData?.extractedText || "",
+        aiSummary: summary,
+        keyFindings: reportPayload.keyFindings,
+        status: "scanned",
+        riskLevel: (analyzedData?.riskLevel as any) || "low",
+        abnormalValues: analyzedData?.abnormalValues,
+        possibleConditions: analyzedData?.possibleConditions,
+        suggestedSpecialist: analyzedData?.suggestedSpecialist,
+        suggestedDoctorName: "Dr. Rajesh Sharma",
+        followUpRecommendation: analyzedData?.followUpRecommendation,
+        extractedPatientName: patient.fullName
+      };
+      
+      const updatedLocal: Patient = {
+        ...patient,
+        scannedReports: [optimisticReport, ...(patient.scannedReports || [])]
+      };
+      onReportSaved(updatedLocal);
+      resetScanner();
     } finally {
       setIsSaving(false);
     }

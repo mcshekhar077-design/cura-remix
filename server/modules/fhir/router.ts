@@ -19,7 +19,7 @@ fhirRouter.get("/Patient/:id", (req: Request, res: Response) => {
     resourceType: "Patient",
     id: patient.id,
     identifier: [
-      { system: "https://cura.health/mrn", value: patient.mrn },
+      { system: "https://clinitial.health/mrn", value: patient.mrn },
       ...(patient.abhaId ? [{ system: "https://abdm.gov.in/abha", value: patient.abhaId }] : [])
     ],
     name: [{ use: "official", text: patient.fullName }],
@@ -35,9 +35,9 @@ fhirRouter.get("/metadata", (req: Request, res: Response) => {
     resourceType: "CapabilityStatement",
     status: "active",
     date: new Date().toISOString(),
-    publisher: "CURA Healthcare Platform",
+    publisher: "CLINITIAL Healthcare Platform",
     kind: "instance",
-    software: { name: "CURA FHIR Server", version: "2.0.0" },
+    software: { name: "CLINITIAL FHIR Server", version: "2.0.0" },
     fhirVersion: "4.0.1",
     format: ["application/fhir+json"]
   });

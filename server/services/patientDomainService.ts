@@ -116,7 +116,7 @@ export class PatientDomainService {
       gender: data.gender,
       bloodGroup: data.bloodGroup,
       phone: data.phone,
-      email: data.email || `${data.fullName.toLowerCase().replace(/\s+/g, ".")}@cura-patient.in`,
+      email: data.email || `${data.fullName.toLowerCase().replace(/\s+/g, ".")}@clinitial-patient.in`,
       allergies: data.allergies || [],
       chronicConditions: data.chronicConditions || [],
       currentMedications: [],

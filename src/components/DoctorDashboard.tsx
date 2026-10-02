@@ -4591,7 +4591,7 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
                       
                       <div>
                         <h4 className="font-extrabold text-emerald-800 text-base">Patient Onboarded!</h4>
-                        <p className="text-xs text-emerald-600 font-medium mt-1">EHR Folder initialized on Cura Cloud Server</p>
+                        <p className="text-xs text-emerald-600 font-medium mt-1">EHR Folder initialized on Clinitial Cloud Server</p>
                       </div>
 
                       <div className="bg-white p-4 rounded-xl border border-emerald-100 space-y-3 text-left">
@@ -8391,7 +8391,7 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
                     </div>
                     <div>
                       <h4 className="text-xs font-black tracking-tight text-slate-900 uppercase">
-                        {tenantConfig?.clinicName || "Cura EMR Networks"}
+                        {tenantConfig?.clinicName || "Clinitial EMR Networks"}
                       </h4>
                       <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
                         Integrated Clinical Identity System

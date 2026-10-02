@@ -31,7 +31,7 @@ export const PROMPT_VERSIONS: AIPromptVersionRecord[] = [
     safetyProfile: "standard",
     isActive: false,
     createdAt: "2026-05-10T10:00:00Z",
-    systemPrompt: `You are CURA Clinical AI Gateway, a clinical decision support system for accredited clinicians. Analyze presenting symptoms, suggest ICD-10 differentials, and recommend standard laboratory diagnostics.`
+    systemPrompt: `You are CLINITIAL Clinical AI Gateway, a clinical decision support system for accredited clinicians. Analyze presenting symptoms, suggest ICD-10 differentials, and recommend standard laboratory diagnostics.`
   },
   {
     id: "prm-v1.1",
@@ -43,7 +43,7 @@ export const PROMPT_VERSIONS: AIPromptVersionRecord[] = [
     safetyProfile: "strict_pharmacovigilance",
     isActive: false,
     createdAt: "2026-06-15T14:30:00Z",
-    systemPrompt: `You are CURA Clinical AI Gateway. When analyzing clinical cases, you MUST cross-reference all proposed medications against the patient's documented allergies and renal function (eGFR). Highlight drug-drug interactions with warning badges.`
+    systemPrompt: `You are CLINITIAL Clinical AI Gateway. When analyzing clinical cases, you MUST cross-reference all proposed medications against the patient's documented allergies and renal function (eGFR). Highlight drug-drug interactions with warning badges.`
   },
   {
     id: "prm-v2.0-nabh",
@@ -55,7 +55,7 @@ export const PROMPT_VERSIONS: AIPromptVersionRecord[] = [
     safetyProfile: "strict_pharmacovigilance",
     isActive: true,
     createdAt: "2026-08-01T09:00:00Z",
-    systemPrompt: `You are CURA Enterprise AI Gateway. Adhere strictly to NABH Chapter MOM (Management of Medications) and COP (Care of Patients). Always require Human-in-the-loop (HITL) doctor confirmation before finalizing any therapeutic change. Identify high-risk LASA (Look-Alike Sound-Alike) drugs. Format recommendations as structured JSON.`
+    systemPrompt: `You are CLINITIAL Enterprise AI Gateway. Adhere strictly to NABH Chapter MOM (Management of Medications) and COP (Care of Patients). Always require Human-in-the-loop (HITL) doctor confirmation before finalizing any therapeutic change. Identify high-risk LASA (Look-Alike Sound-Alike) drugs. Format recommendations as structured JSON.`
   }
 ];
 
@@ -184,7 +184,7 @@ Respond in clean, structured JSON with keys:
   const isRespiratory = /breath|cough|lung|asthma|copd|spo2|oxygen|pneumonia/i.test(params.query);
   const isDiabetes = /sugar|glucose|diabetes|insulin|hba1c|dka/i.test(params.query);
 
-  let summary = "Comprehensive evidence-based clinical analysis generated via CURA Clinical Engine.";
+  let summary = "Comprehensive evidence-based clinical analysis generated via CLINITIAL Clinical Engine.";
   let differentials = [
     { condition: "Essential Primary Hypertension", icd10: "I10", probability: "High" },
     { condition: "Metabolic Syndrome", icd10: "E88.81", probability: "Moderate" }
@@ -260,7 +260,7 @@ Respond in clean, structured JSON with keys:
 
   return {
     success: true,
-    modelUsed: "cura-clinical-engine-hybrid",
+    modelUsed: "clinitial-clinical-engine-hybrid",
     promptVersion: selectedPrompt.version,
     confidenceScore: 0.94,
     clinicalSafetyPassed: true,

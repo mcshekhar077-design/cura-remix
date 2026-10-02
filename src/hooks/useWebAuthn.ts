@@ -19,8 +19,8 @@ export function useWebAuthn(patientId: string | undefined) {
     setIsSupported(supported);
 
     if (patientId) {
-      const storedCred = localStorage.getItem(`cura_webauthn_cred_${patientId}`);
-      const simulatedCred = localStorage.getItem(`cura_webauthn_sim_${patientId}`);
+      const storedCred = localStorage.getItem(`clinitial_webauthn_cred_${patientId}`) || localStorage.getItem(`cura_webauthn_cred_${patientId}`);
+      const simulatedCred = localStorage.getItem(`clinitial_webauthn_sim_${patientId}`) || localStorage.getItem(`cura_webauthn_sim_${patientId}`);
       setIsRegistered(!!storedCred || !!simulatedCred);
       setIsSimulated(!!simulatedCred && !storedCred);
     } else {
@@ -52,7 +52,7 @@ export function useWebAuthn(patientId: string | undefined) {
 
     // If browser doesn't support WebAuthn, fallback to simulation
     if (!isSupported) {
-      localStorage.setItem(`cura_webauthn_sim_${patientId}`, "true");
+      localStorage.setItem(`clinitial_webauthn_sim_${patientId}`, "true");
       setIsRegistered(true);
       setIsSimulated(true);
       setLoading(false);
@@ -66,13 +66,13 @@ export function useWebAuthn(patientId: string | undefined) {
       const creationOptions: PublicKeyCredentialCreationOptions = {
         challenge,
         rp: {
-          name: "CURA Patient Health Vault",
+          name: "CLINITIAL Patient Health Vault",
           id: window.location.hostname || "localhost",
         },
         user: {
           id: userIdBytes,
-          name: `patient-${patientId}@cura.in`,
-          displayName: `CURA Patient (${patientId})`,
+          name: `patient-${patientId}@clinitial.in`,
+          displayName: `CLINITIAL Patient (${patientId})`,
         },
         pubKeyCredParams: [
           { type: "public-key", alg: -7 }, // ES256
@@ -98,8 +98,8 @@ export function useWebAuthn(patientId: string | undefined) {
           rawId: btoa(String.fromCharCode(...new Uint8Array(credential.rawId))),
           type: credential.type,
         };
-        localStorage.setItem(`cura_webauthn_cred_${patientId}`, JSON.stringify(credData));
-        localStorage.removeItem(`cura_webauthn_sim_${patientId}`);
+        localStorage.setItem(`clinitial_webauthn_cred_${patientId}`, JSON.stringify(credData));
+        localStorage.removeItem(`clinitial_webauthn_sim_${patientId}`);
         setIsRegistered(true);
         setIsSimulated(false);
         setLoading(false);
@@ -110,7 +110,7 @@ export function useWebAuthn(patientId: string | undefined) {
       console.warn("Real WebAuthn registration failed or blocked by iframe permissions. Falling back to high-fidelity simulated enrollment:", err);
       
       // Fallback behavior: Enable simulated enrollment so preview is fully interactive
-      localStorage.setItem(`cura_webauthn_sim_${patientId}`, "true");
+      localStorage.setItem(`clinitial_webauthn_sim_${patientId}`, "true");
       setIsRegistered(true);
       setIsSimulated(true);
       setLoading(false);
@@ -125,8 +125,8 @@ export function useWebAuthn(patientId: string | undefined) {
       return false;
     }
 
-    const storedCredStr = localStorage.getItem(`cura_webauthn_cred_${patientId}`);
-    const simulatedCred = localStorage.getItem(`cura_webauthn_sim_${patientId}`);
+    const storedCredStr = localStorage.getItem(`clinitial_webauthn_cred_${patientId}`) || localStorage.getItem(`cura_webauthn_cred_${patientId}`);
+    const simulatedCred = localStorage.getItem(`clinitial_webauthn_sim_${patientId}`) || localStorage.getItem(`cura_webauthn_sim_${patientId}`);
 
     if (!storedCredStr && !simulatedCred) {
       setWebAuthnError("No biometrics registered for this patient profile.");
@@ -183,8 +183,8 @@ export function useWebAuthn(patientId: string | undefined) {
   // 3. Deregister / Disable Biometrics
   const deregisterBiometric = () => {
     if (patientId) {
-      localStorage.removeItem(`cura_webauthn_cred_${patientId}`);
-      localStorage.removeItem(`cura_webauthn_sim_${patientId}`);
+      localStorage.removeItem(`clinitial_webauthn_cred_${patientId}`);
+      localStorage.removeItem(`clinitial_webauthn_sim_${patientId}`);
       setIsRegistered(false);
       setIsSimulated(false);
       setWebAuthnError(null);

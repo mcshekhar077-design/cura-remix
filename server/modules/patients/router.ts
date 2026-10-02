@@ -101,3 +101,65 @@ patientsRouter.post("/:id/scanned-reports/analyze", auditLogMiddleware("ai_analy
     next(err);
   }
 });
+
+// GET /api/v1/patients/:id/scanned-reports
+patientsRouter.get("/:id/scanned-reports", (req: Request, res: Response, next) => {
+  try {
+    const patient = db.tables.patients.get(req.params.id);
+    if (!patient) {
+      return res.status(404).json({ success: false, detail: "Patient not found" });
+    }
+    res.json(patient.scannedReports || []);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/v1/patients/:id/scanned-reports
+patientsRouter.post("/:id/scanned-reports", auditLogMiddleware("create", "diagnostic_report"), (req: Request, res: Response, next) => {
+  try {
+    const patient = db.tables.patients.get(req.params.id);
+    if (!patient) {
+      return res.status(404).json({ success: false, detail: "Patient not found" });
+    }
+
+    const reportData = req.body;
+    const reportId = reportData.id || `rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const newReport = {
+      id: reportId,
+      createdAt: new Date().toISOString(),
+      ...reportData
+    };
+
+    if (!Array.isArray(patient.scannedReports)) {
+      patient.scannedReports = [];
+    }
+    patient.scannedReports.unshift(newReport);
+    patient.updatedAt = new Date().toISOString();
+
+    if (reportData.diagnosis || reportData.title) {
+      if (!Array.isArray(patient.history)) {
+        patient.history = [];
+      }
+      patient.history.unshift({
+        date: reportData.date || new Date().toISOString().split("T")[0],
+        doctor: reportData.suggestedDoctorName || "Consultant Clinician",
+        diagnosis: reportData.diagnosis || reportData.title,
+        symptoms: reportData.category || "Diagnostic Assessment",
+        prescriptions: (reportData.medications || []).map((m: any) => typeof m === "string" ? m : m.name || "")
+      });
+    }
+
+    db.tables.patients.set(patient.id, patient);
+
+    res.status(201).json({
+      success: true,
+      message: `Diagnostic report "${reportData.title || "Report"}" successfully recorded in patient EHR.`,
+      report: newReport,
+      ...patient
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+

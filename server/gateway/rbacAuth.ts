@@ -7,7 +7,7 @@ export const MOCK_USERS: Record<string, GatewayUser> = {
   "doctor": {
     id: "USR-DOC-001",
     name: "Dr. K. S. Murthy, MD (Cardiology)",
-    email: "dr.murthy@apollo.cura.in",
+    email: "dr.murthy@apollo.clinitial.in",
     role: "DOCTOR",
     tenantId: "tenant_apollo",
     permissions: [
@@ -37,7 +37,7 @@ export const MOCK_USERS: Record<string, GatewayUser> = {
   "hospital_admin": {
     id: "USR-ADM-002",
     name: "Dr. Rajesh Sharma, MD (Medical Director)",
-    email: "admin@fortis.cura.in",
+    email: "admin@fortis.clinitial.in",
     role: "HOSPITAL_ADMIN",
     tenantId: "tenant_fortis",
     permissions: [
@@ -82,7 +82,7 @@ export const MOCK_USERS: Record<string, GatewayUser> = {
   "pharmacist": {
     id: "USR-PHARM-004",
     name: "Priya Sharma, B.Pharm (Lead Pharmacist)",
-    email: "pharmacy@apollo.cura.in",
+    email: "pharmacy@apollo.clinitial.in",
     role: "PHARMACIST",
     tenantId: "tenant_apollo",
     permissions: [
@@ -100,7 +100,7 @@ export const MOCK_USERS: Record<string, GatewayUser> = {
   "nurse": {
     id: "USR-NURSE-005",
     name: "Margaret D'Souza (Head Nurse ICU)",
-    email: "nurse.margaret@apollo.cura.in",
+    email: "nurse.margaret@apollo.clinitial.in",
     role: "NURSE",
     tenantId: "tenant_apollo",
     permissions: [
@@ -115,7 +115,7 @@ export const MOCK_USERS: Record<string, GatewayUser> = {
   "radiologist": {
     id: "USR-RAD-006",
     name: "Dr. Sanjay Roy, MD (Radiology)",
-    email: "dr.roy@fortis.cura.in",
+    email: "dr.roy@fortis.clinitial.in",
     role: "RADIOLOGIST",
     tenantId: "tenant_fortis",
     permissions: [
@@ -161,14 +161,14 @@ export function issueGatewayToken(roleKey: string, tenantOverride?: string): { t
     tenantId
   };
 
-  const token = `cura_jwt_${roleKey}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const token = `clinitial_jwt_${roleKey}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   const now = Date.now();
   const context: GatewayAuthContext = {
     user,
     token,
     tenantId,
     ipAddress: "127.0.0.1",
-    userAgent: "CURA-Web/Production",
+    userAgent: "CLINITIAL-Web/Production",
     sessionId: `SES-${Math.floor(10000 + Math.random() * 90000)}`,
     issuedAt: now,
     expiresAt: now + 24 * 60 * 60 * 1000 // 24 hours
@@ -200,7 +200,7 @@ Object.keys(MOCK_USERS).forEach(roleKey => {
     token,
     tenantId: baseUser.tenantId,
     ipAddress: "127.0.0.1",
-    userAgent: "CURA-Web/Demo",
+    userAgent: "CLINITIAL-Web/Demo",
     sessionId: `SES-DEMO-${roleKey.toUpperCase()}`,
     issuedAt: now,
     expiresAt: now + 365 * 24 * 60 * 60 * 1000
@@ -218,8 +218,8 @@ export function authenticateGateway(req: Request, res: Response, next: NextFunct
     token = authHeader.substring(7).trim();
   } else if (req.query.token && typeof req.query.token === "string") {
     token = req.query.token;
-  } else if (req.headers["x-cura-token"] && typeof req.headers["x-cura-token"] === "string") {
-    token = req.headers["x-cura-token"];
+  } else if (req.headers["x-clinitial-token"] && typeof req.headers["x-clinitial-token"] === "string") {
+    token = req.headers["x-clinitial-token"];
   }
 
   // If no token, default to DOCTOR persona for seamless developer experience, but flag as anonymous
@@ -231,7 +231,7 @@ export function authenticateGateway(req: Request, res: Response, next: NextFunct
   const session = activeSessions.get(token);
   if (!session) {
     return res.status(401).json({
-      type: "https://cura.in/errors/unauthorized",
+      type: "https://clinitial.in/errors/unauthorized",
       title: "Unauthorized Access",
       status: 401,
       detail: "Invalid or expired Gateway authentication token. Please provide a valid Bearer token.",
@@ -244,7 +244,7 @@ export function authenticateGateway(req: Request, res: Response, next: NextFunct
   const effectiveTenant = headerTenant || session.tenantId;
 
   // Attach context to request
-  (req as any).curaContext = {
+  (req as any).clinitialContext = {
     ...session,
     tenantId: effectiveTenant,
     ipAddress: (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || session.ipAddress,
@@ -259,10 +259,10 @@ export function authenticateGateway(req: Request, res: Response, next: NextFunct
  */
 export function requireRole(...allowedRoles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const context: GatewayAuthContext = (req as any).curaContext;
+    const context: GatewayAuthContext = (req as any).clinitialContext;
     if (!context || !context.user) {
       return res.status(401).json({
-        type: "https://cura.in/errors/unauthorized",
+        type: "https://clinitial.in/errors/unauthorized",
         title: "Unauthorized",
         status: 401,
         detail: "Authentication context missing"
@@ -283,7 +283,7 @@ export function requireRole(...allowedRoles: UserRole[]) {
       });
 
       return res.status(403).json({
-        type: "https://cura.in/errors/forbidden",
+        type: "https://clinitial.in/errors/forbidden",
         title: "Access Forbidden (RBAC)",
         status: 403,
         detail: `Role '${context.user.role}' does not possess required role clearance. Required: [${allowedRoles.join(", ")}]`,
@@ -302,7 +302,7 @@ export function requireRole(...allowedRoles: UserRole[]) {
  */
 export function requirePermission(...requiredPermissions: Permission[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const context: GatewayAuthContext = (req as any).curaContext;
+    const context: GatewayAuthContext = (req as any).clinitialContext;
     if (!context || !context.user) {
       return res.status(401).json({ status: 401, detail: "Authentication context missing" });
     }
@@ -323,7 +323,7 @@ export function requirePermission(...requiredPermissions: Permission[]) {
       });
 
       return res.status(403).json({
-        type: "https://cura.in/errors/missing-permission",
+        type: "https://clinitial.in/errors/missing-permission",
         title: "Missing Required Permission",
         status: 403,
         detail: `You do not have the required permissions: [${missingPermissions.join(", ")}]`,

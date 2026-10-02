@@ -133,7 +133,7 @@ export function AyushGridIntegration() {
             National AYUSH Digital Health Infrastructure
           </h2>
           <p className="text-xs md:text-sm text-purple-100/90 leading-relaxed font-normal">
-            Real integrations linking CURA into national traditional medicine registries: 
+            Real integrations linking Clinitial into national traditional medicine registries: 
             ABHA patient linking, Healthcare Professionals Registry (HPR / NCISM / NCH), NAMASTE Portal dual-coding with WHO ICD-11, and multilingual clinical prescription translation.
           </p>
         </div>
