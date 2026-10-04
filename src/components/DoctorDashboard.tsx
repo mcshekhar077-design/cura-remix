@@ -687,10 +687,11 @@ export default function DoctorDashboard({ onBackToLanding, initialMedicalSystem 
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        setPatients(data);
-        if (data.length > 0 && !selectedPatient) {
+        const patientList = Array.isArray(data) ? data : (data.patients || []);
+        setPatients(patientList);
+        if (patientList.length > 0 && !selectedPatient) {
           // Default select first patient
-          setSelectedPatient(data[0]);
+          setSelectedPatient(patientList[0]);
         }
       }
     } catch (e) {

@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from "express";
 export function securityHeadersMiddleware(req: Request, res: Response, next: NextFunction) {
   // Prevent MIME-sniffing
   res.setHeader("X-Content-Type-Options", "nosniff");
-  // Frame protection for Clickjacking
-  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  // Frame protection: AI Studio dev environment embeds app in iframe, so allow iframe embedding
+  // X-Frame-Options is omitted to allow iframe rendering in AI Studio
   // XSS protection legacy header
   res.setHeader("X-XSS-Protection", "1; mode=block");
   // Strict Referrer Policy

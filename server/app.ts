@@ -22,6 +22,7 @@ import { crmRouter } from "./modules/crm/router";
 import { fhirRouter } from "./modules/fhir/router";
 import { abdmRouter } from "./modules/abdm/router";
 import { ayushRouter } from "./modules/ayush/router";
+import { intelligenceRouter } from "./modules/intelligence/router";
 import { featureApiRouter } from "./routes/featureApiRouter";
 
 export async function createApp(): Promise<express.Application> {
@@ -46,10 +47,13 @@ export async function createApp(): Promise<express.Application> {
   app.use(tenantIsolationMiddleware);
 
   // 3. Health & Readiness Probes
-  app.get("/health", async (req: Request, res: Response) => {
+  const handleHealth = async (req: Request, res: Response) => {
     const status = await ObservabilityService.getHealth();
     res.json(status);
-  });
+  };
+  app.get("/health", handleHealth);
+  app.get("/api/health", handleHealth);
+  app.get("/api/v1/health", handleHealth);
   app.get("/health/live", (req: Request, res: Response) => {
     res.status(200).send("OK");
   });
@@ -81,6 +85,8 @@ export async function createApp(): Promise<express.Application> {
   app.use("/api/v1", abdmRouter);
   app.use("/api/v1/ayush", ayushRouter);
   app.use("/api/ayush", ayushRouter);
+  app.use("/api/v1/intelligence", intelligenceRouter);
+  app.use("/api/intelligence", intelligenceRouter);
   app.use("/api/v1", featureApiRouter);
   app.use("/certificate/v3", abdmRouter);
   app.use("/pmjay", abdmRouter);

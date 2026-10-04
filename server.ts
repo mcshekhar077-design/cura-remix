@@ -29,7 +29,7 @@ async function startServer() {
   initializeBackgroundWorkers();
 
   server.listen(PORT, "0.0.0.0", () => {
-    ObservabilityService.log("info", `🚀 CURA Healthcare Platform Server listening on http://0.0.0.0:${PORT}`);
+    ObservabilityService.log("info", `🚀 Clinitial Healthcare Platform Server listening on http://0.0.0.0:${PORT}`);
   });
 
   // Graceful shutdown handling

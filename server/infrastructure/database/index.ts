@@ -63,6 +63,7 @@ class PostgresDatabaseAdapter implements DatabaseAdapter {
       updatedAt: new Date().toISOString()
     };
     this.fallbackTables.tenants.set(tenantApollo.id, tenantApollo);
+    this.fallbackTables.tenants.set("tenant_default", { ...tenantApollo, id: "tenant_default", name: "Clinitial Healthcare System" });
 
     // Seed Doctor User
     const docPwd = hashPassword("DoctorSecurePass2026!");
@@ -182,11 +183,94 @@ class PostgresDatabaseAdapter implements DatabaseAdapter {
     };
     this.fallbackTables.users.set(pharmUser.id, pharmUser);
 
-    // Seed Sample Patient
+    // Seed Demo AYUSH Practitioner (Dr. Priya Nair)
+    const ayushPwd = hashPassword("ClinitialAyush@2026!");
+    const ayushUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-ayush-1",
+      tenantId: "tenant_apollo",
+      email: "dr.priya@ayush.clinitial.in",
+      phone: "+91 98230 44556",
+      fullName: "Dr. Priya Nair",
+      role: "ayush_practitioner",
+      specialization: "Ayurveda & Nadi Pariksha",
+      registrationCouncilNumber: "AYUSH-99214",
+      isActive: true,
+      mfaEnabled: false,
+      passwordHash: ayushPwd.hash,
+      salt: ayushPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(ayushUser.id, ayushUser);
+
+    // Seed Demo Specialist (Dr. Ananya Sen)
+    const cardioPwd = hashPassword("ClinitialSpecialist@2026!");
+    const cardioUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-cardio-1",
+      tenantId: "tenant_apollo",
+      email: "dr.ananya@apexcardio.com",
+      phone: "+91 98450 66778",
+      fullName: "Dr. Ananya Sen",
+      role: "specialist",
+      specialization: "Cardiology & Echo Suite",
+      registrationCouncilNumber: "MCI-CARDIO-88",
+      isActive: true,
+      mfaEnabled: false,
+      passwordHash: cardioPwd.hash,
+      salt: cardioPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(cardioUser.id, cardioUser);
+
+    // Seed Demo MR Representative (Amit Verma)
+    const mrPwd = hashPassword("ClinitialMR@2026!");
+    const mrUser: User & { passwordHash: string; salt: string } = {
+      id: "demo-mr-1",
+      tenantId: "tenant_apollo",
+      email: "amit.verma@sunpharma.com",
+      phone: "+91 98333 77889",
+      fullName: "Amit Verma",
+      role: "mr_representative",
+      specialization: "Medical Representative Portal",
+      isActive: true,
+      mfaEnabled: false,
+      passwordHash: mrPwd.hash,
+      salt: mrPwd.salt,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.users.set(mrUser.id, mrUser);
+
+    // Seed Demo Patient Rajesh Kumar
+    const patientRajesh: Patient = {
+      id: "demo-pat-1",
+      tenantId: "tenant_apollo",
+      mrn: "MRN-AP-2026-101",
+      patientCode: "CURA-PAT-101",
+      abhaId: "91-4582-9012-3456",
+      abhaAddress: "rajesh.kumar@abdm",
+      fullName: "Rajesh Kumar",
+      dateOfBirth: "1992-06-15",
+      age: 34,
+      gender: "Male",
+      bloodGroup: "O+",
+      phone: "+91 98765 43210",
+      email: "rajesh.kumar@gmail.com",
+      allergies: ["Dust", "Pollen"],
+      chronicConditions: ["Mild Asthma"],
+      currentMedications: ["Montelukast 10mg"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.patients.set(patientRajesh.id, patientRajesh);
+
+    // Seed Sample Patient Ramesh Kumar
     const patient1: Patient = {
       id: "pat_101",
       tenantId: "tenant_apollo",
       mrn: "MRN-AP-2026-001",
+      patientCode: "CURA-PAT-102",
       abhaId: "91-2049-8819-2041",
       abhaAddress: "ramesh.kumar@abdm",
       fullName: "Ramesh Kumar",
@@ -194,7 +278,7 @@ class PostgresDatabaseAdapter implements DatabaseAdapter {
       age: 48,
       gender: "Male",
       bloodGroup: "B+",
-      phone: "+91 98765 43210",
+      phone: "+91 98450 12345",
       email: "ramesh.kumar@example.com",
       allergies: ["Penicillin", "Sulfa drugs"],
       chronicConditions: ["Hypertension", "Type 2 Diabetes"],
@@ -203,6 +287,50 @@ class PostgresDatabaseAdapter implements DatabaseAdapter {
       updatedAt: new Date().toISOString()
     };
     this.fallbackTables.patients.set(patient1.id, patient1);
+
+    // Seed Sample Patient Priya Sharma
+    const patient2: Patient = {
+      id: "pat_102",
+      tenantId: "tenant_apollo",
+      mrn: "MRN-AP-2026-002",
+      patientCode: "CURA-PAT-103",
+      abhaId: "91-3829-1102-4912",
+      fullName: "Priya Sharma",
+      dateOfBirth: "1997-08-22",
+      age: 29,
+      gender: "Female",
+      bloodGroup: "A+",
+      phone: "+91 98765 11223",
+      email: "priya.sharma@example.com",
+      allergies: [],
+      chronicConditions: [],
+      currentMedications: ["Folic Acid 5mg"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.patients.set(patient2.id, patient2);
+
+    // Seed Sample Patient Sunita Devi
+    const patient3: Patient = {
+      id: "pat_103",
+      tenantId: "tenant_apollo",
+      mrn: "MRN-AP-2026-003",
+      patientCode: "CURA-PAT-104",
+      abhaId: "91-7721-3948-5920",
+      fullName: "Sunita Devi",
+      dateOfBirth: "1964-03-10",
+      age: 62,
+      gender: "Female",
+      bloodGroup: "AB+",
+      phone: "+91 98111 55667",
+      email: "sunita.devi@example.com",
+      allergies: ["Aspirin"],
+      chronicConditions: ["Osteoarthritis", "Hypothyroidism"],
+      currentMedications: ["Levothyroxine 50mcg", "Calcium D3"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.fallbackTables.patients.set(patient3.id, patient3);
   }
 
   async query<T = any>(sql: string, params: any[] = []): Promise<{ rows: T[]; rowCount: number }> {

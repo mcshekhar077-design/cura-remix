@@ -16,7 +16,7 @@ export interface User {
   email: string;
   phone?: string;
   fullName: string;
-  role: "super_admin" | "hospital_admin" | "doctor" | "nurse" | "pharmacist" | "radiologist" | "patient" | "auditor";
+  role: "super_admin" | "hospital_admin" | "doctor" | "nurse" | "pharmacist" | "radiologist" | "patient" | "auditor" | "ayush_practitioner" | "specialist" | "mr_representative" | "admin";
   specialization?: string;
   registrationCouncilNumber?: string;
   isActive: boolean;
@@ -42,6 +42,7 @@ export interface Patient {
   id: string;
   tenantId: string;
   mrn: string;
+  patientCode?: string;
   abhaId?: string;
   abhaAddress?: string;
   fullName: string;

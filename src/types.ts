@@ -21,6 +21,8 @@ export interface Patient {
   bloodGroup: string;
   allergies: string[];
   currentMedications: string[];
+  chronicConditions?: string[];
+  mrn?: string;
   history: Array<{
     date: string;
     doctor: string;

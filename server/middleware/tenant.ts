@@ -16,7 +16,7 @@ export function tenantIsolationMiddleware(req: Request, res: Response, next: Nex
   } else {
     // For public endpoints, fallback to tenant header or default tenant
     const headerTenant = req.headers["x-tenant-id"] as string;
-    req.tenantId = headerTenant || "tenant_default";
+    req.tenantId = headerTenant || "tenant_apollo";
   }
 
   // Prevent client tenant spoofing:

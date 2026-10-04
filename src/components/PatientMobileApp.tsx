@@ -79,6 +79,7 @@ import { Patient, Appointment } from "../types";
 import PatientDashboard from "./PatientDashboard";
 import { useWebAuthn } from "../hooks/useWebAuthn";
 import { queueFailedDiagnosticReport } from "./OfflineSyncEngine";
+import { PWAInstallButton } from "./PWAInstallButton";
 
 const PREDEFINED_SYMPTOMS = [
   "Cough",
@@ -1881,7 +1882,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
         const resPatients = await fetch("/api/v1/patients");
         if (resPatients.ok) {
           const data = await resPatients.json();
-          setPatients(data);
+          setPatients(Array.isArray(data) ? data : (data.patients || []));
         }
 
         // Fetch updated scanned reports list
@@ -2287,18 +2288,23 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
     }
   }, []);
 
+  const [showPwaGuideModal, setShowPwaGuideModal] = useState(false);
+
   const handleInstallPWA = async () => {
     if (deferredPwaPrompt) {
-      deferredPwaPrompt.prompt();
-      const { outcome } = await deferredPwaPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setIsPwaInstalled(true);
-        setPwaInstallSuccess(true);
+      try {
+        await deferredPwaPrompt.prompt();
+        const { outcome } = await deferredPwaPrompt.userChoice;
+        if (outcome === 'accepted') {
+          setIsPwaInstalled(true);
+          setPwaInstallSuccess(true);
+        }
+        setDeferredPwaPrompt(null);
+      } catch {
+        setShowPwaGuideModal(true);
       }
-      setDeferredPwaPrompt(null);
     } else {
-      // Direct instructions fallback for browsers or iOS Safari
-      alert("To install Remix CLINITIAL as a PWA:\n\n• On Mobile Chrome/Android: Tap Menu (⋮) → 'Install app' or 'Add to Home screen'\n• On iPhone/Safari: Tap Share (⎋) → 'Add to Home Screen'");
+      setShowPwaGuideModal(true);
     }
   };
 
@@ -2742,12 +2748,14 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
   const handlePatientSelectAndPersist = async (p: Patient) => {
     setSelectedPatient(p);
     try {
-      localStorage.setItem("clinitial_patient_session", JSON.stringify({
+      const sessionData = JSON.stringify({
         id: p.id,
         patientCode: p.patientCode,
         fullName: p.fullName,
         timestamp: Date.now()
-      }));
+      });
+      localStorage.setItem("clinitial_patient_session", sessionData);
+      localStorage.setItem("cura_patient_session", sessionData);
       await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2770,7 +2778,8 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
 
         let loadedPatients: Patient[] = [];
         if (resPatients.ok) {
-          loadedPatients = await resPatients.json();
+          const rawPatients = await resPatients.json();
+          loadedPatients = Array.isArray(rawPatients) ? rawPatients : (rawPatients.patients || []);
           setPatients(loadedPatients);
         }
         if (resAppts.ok) {
@@ -2795,7 +2804,7 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
               const parsed = JSON.parse(stored);
               restoredPatient = loadedPatients.find(
                 p => p.id === parsed.id || (p.patientCode && p.patientCode === parsed.patientCode)
-              ) || null;
+              ) || parsed;
             } catch (e) {}
           }
         }
@@ -3280,6 +3289,8 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
           >
             <Maximize2 className="h-3.5 w-3.5 text-sky-400" /> Responsive Web
           </button>
+
+          <PWAInstallButton variant="compact" />
 
           <div className="h-6 w-[1px] bg-slate-800 mx-2 hidden md:block" />
 
@@ -5546,6 +5557,66 @@ export default function PatientMobileApp({ onBackToLanding }: PatientMobileAppPr
                   Close Insight
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: PWA MOBILE INSTALLATION GUIDE */}
+      <AnimatePresence>
+        {showPwaGuideModal && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-slate-900 border border-slate-700/80 rounded-3xl w-full max-w-sm overflow-hidden text-slate-100 shadow-2xl relative p-6 text-left"
+            >
+              <button
+                onClick={() => setShowPwaGuideModal(false)}
+                className="absolute right-4 top-4 p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mb-4">
+                <Smartphone className="w-6 h-6 text-emerald-400" />
+              </div>
+
+              <h3 className="text-lg font-bold text-white mb-1">
+                Install Clinitial Mobile App
+              </h3>
+              <p className="text-xs text-slate-400 mb-4">
+                Install as a standalone PWA on your phone for instant launch, offline EHR access, and notifications.
+              </p>
+
+              <div className="space-y-3 bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 mb-5 text-xs text-slate-300">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                  <div>
+                    <strong className="text-white">iPhone / iPad Safari:</strong> Tap the <strong className="text-sky-400">Share</strong> icon at bottom, then select <strong className="text-emerald-400">Add to Home Screen</strong>.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                  <div>
+                    <strong className="text-white">Android Chrome:</strong> Tap the <strong className="text-sky-400">⋮ Menu</strong> button, then select <strong className="text-emerald-400">Install App</strong> or Add to Home screen.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                  <div>
+                    <strong className="text-white">Offline Ready:</strong> Works seamlessly even without internet connection!
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowPwaGuideModal(false)}
+                className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition cursor-pointer"
+              >
+                Close & Return to App
+              </button>
             </motion.div>
           </div>
         )}

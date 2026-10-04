@@ -50,6 +50,7 @@ import ProductTour from "./ProductTour";
 import { useAuth } from "../context/AuthContext";
 import ClinitialAuthModal from "./ClinitialAuthModal";
 import { useTheme } from "./ThemeSelector";
+import { PWAInstallButton } from "./PWAInstallButton";
 
 interface LandingPageProps {
   onNavigateToDashboard: () => void;
@@ -561,6 +562,9 @@ export default function LandingPage({
 
             {/* Right Action Buttons */}
             <div className="flex items-center gap-2.5">
+              {/* PWA Mobile & Desktop Install Button */}
+              <PWAInstallButton variant="compact" />
+
               {/* Palette / Theme Quick Access */}
               <button 
                 onClick={openPalette}
@@ -1352,14 +1356,15 @@ export default function LandingPage({
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button 
                   onClick={() => triggerGuardedNavigation(onNavigateToPatient, "Patient Health Companion")}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition cursor-pointer"
                 >
                   <span>Explore Patient App</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
+                <PWAInstallButton variant="compact" />
               </div>
             </div>
           </div>

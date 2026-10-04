@@ -33,6 +33,7 @@ import ProductionBlueprintSuite from "./components/ProductionBlueprintSuite";
 import ThemeSelectorWidget, { ThemeProvider } from "./components/ThemeSelector";
 import OfflineSyncEngine from "./components/OfflineSyncEngine";
 import GlobalEmergencySOS from "./components/GlobalEmergencySOS";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ClinitialAuthModal from "./components/ClinitialAuthModal";
 
@@ -77,7 +78,7 @@ function MainRouter() {
   const navigateTo = (view: ViewState) => {
     if (view === "admin") {
       if (!isAuthenticated || !isAdmin) {
-        openAuthModal("admin", "CURA Enterprise Admin Console");
+        openAuthModal("admin", "Clinitial Enterprise Admin Console");
         return;
       }
     }
@@ -178,13 +179,13 @@ function MainRouter() {
                 <h2 className="text-xl font-black tracking-tight text-white">Administrator Privileges Required</h2>
                 <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                   {currentUser 
-                    ? `You are currently authenticated as ${currentUser.fullName} (${currentUser.role}). Access to the CURA Admin OS requires verified Hospital or System Administrator credentials.`
-                    : "Access to the CURA Admin OS and enterprise governance console requires verified Administrator credentials."}
+                    ? `You are currently authenticated as ${currentUser.fullName} (${currentUser.role}). Access to the Clinitial Admin OS requires verified Hospital or System Administrator credentials.`
+                    : "Access to the Clinitial Admin OS and enterprise governance console requires verified Administrator credentials."}
                 </p>
               </div>
               <div className="pt-2 flex flex-col gap-2.5">
                 <button 
-                  onClick={() => openAuthModal("admin", "CURA Enterprise Admin Console")}
+                  onClick={() => openAuthModal("admin", "Clinitial Enterprise Admin Console")}
                   className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-purple-600/30 transition cursor-pointer"
                 >
                   Authenticate as Administrator
@@ -345,6 +346,9 @@ function MainRouter() {
 
       {/* Global Offline Storage Sink & Auto-Sync Engine */}
       <OfflineSyncEngine />
+
+      {/* PWA Offline Connectivity Indicator */}
+      <OfflineIndicator />
 
       {/* Global Emergency SOS Floating Action Button */}
       <GlobalEmergencySOS 

@@ -17,7 +17,7 @@ featureApiRouter.use((req, res, next) => {
   const correlationId = req.headers["x-request-id"] || `req_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
   res.setHeader("X-Request-ID", correlationId);
   res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
+  // Allow iframe embedding in AI Studio workspace
   next();
 });
 

@@ -22,8 +22,12 @@ import {
   Info,
   Truck,
   Send,
-  Sparkles
+  Sparkles,
+  Baby,
+  Calculator,
+  Scale
 } from "lucide-react";
+import PediatricDosageCalculator from "./pharmacy/PediatricDosageCalculator";
 import {
   AreaChart,
   Area,
@@ -95,35 +99,35 @@ const INITIAL_SALES: Sale[] = [];
 const INITIAL_PURCHASE_ORDERS: PurchaseOrder[] = [];
 
 export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "inventory" | "dispensing" | "alerts" | "orders">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "inventory" | "dispensing" | "alerts" | "orders" | "pediatric">("overview");
 
   // Load from localStorage or initialize
   const [medicines, setMedicines] = useState<Medicine[]>(() => {
-    const saved = localStorage.getItem("cura_pharmacy_medicines");
+    const saved = localStorage.getItem("clinitial_pharmacy_medicines") || localStorage.getItem("cura_pharmacy_medicines");
     return saved ? JSON.parse(saved) : INITIAL_MEDICINES;
   });
 
   const [sales, setSales] = useState<Sale[]>(() => {
-    const saved = localStorage.getItem("cura_pharmacy_sales");
+    const saved = localStorage.getItem("clinitial_pharmacy_sales") || localStorage.getItem("cura_pharmacy_sales");
     return saved ? JSON.parse(saved) : INITIAL_SALES;
   });
 
   const [orders, setOrders] = useState<PurchaseOrder[]>(() => {
-    const saved = localStorage.getItem("cura_pharmacy_orders");
+    const saved = localStorage.getItem("clinitial_pharmacy_orders") || localStorage.getItem("cura_pharmacy_orders");
     return saved ? JSON.parse(saved) : INITIAL_PURCHASE_ORDERS;
   });
 
   // Save to localStorage on change
   useEffect(() => {
-    localStorage.setItem("cura_pharmacy_medicines", JSON.stringify(medicines));
+    localStorage.setItem("clinitial_pharmacy_medicines", JSON.stringify(medicines));
   }, [medicines]);
 
   useEffect(() => {
-    localStorage.setItem("cura_pharmacy_sales", JSON.stringify(sales));
+    localStorage.setItem("clinitial_pharmacy_sales", JSON.stringify(sales));
   }, [sales]);
 
   useEffect(() => {
-    localStorage.setItem("cura_pharmacy_orders", JSON.stringify(orders));
+    localStorage.setItem("clinitial_pharmacy_orders", JSON.stringify(orders));
   }, [orders]);
 
   // Inventory Search & Filters
@@ -470,7 +474,7 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
             </span>
             <div>
               <h1 className="text-sm font-black tracking-tight text-white uppercase flex items-center gap-2">
-                CURA Pharmacy Portal
+                Clinitial Pharmacy Portal
                 <span className="text-[8.5px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full font-black uppercase tracking-widest leading-none">
                   Included
                 </span>
@@ -526,7 +530,7 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
                   A real-time prescription dispatch receipt has been compiled and messaged to the patient.
                 </p>
                 <div className="bg-slate-950/80 border border-slate-800 p-2 rounded-lg text-[9px] font-mono text-emerald-400 leading-normal space-y-0.5 mt-2">
-                  <p className="font-bold text-white">💬 CURA Dispense Receipt:</p>
+                  <p className="font-bold text-white">💬 Clinitial Dispense Receipt:</p>
                   <p>Patient: {dispensePatientName || "Anonymous"}</p>
                   <p>Rx Item: Metformin or selected compound</p>
                   <p>Message: "Hello, your order is ready for collection at Central Pharmacy. Total: INR."</p>
@@ -600,6 +604,20 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
           >
             <Truck className="h-4 w-4" />
             Purchase Orders
+          </button>
+          <button
+            onClick={() => setActiveTab("pediatric")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black tracking-wider uppercase transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === "pediatric"
+                ? "bg-emerald-500 text-slate-950 shadow"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <Baby className="h-4 w-4" />
+            Pediatric Dosage Calculator
+            <span className="bg-sky-500/20 text-sky-400 border border-sky-500/30 text-[8.5px] px-1.5 py-0.5 rounded-full font-black leading-none">
+              CDSS
+            </span>
           </button>
         </div>
 
@@ -753,11 +771,18 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
                 <div>
                   <h4 className="text-xs font-black text-white uppercase tracking-wider">Clinical Differentiation Advantage</h4>
                   <p className="text-[10px] text-slate-400 leading-normal">
-                    Unlike standard platforms like NeftX and Healthray which charge extra for core pharmacy workflows, CURA includes fully integrated stock tracking, automated alerts, and WhatsApp dispensing notification capabilities at zero extra cost.
+                    Unlike standard platforms like NeftX and Healthray which charge extra for core pharmacy workflows, Clinitial includes fully integrated stock tracking, automated pediatric dosage calculation, alerts, and WhatsApp dispensing notification capabilities at zero extra cost.
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                <button 
+                  onClick={() => setActiveTab("pediatric")}
+                  className="px-3 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                >
+                  <Baby className="h-3.5 w-3.5" />
+                  Pediatric Calculator
+                </button>
                 <button 
                   onClick={() => setActiveTab("dispensing")}
                   className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-black uppercase tracking-wider px-4 py-2 rounded-xl transition-all shadow-md shadow-emerald-500/10 cursor-pointer"
@@ -963,6 +988,26 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
                 <p className="text-[9px] text-slate-400 font-bold uppercase">Select medicine, compute clinical pricing, and trigger WhatsApp notification</p>
               </div>
 
+              {/* PEDIATRIC DOSING QUICK SHORTCUT */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-sky-500/10 border border-sky-500/30 p-3.5 rounded-2xl">
+                <div className="flex items-center gap-2.5">
+                  <span className="p-1.5 bg-sky-500/20 text-sky-400 rounded-xl">
+                    <Baby className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h5 className="text-[11px] font-black text-white uppercase tracking-wider">Dispensing to an infant or child?</h5>
+                    <p className="text-[9.5px] text-sky-300 font-medium">Use the Pediatric Calculator to compute exact weight-based mg/kg and mL volume.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("pediatric")}
+                  className="px-3 py-1.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-[10px] rounded-xl uppercase tracking-wider shrink-0 transition-all cursor-pointer shadow-sm shadow-sky-500/20"
+                >
+                  Open Pediatric CDSS →
+                </button>
+              </div>
+
               <form onSubmit={handleDispense} className="space-y-4.5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -1102,7 +1147,7 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
                   <div className="bg-slate-900 p-3 flex items-center gap-2.5 border-b border-slate-950">
                     <span className="h-7 w-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xs">C</span>
                     <div>
-                      <h4 className="text-[11px] font-black text-white">CURA Clinical Alerts</h4>
+                      <h4 className="text-[11px] font-black text-white">Clinitial Clinical Alerts</h4>
                       <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">Verified Account</p>
                     </div>
                   </div>
@@ -1113,14 +1158,14 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
                     {/* Incoming system text */}
                     <div className="max-w-[85%] bg-slate-850 border border-slate-800/60 p-3 rounded-2xl rounded-tl-none self-start space-y-1">
                       <p className="text-[10px] text-slate-300 leading-normal">
-                        Hello! This is <span className="text-white font-bold">CURA Central Pharmacy</span>.
+                        Hello! This is <span className="text-white font-bold">Clinitial Central Pharmacy</span>.
                       </p>
                       <p className="text-[10px] text-slate-300 leading-normal">
                         Your clinical prescription has been dispensed successfully. Please pick it up at your convenience.
                       </p>
                       <div className="bg-slate-950/60 p-2 rounded-lg text-[9px] font-mono text-emerald-400 leading-normal border border-slate-900">
                         <p className="text-white font-bold">📄 ORDER RECEIPT:</p>
-                        <p>ID: TXN-CURA-4491</p>
+                        <p>ID: TXN-CLINITIAL-4491</p>
                         <p>Status: Ready for Collection</p>
                         <p>Total: Paid with UPI</p>
                       </div>
@@ -1346,6 +1391,34 @@ export default function PharmacyDashboard({ onBackToLanding }: PharmacyDashboard
             </div>
 
           </div>
+        )}
+
+        {/* ======================= PEDIATRIC DOSAGE CALCULATOR TAB ======================= */}
+        {activeTab === "pediatric" && (
+          <PediatricDosageCalculator
+            inventoryMedicines={medicines}
+            onTransferToDispense={({ medicineName, genericName, patientName, patientPhone, calculatedDose, instructions, estimatedQtyBottles }) => {
+              setDispensePatientName(patientName || "");
+              if (patientPhone) setDispensePatientPhone(patientPhone);
+              setDispenseQty(estimatedQtyBottles || 1);
+              // Find matching medicine in stock
+              const match = medicines.find(m => 
+                m.isActive && (
+                  m.name.toLowerCase().includes(medicineName.toLowerCase()) ||
+                  m.genericName.toLowerCase().includes(genericName.toLowerCase())
+                )
+              );
+              if (match) {
+                setDispenseMedId(match.id);
+              }
+              setActiveTab("dispensing");
+            }}
+            onSendWhatsapp={(phone, text) => {
+              setDispensePatientPhone(phone);
+              setWhatsappDispatched(true);
+              setTimeout(() => setWhatsappDispatched(false), 5000);
+            }}
+          />
         )}
 
       </main>

@@ -3,22 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Remix Clinitial - Healthcare Platform</title>
+    <title>Clinitial - Healthcare Platform</title>
     
-    <!-- PWA Meta Tags -->
+    <!-- PWA Meta Tags & Manifest -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0f172a" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Remix Clinitial" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <meta name="apple-mobile-web-app-title" content="Clinitial" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <meta name="description" content="Remix Clinitial AI Healthcare Platform - Multi-agent care team, health memory, PHR & wearable telemetry." />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <meta name="description" content="Clinitial AI Healthcare Platform - Multi-agent care team, health memory, PHR & wearable telemetry." />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Register service worker for PWA offline capabilities and mobile installability
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('[PWA] Service worker registered successfully:', reg.scope);
+          }).catch((err) => {
+            console.warn('[PWA] Service worker registration failed:', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
-

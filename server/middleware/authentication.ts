@@ -23,9 +23,15 @@ export function authenticationMiddleware(req: Request, res: Response, next: Next
   if (authHeader && authHeader.startsWith("Bearer ")) {
     token = authHeader.substring(7).trim();
   } else if (req.headers.cookie) {
-    // Check session_token cookie
+    // Check session cookies
     const cookies = req.headers.cookie.split(";").map(c => c.trim());
-    const sessionCookie = cookies.find(c => c.startsWith("session_token="));
+    const sessionCookie = cookies.find(c => 
+      c.startsWith("session_token=") || 
+      c.startsWith("clinitial_session=") || 
+      c.startsWith("cura_session=") || 
+      c.startsWith("clinitial_patient_session=") || 
+      c.startsWith("cura_patient_session=")
+    );
     if (sessionCookie) {
       token = sessionCookie.split("=")[1];
     }

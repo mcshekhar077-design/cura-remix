@@ -38,5 +38,5 @@ export function createRateLimiter(options: { maxRequests: number; windowMs: numb
 }
 
 export const standardRateLimiter = createRateLimiter({ maxRequests: 300, windowMs: 60 * 1000, name: "std" });
-export const authRateLimiter = createRateLimiter({ maxRequests: 20, windowMs: 60 * 1000, name: "auth" });
-export const aiRateLimiter = createRateLimiter({ maxRequests: 40, windowMs: 60 * 1000, name: "ai" });
+export const authRateLimiter = createRateLimiter({ maxRequests: 150, windowMs: 60 * 1000, name: "auth" });
+export const aiRateLimiter = createRateLimiter({ maxRequests: 60, windowMs: 60 * 1000, name: "ai" });

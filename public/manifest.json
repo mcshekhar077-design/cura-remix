@@ -1,19 +1,33 @@
 {
-  "short_name": "RemixClinitial",
-  "name": "Remix Clinitial - AI Healthcare Platform",
+  "id": "/",
+  "name": "Clinitial - AI Healthcare Platform",
+  "short_name": "Clinitial",
   "description": "AI-powered healthcare platform with multi-agent orchestration, lifetime health memory, and wearable telemetry.",
-  "icons": [
-    {
-      "src": "/icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "192x192 512x512",
-      "purpose": "any maskable"
-    }
-  ],
   "start_url": "/",
-  "background_color": "#020617",
-  "theme_color": "#0f172a",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "categories": ["medical", "health", "lifestyle"]
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "categories": ["medical", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }

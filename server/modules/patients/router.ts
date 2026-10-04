@@ -12,11 +12,28 @@ export const patientsRouter = Router();
 // List patients for tenant
 patientsRouter.get("/", (req: Request, res: Response) => {
   const tenantId = req.tenantId || req.user?.tenantId || "tenant_apollo";
-  const allPatients = Array.from(db.tables.patients.values()).filter(p => p.tenantId === tenantId);
-  res.json({
-    success: true,
-    patients: allPatients
-  });
+  const query = (req.query.q as string || "").toLowerCase().trim();
+  let allPatients = Array.from(db.tables.patients.values()).filter(p => 
+    !tenantId || 
+    p.tenantId === tenantId || 
+    p.tenantId === "tenant_apollo" || 
+    tenantId === "tenant_default"
+  );
+  if (query) {
+    allPatients = allPatients.filter(p => 
+      p.fullName.toLowerCase().includes(query) ||
+      (p.phone && p.phone.includes(query)) ||
+      (p.mrn && p.mrn.toLowerCase().includes(query)) ||
+      (p.patientCode && p.patientCode.toLowerCase().includes(query)) ||
+      (p.abhaId && p.abhaId.toLowerCase().includes(query)) ||
+      (p.email && p.email.toLowerCase().includes(query)) ||
+      p.id.toLowerCase().includes(query)
+    );
+  }
+  if (req.query.format === "envelope") {
+    return res.json({ success: true, patients: allPatients });
+  }
+  res.json(allPatients);
 });
 
 // Create new patient
